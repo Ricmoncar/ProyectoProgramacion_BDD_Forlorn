@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planetas - Crónicas del Destino</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.dataTables.min.css">
+    <script src="planet.js"></script>
+   <style>
+        /* Variables de color en caso de que no estén definidas en styles.css */
+        :root {
+            --dark-bg: #121212;
+            --dark-secondary: #1e1e1e;
+            --gold: #d4af37;
+            --crimson: #dc143c;
+            --text-light: #f0f0f0;
+            --text-faded: #a0a0a0;
+        }
+        
+        .planet-hero {
+            height: 50vh;
+            background: linear-gradient(rgba(18, 18, 18, 0.7), rgba(18, 18, 18, 0.9)),
+                url("img/earth.jpg") no-repeat center center/cover;
+        }
+        
+        /* Estilos generales de la tabla */
+        .table-container {
+            background-color: var(--dark-secondary);
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            margin-bottom: 40px;
+            overflow-x: auto; /* Para responsividad básica */
+        }
+        
+        /* Resetear los estilos de DataTables para evitar conflictos */
+        .dataTable * {
+            box-sizing: border-box;
+        }
+        
+        /* Estilos fundamentales de la tabla */
+        table.dataTable {
+            width: 100% !important;
+            border-collapse: separate;
+            border-spacing: 0;
+            border: 1px solid rgba(212, 175, 55, 0.2) !important;
+            border-radius: 5px;
+            overflow: hidden;
+            color: var(--text-light) !important;
+            margin-top: 15px !important;
+            margin-bottom: 15px !important;
+        }
+        
+        /* Encabezados de la tabla */
+        table.dataTable thead th {
+            background-color: var(--dark-bg) !important;
+            color: var(--gold) !important;
+            border-bottom: 2px solid var(--gold) !important;
+            padding: 15px 10px !important;
+            font-family: "Cinzel", serif !important;
+            font-weight: bold !important;
+            text-align: left !important;
+            vertical-align: middle !important;
+            position: relative;
+        }
+        
+        /* Filas de la tabla */
+        table.dataTable tbody tr {
+            background-color: var(--dark-secondary) !important;
+        }
+        
+        table.dataTable tbody tr:nth-child(odd) {
+            background-color: rgba(30, 30, 30, 0.8) !important;
+        }
+        
+        /* Celdas de la tabla */
+        table.dataTable tbody td {
+            padding: 12px 10px !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+            color: var(--text-light) !important;
+            text-align: left !important;
+            vertical-align: middle !important;
+        }
+        
+        table.dataTable tbody tr:last-child td {
+            border-bottom: none !important;
+        }
+        
+        /* Efecto hover para las filas */
+        table.dataTable tbody tr:hover {
+            background-color: rgba(212, 175, 55, 0.1) !important;
+        }
+        
+        /* Controles de DataTables */
+        .dataTables_wrapper .dataTables_length,
+        .dataTables_wrapper .dataTables_filter,
+        .dataTables_wrapper .dataTables_info,
+        .dataTables_wrapper .dataTables_processing,
+        .dataTables_wrapper .dataTables_paginate {
+            color: var(--text-faded) !important;
+            margin-bottom: 15px;
+        }
+        
+        .dataTables_wrapper .dataTables_length select {
+            background-color: var(--dark-bg) !important;
+            border: 1px solid rgba(212, 175, 55, 0.3) !important;
+            color: var(--text-light) !important;
+            border-radius: 3px !important;
+            padding: 5px 10px !important;
+            margin: 0 5px !important;
+        }
+        
+        .dataTables_wrapper .dataTables_filter input {
+            background-color: var(--dark-bg) !important;
+            border: 1px solid rgba(212, 175, 55, 0.3) !important;
+            color: var(--text-light) !important;
+            border-radius: 3px !important;
+            padding: 5px 10px !important;
+            margin-left: 5px !important;
+        }
+        
+        /* Paginación */
+        .dataTables_wrapper .dataTables_paginate .paginate_button {
+            color: var(--gold) !important;
+            border: 1px solid rgba(212, 175, 55, 0.3) !important;
+            border-radius: 3px !important;
+            background: var(--dark-bg) !important;
+            margin: 0 3px !important;
+            padding: 5px 10px !important;
+        }
+        
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+            background: var(--crimson) !important;
+            color: var(--text-light) !important;
+            border-color: var(--crimson) !important;
+        }
+        
+        .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+            background: rgba(212, 175, 55, 0.2) !important;
+            color: var(--text-light) !important;
+            border-color: var(--gold) !important;
+        }
+        
+        /* Asegurar responsividad */
+        @media screen and (max-width: 767px) {
+            .table-container {
+                padding: 15px;
+            }
+            
+            table.dataTable thead th,
+            table.dataTable tbody td {
+                padding: 10px 5px !important;
+            }
+            
+            .dataTables_wrapper .dataTables_filter,
+            .dataTables_wrapper .dataTables_length {
+                text-align: left !important;
+                float: none !important;
+                margin-bottom: 10px !important;
+            }
+            
+            .dataTables_wrapper .dataTables_filter input {
+                width: 100% !important;
+                margin-left: 0 !important;
+                margin-top: 5px !important;
+            }
+            
+            .dataTables_wrapper .dataTables_length select {
+                width: 80px !important;
+            }
+            
+            /* Ajustes para botones de acción en móvil */
+            .planet-actions {
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
+        
+        /* Estilos para responsive DataTables */
+        .dtr-details {
+            width: 100%;
+            padding: 10px !important;
+            background-color: var(--dark-bg) !important;
+        }
+        
+        .dtr-details li {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0 !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+        }
+        
+        .dtr-details .dtr-title {
+            color: var(--gold) !important;
+            width: 40% !important;
+            font-weight: bold !important;
+        }
+        
+        .dtr-details .dtr-data {
+            color: var(--text-light) !important;
+            width: 60% !important;
+        }
+        
+        /* Estilos para los botones de acción */
+        .planet-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        
+        .planet-actions button {
+            background: none;
+            border: none;
+            color: var(--text-faded);
+            cursor: pointer;
+            transition: color 0.3s ease;
+            padding: 5px;
+            font-size: 1.1rem;
+        }
+        
+        .planet-actions .edit-btn:hover {
+            color: var(--gold);
+        }
+        
+        .planet-actions .delete-btn:hover {
+            color: var(--crimson);
+        }
+        
+        .planet-actions .view-btn:hover {
+            color: #4fa4ff;
+        }
+        
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1100;
+            overflow-y: auto;
+        }
+        
+        .modal-content {
+            background-color: var(--dark-secondary);
+            margin: 50px auto;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 600px;
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.5);
+            position: relative;
+            border: 1px solid var(--gold);
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 1.5rem;
+            color: var(--text-faded);
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+        
+        .close-modal:hover {
+            color: var(--crimson);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--gold);
+            font-family: "Cinzel", serif;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--dark-bg);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 5px;
+            color: var(--text-light);
+            font-family: "Lato", sans-serif;
+        }
+        
+        textarea.form-control {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .planet-detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .detail-item {
+            padding: 10px;
+            background-color: var(--dark-bg);
+            border-radius: 5px;
+        }
+        
+        .detail-description {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: var(--dark-bg);
+            border-radius: 5px;
+        }
+        
+        .detail-description h4 {
+            color: var(--gold);
+            margin-bottom: 10px;
+        }
+        
+        /* Media queries para responsividad del modal */
+        @media screen and (max-width: 650px) {
+            .modal-content {
+                width: 90%;
+                margin: 20px auto;
+                padding: 20px;
+            }
+            
+            .planet-detail-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+            }
+            
+            .form-actions .btn {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            table.dataTable tbody td:first-child {
+    background-color: var(--dark-secondary) !important;
+    color: var(--gold) !important;
+}
+
+table.dataTable tbody tr:hover td:first-child {
+    background-color: rgba(212, 175, 55, 0.1) !important;
+}
+
+.dtr-data {
+    background-color: var(--dark-bg) !important;
+}
+
+table.dataTable tbody tr.odd td:first-child,
+table.dataTable tbody tr.even td:first-child {
+    background-color: var(--dark-secondary) !important;
+    color: var(--gold) !important;
+}
+
+table.dataTable tbody tr.odd:hover td:first-child,
+table.dataTable tbody tr.even:hover td:first-child {
+    background-color: rgba(212, 175, 55, 0.1) !important;
+}
+table#planetsTable tbody td:nth-child(1) {
+    background-color: var(--dark-secondary) !important;
+    color: var(--gold) !important;
+}
+
+table#planetsTable tbody tr:hover td:nth-child(1) {
+    background-color: rgba(212, 175, 55, 0.1) !important;
+}
+
+table#planetsTable tbody tr.odd td:nth-child(1),
+table#planetsTable tbody tr.even td:nth-child(1) {
+    background-color: var(--dark-secondary) !important;
+    color: var(--gold) !important;
+}
+
+table#planetsTable tbody tr.odd:hover td:nth-child(1),
+table#planetsTable tbody tr.even:hover td:nth-child(1) {
+    background-color: rgba(212, 175, 55, 0.1) !important;
+}
+
+table#planetsTable.dtr-inline.collapsed > tbody > tr > td:first-child:before,
+table#planetsTable.dtr-inline.collapsed > tbody > tr > th:first-child:before {
+    background-color: var(--gold) !important;
+}
+
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container nav-container">
+            <a href="index.html" class="logo">Crónicas del <span>Destino</span></a>
+            <nav class="nav-links">
+                <a href="index.html">Inicio</a>
+                <a href="planet.html" class="active">Planetas</a>
+                <a href="#">Imperios</a>
+                <a href="#">Razas</a>
+                <a href="#">Personajes</a>
+                <a href="#">Equipamiento</a>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero planet-hero">
+        <div class="hero-background"></div>
+        <div class="hero-content">
+            <h1>Planetas de Forlorn</h1>
+            <p>Explora los misteriosos mundos que conforman el universo de Forlorn. Cada planeta cuenta con características únicas, desde su geografía hasta sus condiciones para albergar vida.</p>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">Catálogo de Planetas</h2>
+            
+            <div class="action-bar" style="margin-bottom: 20px; text-align: right;">
+                <button id="addPlanetBtn" class="btn">
+                    <i class="fas fa-plus"></i> Añadir Planeta
+                </button>
+            </div>
+            
+            <div class="table-container">
+                <table id="planetsTable" class="display responsive nowrap" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Ubicación</th>
+                            <th>Habitable</th>
+                            <th>Nivel Agua</th>
+                            <th>Tamaño</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div id="planetModal" class="modal">
+                <div class="modal-content">
+                    <span class="close-modal">&times;</span>
+                    <h3 id="modalTitle">Añadir Nuevo Planeta</h3>
+                    <form id="planetForm">
+                        <input type="hidden" id="planetId">
+                        
+                        <div class="form-group">
+                            <label for="planetName">Nombre:</label>
+                            <input type="text" id="planetName" class="form-control" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="planetLocation">Ubicación:</label>
+                            <input type="text" id="planetLocation" class="form-control">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="planetHabitable">Habitable:</label>
+                            <select id="planetHabitable" class="form-control">
+                                <option value="1">Sí</option>
+                                <option value="0">No</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="planetWaterLevel">Nivel de Agua (0-100):</label>
+                            <input type="number" id="planetWaterLevel" class="form-control" min="0" max="100" step="0.1">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="planetCreationDate">Fecha de Creación:</label>
+                            <input type="date" id="planetCreationDate" class="form-control">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="planetSize">Tamaño (km):</label>
+                            <input type="number" id="planetSize" class="form-control" min="0" step="0.1">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="planetDensity">Densidad (g/cm³):</label>
+                            <input type="number" id="planetDensity" class="form-control" min="0" step="0.01">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="planetDescription">Descripción:</label>
+                            <textarea id="planetDescription" class="form-control"></textarea>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="button" class="btn" id="cancelBtn" style="background-color: #333;">Cancelar</button>
+                            <button type="submit" class="btn">Guardar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div id="viewPlanetModal" class="modal">
+                <div class="modal-content">
+                    <span class="close-modal">&times;</span>
+                    <h3 id="viewPlanetName">Detalles del Planeta</h3>
+                    <div id="planetDetails">
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn" id="closeViewBtn">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <footer>
+        <div class="container">
+            <div class="footer-container">
+                <div class="footer-section">
+                    <h3>Crónicas del Destino</h3>
+                    <p>Un mundo de fantasía meticulosamente creado.</p>
+                    <div class="social-links">
+                        <a href="#" class="social-link">
+                            <span>F</span>
+                        </a>
+                        <a href="#" class="social-link">
+                            <span>T</span>
+                        </a>
+                        <a href="#" class="social-link">
+                            <span>I</span>
+                        </a>
+                        <a href="#" class="social-link">
+                            <span>D</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Explorar</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Planetas</a></li>
+                        <li><a href="#">Continentes</a></li>
+                        <li><a href="#">Biomas</a></li>
+                        <li><a href="#">Imperios</a></li>
+                        <li><a href="#">Razas</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Operaciones</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Crear Nueva Entidad</a></li>
+                        <li><a href="#">Editar Existentes</a></li>
+                        <li><a href="#">Explorar Base de Datos</a></li>
+                        <li><a href="#">Generar Informes</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Contacto</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Sobre el Creador</a></li>
+                        <li><a href="#">Contribuir</a></li>
+                        <li><a href="#">Reportar Errores</a></li>
+                        <li><a href="#">Sugerir Mejoras</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2025 Crónicas del Destino. Todos los derechos reservados. </p>
+
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

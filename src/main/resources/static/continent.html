@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Continentes - Crónicas del Destino</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.dataTables.min.css">
+    <script src="continente.js"></script>
+   <style>
+        /* Variables de color en caso de que no estén definidas en styles.css */
+        :root {
+            --dark-bg: #121212;
+            --dark-secondary: #1e1e1e;
+            --gold: #d4af37;
+            --crimson: #dc143c;
+            --text-light: #f0f0f0;
+            --text-faded: #a0a0a0;
+        }
+        
+        .continent-hero {
+            height: 50vh;
+            background: linear-gradient(rgba(18, 18, 18, 0.7), rgba(18, 18, 18, 0.9)),
+                url("img/continent.jpg") no-repeat center center/cover;
+        }
+        
+        /* Estilos generales de la tabla */
+        .table-container {
+            background-color: var(--dark-secondary);
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            margin-bottom: 40px;
+            overflow-x: auto; /* Para responsividad básica */
+        }
+        
+        /* Resetear los estilos de DataTables para evitar conflictos */
+        .dataTable * {
+            box-sizing: border-box;
+        }
+        
+        /* Estilos fundamentales de la tabla */
+        table.dataTable {
+            width: 100% !important;
+            border-collapse: separate;
+            border-spacing: 0;
+            border: 1px solid rgba(212, 175, 55, 0.2) !important;
+            border-radius: 5px;
+            overflow: hidden;
+            color: var(--text-light) !important;
+            margin-top: 15px !important;
+            margin-bottom: 15px !important;
+        }
+        
+        /* Encabezados de la tabla */
+        table.dataTable thead th {
+            background-color: var(--dark-bg) !important;
+            color: var(--gold) !important;
+            border-bottom: 2px solid var(--gold) !important;
+            padding: 15px 10px !important;
+            font-family: "Cinzel", serif !important;
+            font-weight: bold !important;
+            text-align: left !important;
+            vertical-align: middle !important;
+            position: relative;
+        }
+        
+        /* Filas de la tabla */
+        table.dataTable tbody tr {
+            background-color: var(--dark-secondary) !important;
+        }
+        
+        table.dataTable tbody tr:nth-child(odd) {
+            background-color: rgba(30, 30, 30, 0.8) !important;
+        }
+        
+        /* Celdas de la tabla */
+        table.dataTable tbody td {
+            padding: 12px 10px !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+            color: var(--text-light) !important;
+            text-align: left !important;
+            vertical-align: middle !important;
+        }
+        
+        table.dataTable tbody tr:last-child td {
+            border-bottom: none !important;
+        }
+        
+        /* Efecto hover para las filas */
+        table.dataTable tbody tr:hover {
+            background-color: rgba(212, 175, 55, 0.1) !important;
+        }
+        
+        /* Controles de DataTables */
+        .dataTables_wrapper .dataTables_length,
+        .dataTables_wrapper .dataTables_filter,
+        .dataTables_wrapper .dataTables_info,
+        .dataTables_wrapper .dataTables_processing,
+        .dataTables_wrapper .dataTables_paginate {
+            color: var(--text-faded) !important;
+            margin-bottom: 15px;
+        }
+        
+        .dataTables_wrapper .dataTables_length select {
+            background-color: var(--dark-bg) !important;
+            border: 1px solid rgba(212, 175, 55, 0.3) !important;
+            color: var(--text-light) !important;
+            border-radius: 3px !important;
+            padding: 5px 10px !important;
+            margin: 0 5px !important;
+        }
+        
+        .dataTables_wrapper .dataTables_filter input {
+            background-color: var(--dark-bg) !important;
+            border: 1px solid rgba(212, 175, 55, 0.3) !important;
+            color: var(--text-light) !important;
+            border-radius: 3px !important;
+            padding: 5px 10px !important;
+            margin-left: 5px !important;
+        }
+        
+        /* Paginación */
+        .dataTables_wrapper .dataTables_paginate .paginate_button {
+            color: var(--gold) !important;
+            border: 1px solid rgba(212, 175, 55, 0.3) !important;
+            border-radius: 3px !important;
+            background: var(--dark-bg) !important;
+            margin: 0 3px !important;
+            padding: 5px 10px !important;
+        }
+        
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+            background: var(--crimson) !important;
+            color: var(--text-light) !important;
+            border-color: var(--crimson) !important;
+        }
+        
+        .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+            background: rgba(212, 175, 55, 0.2) !important;
+            color: var(--text-light) !important;
+            border-color: var(--gold) !important;
+        }
+        
+        /* Asegurar responsividad */
+        @media screen and (max-width: 767px) {
+            .table-container {
+                padding: 15px;
+            }
+            
+            table.dataTable thead th,
+            table.dataTable tbody td {
+                padding: 10px 5px !important;
+            }
+            
+            .dataTables_wrapper .dataTables_filter,
+            .dataTables_wrapper .dataTables_length {
+                text-align: left !important;
+                float: none !important;
+                margin-bottom: 10px !important;
+            }
+            
+            .dataTables_wrapper .dataTables_filter input {
+                width: 100% !important;
+                margin-left: 0 !important;
+                margin-top: 5px !important;
+            }
+            
+            .dataTables_wrapper .dataTables_length select {
+                width: 80px !important;
+            }
+            
+            /* Ajustes para botones de acción en móvil */
+            .continent-actions {
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
+        
+        /* Estilos para responsive DataTables */
+        .dtr-details {
+            width: 100%;
+            padding: 10px !important;
+            background-color: var(--dark-bg) !important;
+        }
+        
+        .dtr-details li {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0 !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+        }
+        
+        .dtr-details .dtr-title {
+            color: var(--gold) !important;
+            width: 40% !important;
+            font-weight: bold !important;
+        }
+        
+        .dtr-details .dtr-data {
+            color: var(--text-light) !important;
+            width: 60% !important;
+        }
+        
+        /* Estilos para los botones de acción */
+        .continent-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        
+        .continent-actions button {
+            background: none;
+            border: none;
+            color: var(--text-faded);
+            cursor: pointer;
+            transition: color 0.3s ease;
+            padding: 5px;
+            font-size: 1.1rem;
+        }
+        
+        .continent-actions .edit-btn:hover {
+            color: var(--gold);
+        }
+        
+        .continent-actions .delete-btn:hover {
+            color: var(--crimson);
+        }
+        
+        .continent-actions .view-btn:hover {
+            color: #4fa4ff;
+        }
+        
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1100;
+            overflow-y: auto;
+        }
+        
+        .modal-content {
+            background-color: var(--dark-secondary);
+            margin: 50px auto;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 600px;
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.5);
+            position: relative;
+            border: 1px solid var(--gold);
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 1.5rem;
+            color: var(--text-faded);
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+        
+        .close-modal:hover {
+            color: var(--crimson);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--gold);
+            font-family: "Cinzel", serif;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--dark-bg);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 5px;
+            color: var(--text-light);
+            font-family: "Lato", sans-serif;
+        }
+        
+        textarea.form-control {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .continent-detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .detail-item {
+            padding: 10px;
+            background-color: var(--dark-bg);
+            border-radius: 5px;
+        }
+        
+        .detail-description {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: var(--dark-bg);
+            border-radius: 5px;
+        }
+        
+        .detail-description h4 {
+            color: var(--gold);
+            margin-bottom: 10px;
+        }
+        
+        /* Media queries para responsividad del modal */
+        @media screen and (max-width: 650px) {
+            .modal-content {
+                width: 90%;
+                margin: 20px auto;
+                padding: 20px;
+            }
+            
+            .continent-detail-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+            }
+            
+            .form-actions .btn {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            table.dataTable tbody td:first-child {
+                background-color: var(--dark-secondary) !important;
+                color: var(--gold) !important;
+            }
+
+            table.dataTable tbody tr:hover td:first-child {
+                background-color: rgba(212, 175, 55, 0.1) !important;
+            }
+
+            .dtr-data {
+                background-color: var(--dark-bg) !important;
+            }
+
+            table.dataTable tbody tr.odd td:first-child,
+            table.dataTable tbody tr.even td:first-child {
+                background-color: var(--dark-secondary) !important;
+                color: var(--gold) !important;
+            }
+
+            table.dataTable tbody tr.odd:hover td:first-child,
+            table.dataTable tbody tr.even:hover td:first-child {
+                background-color: rgba(212, 175, 55, 0.1) !important;
+            }
+            
+            table#continentsTable tbody td:nth-child(1) {
+                background-color: var(--dark-secondary) !important;
+                color: var(--gold) !important;
+            }
+
+            table#continentsTable tbody tr:hover td:nth-child(1) {
+                background-color: rgba(212, 175, 55, 0.1) !important;
+            }
+
+            table#continentsTable tbody tr.odd td:nth-child(1),
+            table#continentsTable tbody tr.even td:nth-child(1) {
+                background-color: var(--dark-secondary) !important;
+                color: var(--gold) !important;
+            }
+
+            table#continentsTable tbody tr.odd:hover td:nth-child(1),
+            table#continentsTable tbody tr.even:hover td:nth-child(1) {
+                background-color: rgba(212, 175, 55, 0.1) !important;
+            }
+
+            table#continentsTable.dtr-inline.collapsed > tbody > tr > td:first-child:before,
+            table#continentsTable.dtr-inline.collapsed > tbody > tr > th:first-child:before {
+                background-color: var(--gold) !important;
+            }
+        }
+        
+        /* Filtros personalizados */
+        .custom-filters {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+            background-color: var(--dark-secondary);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .filter-group label {
+            color: var(--gold);
+            margin-bottom: 8px;
+            font-family: "Cinzel", serif;
+            font-size: 0.9rem;
+        }
+        
+        .filter-control {
+            background-color: var(--dark-bg);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            color: var(--text-light);
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-family: "Lato", sans-serif;
+        }
+        
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+        
+        @media screen and (max-width: 767px) {
+            .custom-filters {
+                grid-template-columns: 1fr;
+            }
+            
+            .filter-buttons {
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container nav-container">
+            <a href="index.html" class="logo">Crónicas del <span>Destino</span></a>
+            <nav class="nav-links">
+                <a href="index.html">Inicio</a>
+                <a href="planet.html">Planetas</a>
+                <a href="continente.html" class="active">Continentes</a>
+                <a href="#">Imperios</a>
+                <a href="#">Razas</a>
+                <a href="#">Personajes</a>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero continent-hero">
+        <div class="hero-background"></div>
+        <div class="hero-content">
+            <h1>Continentes de Forlorn</h1>
+            <p>Explora las vastas extensiones de tierra que conforman los diversos planetas del universo de Forlorn. Cada continente alberga sus propios ecosistemas, climas y secretos por descubrir.</p>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">Catálogo de Continentes</h2>
+            
+            <div class="custom-filters">
+                <div class="filter-group">
+                    <label for="filterName">Nombre:</label>
+                    <input type="text" id="filterName" class="filter-control">
+                </div>
+                
+                <div class="filter-group">
+                    <label for="filterClima">Clima:</label>
+                    <select id="filterClima" class="filter-control">
+                        <option value="">Todos</option>
+                        <option value="Tropical">Tropical</option>
+                        <option value="Templado">Templado</option>
+                        <option value="Desértico">Desértico</option>
+                        <option value="Polar">Polar</option>
+                        <option value="Continental">Continental</option>
+                        <option value="Mediterráneo">Mediterráneo</option>
+                        <option value="Montañoso">Montañoso</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="filterHabitable">Habitable:</label>
+                    <select id="filterHabitable" class="filter-control">
+                        <option value="">Todos</option>
+                        <option value="1">Sí</option>
+                        <option value="0">No</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="filterPlaneta">Planeta:</label>
+                    <select id="filterPlaneta" class="filter-control">
+                        <option value="">Todos</option>
+                        <!-- Se llenará dinámicamente desde el JS -->
+                    </select>
+                </div>
+                
+                <div class="filter-buttons">
+                    <button id="applyFiltersBtn" class="btn">Aplicar Filtros</button>
+                    <button id="resetFiltersBtn" class="btn" style="background-color: #333;">Resetear</button>
+                </div>
+            </div>
+            
+            <div class="action-bar" style="margin-bottom: 20px; text-align: right;">
+                <button id="addContinentBtn" class="btn">
+                    <i class="fas fa-plus"></i> Añadir Continente
+                </button>
+            </div>
+            
+            <div class="table-container">
+                <table id="continentsTable" class="display responsive nowrap" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Planeta</th>
+                            <th>Hemisferio</th>
+                            <th>Clima</th>
+                            <th>Tamaño</th>
+                            <th>Habitable</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div id="continentModal" class="modal">
+                <div class="modal-content">
+                    <span class="close-modal">&times;</span>
+                    <h3 id="modalTitle">Añadir Nuevo Continente</h3>
+                    <form id="continentForm">
+                        <input type="hidden" id="continentId">
+                        
+                        <div class="form-group">
+                            <label for="continentName">Nombre:</label>
+                            <input type="text" id="continentName" class="form-control" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="continentPlanet">Planeta:</label>
+                            <select id="continentPlanet" class="form-control" required>
+                                <!-- Se llenará dinámicamente desde el JS -->
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="continentHemisphere">Hemisferio:</label>
+                            <select id="continentHemisphere" class="form-control">
+                                <option value="Norte">Norte</option>
+                                <option value="Sur">Sur</option>
+                                <option value="Este">Este</option>
+                                <option value="Oeste">Oeste</option>
+                                <option value="Central">Central</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="continentClimate">Clima:</label>
+                            <select id="continentClimate" class="form-control">
+                                <option value="Tropical">Tropical</option>
+                                <option value="Templado">Templado</option>
+                                <option value="Desértico">Desértico</option>
+                                <option value="Polar">Polar</option>
+                                <option value="Continental">Continental</option>
+                                <option value="Mediterráneo">Mediterráneo</option>
+                                <option value="Montañoso">Montañoso</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="continentSize">Tamaño (km²):</label>
+                            <input type="number" id="continentSize" class="form-control" min="0" step="0.1">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="continentHabitable">Habitable:</label>
+                            <select id="continentHabitable" class="form-control">
+                                <option value="1">Sí</option>
+                                <option value="0">No</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="continentDescription">Descripción:</label>
+                            <textarea id="continentDescription" class="form-control"></textarea>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="button" class="btn" id="cancelBtn" style="background-color: #333;">Cancelar</button>
+                            <button type="submit" class="btn">Guardar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div id="viewContinentModal" class="modal">
+                <div class="modal-content">
+                    <span class="close-modal">&times;</span>
+                    <h3 id="viewContinentName">Detalles del Continente</h3>
+                    <div id="continentDetails">
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn" id="closeViewBtn">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <footer>
+        <div class="container">
+            <div class="footer-container">
+                <div class="footer-section">
+                    <h3>Crónicas del Destino</h3>
+                    <p>Un mundo de fantasía meticulosamente creado.</p>
+                    <div class="social-links">
+                        <a href="#" class="social-link">
+                            <span>F</span>
+                        </a>
+                        <a href="#" class="social-link">
+                            <span>T</span>
+                        </a>
+                        <a href="#" class="social-link">
+                            <span>I</span>
+                        </a>
+                        <a href="#" class="social-link">
+                            <span>D</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Explorar</h3>
+                    <ul class="footer-links">
+                        <li><a href="planet.html">Planetas</a></li>
+                        <li><a href="continente.html">Continentes</a></li>
+                        <li><a href="#">Biomas</a></li>
+                        <li><a href="#">Imperios</a></li>
+                        <li><a href="#">Razas</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Operaciones</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Crear Nueva Entidad</a></li>
+                        <li><a href="#">Editar Existentes</a></li>
+                        <li><a href="#">Explorar Base de Datos</a></li>
+                        <li><a href="#">Generar Informes</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Contacto</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Sobre el Creador</a></li>
+                        <li><a href="#">Contribuir</a></li>
+                        <li><a href="#">Reportar Errores</a></li>
+                        <li><a href="#">Sugerir Mejoras</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2025 Crónicas del Destino. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

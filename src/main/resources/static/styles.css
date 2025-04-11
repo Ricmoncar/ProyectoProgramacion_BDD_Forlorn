@@ -1,0 +1,624 @@
+/* Estilos generales */
+@import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Lato:wght@300;400;700&display=swap");
+
+:root {
+    --dark-bg: #121212;
+    --dark-secondary: #1a1a1a;
+    --gold: #d4af37;
+    --gold-light: #e5c767;
+    --crimson: #dc143c;
+    --crimson-dark: #9e0e2a;
+    --text-light: #f0f0f0;
+    --text-faded: #a0a0a0;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Lato", sans-serif;
+    background-color: var(--dark-bg);
+    color: var(--text-light);
+    line-height: 1.6;
+}
+
+h1,
+h2,
+h3,
+h4 {
+    font-family: "Cinzel", serif;
+    color: var(--gold);
+    margin-bottom: 1rem;
+}
+
+a {
+    text-decoration: none;
+    color: var(--gold-light);
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: var(--gold);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.section {
+    padding: 5rem 0;
+}
+
+.section-title {
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 3rem;
+    position: relative;
+}
+
+.section-title::after {
+    content: "";
+    position: absolute;
+    bottom: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+
+.btn {
+    display: inline-block;
+    padding: 10px 25px;
+    background-color: var(--crimson);
+    color: var(--text-light);
+    border: none;
+    border-radius: 3px;
+    font-family: "Cinzel", serif;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    background-color: var(--crimson-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(220, 20, 60, 0.3);
+}
+
+/* Header y Navegación */
+header {
+    background-color: rgba(18, 18, 18, 0.95);
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+    border-bottom: 1px solid var(--gold);
+}
+
+.nav-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0;
+}
+
+.logo {
+    font-family: "Cinzel", serif;
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.logo span {
+    color: var(--crimson);
+}
+
+.nav-links {
+    display: flex;
+    gap: 30px;
+}
+
+.nav-links a {
+    font-family: "Cinzel", serif;
+    font-weight: 400;
+    position: relative;
+}
+
+.nav-links a::after {
+    content: "";
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -5px;
+    left: 0;
+    background-color: var(--gold);
+    transition: width 0.3s ease;
+}
+
+.nav-links a:hover::after {
+    width: 100%;
+}
+
+/* Sección hero */
+.hero {
+    height: 100vh;
+    background: linear-gradient(rgba(18, 18, 18, 0.7), rgba(18, 18, 18, 0.9)),
+        url("img/indeximg.jfif") no-repeat center center/cover;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, transparent 60%, var(--dark-bg));
+    z-index: 1;
+}
+
+.hero-content {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 20px;
+    position: relative;
+    z-index: 2;
+}
+
+.hero h1 {
+    font-size: 4rem;
+    margin-bottom: 1.5rem;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.hero p {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+    color: var(--text-light);
+}
+
+/* Tarjetas de características */
+.features {
+    background-color: var(--dark-secondary);
+}
+
+.cards-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+}
+
+.card {
+    background: linear-gradient(145deg, #151515, #1e1e1e);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+}
+
+.card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+}
+
+.card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background: linear-gradient(90deg, var(--crimson), var(--gold));
+}
+
+.card-image {
+    height: 200px;
+    background-color: #222;
+    overflow: hidden;
+}
+
+.card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.card:hover .card-image img {
+    transform: scale(1.1);
+}
+
+.card-content {
+    padding: 25px;
+}
+
+.card h3 {
+    font-size: 1.5rem;
+}
+
+.card p {
+    color: var(--text-faded);
+    margin-bottom: 20px;
+}
+
+/* Sección de estadísticas */
+.stats {
+    background: linear-gradient(rgba(18, 18, 18, 0.9), rgba(18, 18, 18, 0.9)),
+        url("/api/placeholder/1200/800") no-repeat center center/cover;
+    text-align: center;
+}
+
+.stats-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 30px;
+}
+
+.stat {
+    padding: 30px;
+    border-radius: 10px;
+    background-color: rgba(26, 26, 26, 0.7);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    transition: transform 0.3s ease;
+}
+
+.stat:hover {
+    transform: translateY(-5px);
+}
+
+.stat-number {
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--gold);
+    margin-bottom: 10px;
+}
+
+.stat-label {
+    font-family: "Cinzel", serif;
+    color: var(--text-light);
+}
+
+/* Sección Acerca de */
+.about {
+    background-color: var(--dark-bg);
+}
+
+.about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 50px;
+    align-items: center;
+}
+
+.about-image {
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+    position: relative;
+}
+
+.about-image::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, rgba(212, 175, 55, 0.3), transparent);
+    z-index: 1;
+}
+
+.about-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.about-content h2 {
+    margin-bottom: 20px;
+}
+
+.about-content p {
+    margin-bottom: 15px;
+}
+
+/* Footer */
+footer {
+    background-color: var(--dark-secondary);
+    padding: 50px 0 20px;
+    border-top: 1px solid var(--gold);
+}
+
+.footer-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 40px;
+    margin-bottom: 40px;
+}
+
+.footer-section h3 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    position: relative;
+    padding-bottom: 10px;
+}
+
+.footer-section h3::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 50px;
+    height: 2px;
+    background-color: var(--crimson);
+}
+
+.footer-links {
+    list-style: none;
+}
+
+.footer-links li {
+    margin-bottom: 10px;
+}
+
+.footer-links a {
+    color: var(--text-faded);
+    transition: color 0.3s ease, transform 0.3s ease;
+    display: inline-block;
+}
+
+.footer-links a:hover {
+    color: var(--gold);
+    transform: translateX(5px);
+}
+
+.social-links {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.social-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background-color: rgba(212, 175, 55, 0.1);
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.social-link:hover {
+    background-color: var(--gold);
+    transform: translateY(-3px);
+}
+
+.social-link i {
+    color: var(--text-light);
+    font-size: 1.2rem;
+}
+
+.copyright {
+    text-align: center;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-faded);
+    font-size: 0.9rem;
+}
+
+/* Responsividad */
+@media (max-width: 768px) {
+    .nav-container {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .nav-links {
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
+    }
+
+    .hero h1 {
+        font-size: 2.5rem;
+    }
+
+    .about-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .section-title {
+        font-size: 2rem;
+    }
+}
+
+/* Estilos generales para la tabla */
+#planetsTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-family: Arial, sans-serif;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+/* Estilos para el encabezado de la tabla */
+#planetsTable thead th {
+    background-color: #3498db;
+    color: white;
+    font-weight: bold;
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 2px solid #2980b9;
+}
+
+/* Estilos para las filas de datos */
+#planetsTable tbody tr {
+    border-bottom: 1px solid #dddddd;
+}
+
+/* Alternar colores para las filas para mejor legibilidad */
+#planetsTable tbody tr:nth-of-type(even) {
+    background-color: #f3f3f3;
+}
+
+#planetsTable tbody tr:last-of-type {
+    border-bottom: 2px solid #3498db;
+}
+
+/* Estilos para las celdas de datos */
+#planetsTable td {
+    padding: 10px 15px;
+}
+
+/* Estilo al pasar el cursor por una fila */
+#planetsTable tbody tr:hover {
+    background-color: #eaf2f8;
+    cursor: pointer;
+}
+
+/* Estilos para los botones de acción */
+.planet-actions button {
+    margin: 0 5px;
+    padding: 6px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.view-btn {
+    background-color: #2ecc71;
+    color: white;
+}
+
+.edit-btn {
+    background-color: #f39c12;
+    color: white;
+}
+
+.delete-btn {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.planet-actions button:hover {
+    opacity: 0.8;
+    transform: scale(1.05);
+}
+
+/* Sobrescribir estilos DataTables para adaptarse al tema oscuro */
+table.dataTable {
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    border-radius: 5px;
+    overflow: hidden;
+    color: var(--text-light); /* Asegura que el texto sea claro */
+}
+
+table.dataTable thead th {
+    background-color: var(--dark-bg);
+    color: var(--gold);
+    border-bottom: 2px solid var(--gold);
+    padding: 15px 10px;
+    font-family: "Cinzel", serif;
+}
+
+table.dataTable tbody tr {
+    background-color: var(--dark-secondary); /* Fondo oscuro para las filas */
+}
+
+table.dataTable tbody tr:nth-of-type(even) {
+    background-color: rgba(30, 30, 30, 0.7); /* Filas pares ligeramente más claras */
+}
+
+table.dataTable tbody tr:hover {
+    background-color: rgba(212, 175, 55, 0.1); /* Hover dorado sutil */
+}
+
+table.dataTable tbody td {
+    padding: 12px 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-light); /* Texto claro para contraste */
+}
+
+/* Personalizar controles de DataTables */
+.dataTables_wrapper .dataTables_length, 
+.dataTables_wrapper .dataTables_filter, 
+.dataTables_wrapper .dataTables_info, 
+.dataTables_wrapper .dataTables_processing, 
+.dataTables_wrapper .dataTables_paginate {
+    color: var(--text-faded);
+}
+
+.dataTables_wrapper .dataTables_length select, 
+.dataTables_wrapper .dataTables_filter input {
+    background-color: var(--dark-bg);
+    color: var(--text-light);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+}
+
+/* Botones de paginación */
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    background: var(--dark-bg) !important;
+    color: var(--gold) !important;
+    border: 1px solid rgba(212, 175, 55, 0.3) !important;
+    border-radius: 3px;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current, 
+.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+    background: var(--crimson) !important;
+    color: var(--text-light) !important;
+    border-color: var(--crimson) !important;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    background: rgba(212, 175, 55, 0.2) !important;
+    color: var(--text-light) !important;
+}
+
+/* Mejorar botones de acción */
+.planet-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.planet-actions button {
+    background: none;
+    border: none;
+    padding: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: var(--text-faded);
+}
+
+.planet-actions .view-btn:hover {
+    color: #4fa4ff;
+}
+
+.planet-actions .edit-btn:hover {
+    color: var(--gold);
+}
+
+.planet-actions .delete-btn:hover {
+    color: var(--crimson);
+}
+
