@@ -181,8 +181,6 @@ public class Servicio {
 
 	public String actualizarContinente(Integer id, String nombre, Integer planetaId, String hemisferio, String clima, Float tamanio, Boolean habitable, String descripcion) throws SQLException {
 		int rowsAffected = 0;
-        // *** FIX: Use PlanetaID in UPDATE ***
-        // *** FIX: Use correct case for other columns if needed (e.g., Tamanio) ***
         String sql = "UPDATE continente SET nombre = ?, PlanetaID = ?, hemisferio = ?, clima = ?, Tamanio = ?, habitable = ?, descripcion = ? WHERE id = ?";
 		try (Connection con = DriverManager.getConnection(url);
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -267,19 +265,7 @@ public class Servicio {
 
             // Set parameters dynamically
             for (int i = 0; i < params.size(); i++) {
-                 ps.setObject(i + 1, params.get(i)); // setObject can often handle type inference
-                /* Explicit type setting (safer if types are strict):
-                Object param = params.get(i);
-                if (param instanceof Integer) {
-                    ps.setInt(i + 1, (Integer) param);
-                } else if (param instanceof String) {
-                    ps.setString(i + 1, (String) param);
-                } else if (param instanceof Boolean) {
-                    ps.setBoolean(i + 1, (Boolean) param);
-                } else if (param instanceof Float) {
-                    ps.setFloat(i + 1, (Float) param);
-                } // Add other types if necessary
-                */
+                 ps.setObject(i + 1, params.get(i));
             }
 
             try (ResultSet rs = ps.executeQuery()) {
