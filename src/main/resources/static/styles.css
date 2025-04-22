@@ -10,6 +10,10 @@
     --crimson-dark: #9e0e2a;
     --text-light: #f0f0f0;
     --text-faded: #a0a0a0;
+    --success: #28a745;
+    --error: #dc3545;
+    --info: #17a2b8;
+    --warning: #ffc107;
 }
 
 * {
@@ -23,12 +27,10 @@ body {
     background-color: var(--dark-bg);
     color: var(--text-light);
     line-height: 1.6;
+    position: relative;
 }
 
-h1,
-h2,
-h3,
-h4 {
+h1, h2, h3, h4 {
     font-family: "Cinzel", serif;
     color: var(--gold);
     margin-bottom: 1rem;
@@ -144,7 +146,11 @@ header {
     width: 100%;
 }
 
-/* Sección hero */
+.nav-links a.active::after {
+    width: 100%;
+}
+
+/* Sección hero - General */
 .hero {
     height: 100vh;
     background: linear-gradient(rgba(18, 18, 18, 0.7), rgba(18, 18, 18, 0.9)),
@@ -185,6 +191,39 @@ header {
     font-size: 1.2rem;
     margin-bottom: 2rem;
     color: var(--text-light);
+}
+
+/* Variantes de Hero */
+.planet-hero {
+    height: 50vh;
+    background: linear-gradient(rgba(18, 18, 18, 0.7), rgba(18, 18, 18, 0.9)),
+        url("img/earth.jpg") no-repeat center center/cover;
+}
+
+.continent-hero {
+    height: 50vh;
+    background: linear-gradient(rgba(18, 18, 18, 0.7), rgba(18, 18, 18, 0.9)),
+        url("img/continents.jpg") no-repeat center center/cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: var(--text-light);
+    padding: 20px;
+}
+
+.continent-hero .hero-content h1 {
+    font-family: 'Cinzel', serif;
+    font-size: 3rem;
+    margin-bottom: 15px;
+    color: var(--gold);
+}
+
+.continent-hero .hero-content p {
+    font-size: 1.1rem;
+    max-width: 800px;
+    margin: 0 auto;
+    color: var(--text-faded);
 }
 
 /* Tarjetas de características */
@@ -419,170 +458,106 @@ footer {
     font-size: 0.9rem;
 }
 
-/* Responsividad */
-@media (max-width: 768px) {
-    .nav-container {
-        flex-direction: column;
-        gap: 20px;
-    }
-
-    .nav-links {
-        flex-direction: column;
-        text-align: center;
-        gap: 15px;
-    }
-
-    .hero h1 {
-        font-size: 2.5rem;
-    }
-
-    .about-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .section-title {
-        font-size: 2rem;
-    }
+/* Estilos para DataTables */
+.table-container {
+    background-color: var(--dark-secondary);
+    border-radius: 10px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    margin-bottom: 40px;
+    overflow-x: auto;
 }
 
-/* Estilos generales para la tabla */
-#planetsTable {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 20px 0;
-    font-family: Arial, sans-serif;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
-    border-radius: 5px;
-    overflow: hidden;
+.dataTable * {
+    box-sizing: border-box;
 }
 
-/* Estilos para el encabezado de la tabla */
-#planetsTable thead th {
-    background-color: #3498db;
-    color: white;
-    font-weight: bold;
-    padding: 12px 15px;
-    text-align: left;
-    border-bottom: 2px solid #2980b9;
-}
-
-/* Estilos para las filas de datos */
-#planetsTable tbody tr {
-    border-bottom: 1px solid #dddddd;
-}
-
-/* Alternar colores para las filas para mejor legibilidad */
-#planetsTable tbody tr:nth-of-type(even) {
-    background-color: #f3f3f3;
-}
-
-#planetsTable tbody tr:last-of-type {
-    border-bottom: 2px solid #3498db;
-}
-
-/* Estilos para las celdas de datos */
-#planetsTable td {
-    padding: 10px 15px;
-}
-
-/* Estilo al pasar el cursor por una fila */
-#planetsTable tbody tr:hover {
-    background-color: #eaf2f8;
-    cursor: pointer;
-}
-
-/* Estilos para los botones de acción */
-.planet-actions button {
-    margin: 0 5px;
-    padding: 6px 10px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.3s;
-}
-
-.view-btn {
-    background-color: #2ecc71;
-    color: white;
-}
-
-.edit-btn {
-    background-color: #f39c12;
-    color: white;
-}
-
-.delete-btn {
-    background-color: #e74c3c;
-    color: white;
-}
-
-.planet-actions button:hover {
-    opacity: 0.8;
-    transform: scale(1.05);
-}
-
-/* Sobrescribir estilos DataTables para adaptarse al tema oscuro */
 table.dataTable {
+    width: 100% !important;
     border-collapse: separate;
     border-spacing: 0;
-    width: 100%;
-    border: 1px solid rgba(212, 175, 55, 0.2);
+    border: 1px solid rgba(212, 175, 55, 0.2) !important;
     border-radius: 5px;
     overflow: hidden;
-    color: var(--text-light); /* Asegura que el texto sea claro */
+    color: var(--text-light) !important;
+    margin-top: 15px !important;
+    margin-bottom: 15px !important;
 }
 
 table.dataTable thead th {
-    background-color: var(--dark-bg);
-    color: var(--gold);
-    border-bottom: 2px solid var(--gold);
-    padding: 15px 10px;
-    font-family: "Cinzel", serif;
+    background-color: var(--dark-bg) !important;
+    color: var(--gold) !important;
+    border-bottom: 2px solid var(--gold) !important;
+    padding: 15px 10px !important;
+    font-family: "Cinzel", serif !important;
+    font-weight: bold !important;
+    text-align: left !important;
+    vertical-align: middle !important;
+    position: relative;
 }
 
 table.dataTable tbody tr {
-    background-color: var(--dark-secondary); /* Fondo oscuro para las filas */
+    background-color: var(--dark-secondary) !important;
 }
 
-table.dataTable tbody tr:nth-of-type(even) {
-    background-color: rgba(30, 30, 30, 0.7); /* Filas pares ligeramente más claras */
-}
-
-table.dataTable tbody tr:hover {
-    background-color: rgba(212, 175, 55, 0.1); /* Hover dorado sutil */
+table.dataTable tbody tr:nth-child(odd) {
+    background-color: rgba(30, 30, 30, 0.8) !important;
 }
 
 table.dataTable tbody td {
-    padding: 12px 10px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    color: var(--text-light); /* Texto claro para contraste */
+    padding: 12px 10px !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: var(--text-light) !important;
+    text-align: left !important;
+    vertical-align: middle !important;
 }
 
-/* Personalizar controles de DataTables */
-.dataTables_wrapper .dataTables_length, 
-.dataTables_wrapper .dataTables_filter, 
-.dataTables_wrapper .dataTables_info, 
-.dataTables_wrapper .dataTables_processing, 
+table.dataTable tbody tr:last-child td {
+    border-bottom: none !important;
+}
+
+table.dataTable tbody tr:hover {
+    background-color: rgba(212, 175, 55, 0.1) !important;
+}
+
+.dataTables_wrapper .dataTables_length,
+.dataTables_wrapper .dataTables_filter,
+.dataTables_wrapper .dataTables_info,
+.dataTables_wrapper .dataTables_processing,
 .dataTables_wrapper .dataTables_paginate {
-    color: var(--text-faded);
+    color: var(--text-faded) !important;
+    margin-bottom: 15px;
 }
 
-.dataTables_wrapper .dataTables_length select, 
+.dataTables_wrapper .dataTables_length select {
+    background-color: var(--dark-bg) !important;
+    border: 1px solid rgba(212, 175, 55, 0.3) !important;
+    color: var(--text-light) !important;
+    border-radius: 3px !important;
+    padding: 5px 10px !important;
+    margin: 0 5px !important;
+}
+
 .dataTables_wrapper .dataTables_filter input {
-    background-color: var(--dark-bg);
-    color: var(--text-light);
-    border: 1px solid rgba(212, 175, 55, 0.3);
+    background-color: var(--dark-bg) !important;
+    border: 1px solid rgba(212, 175, 55, 0.3) !important;
+    color: var(--text-light) !important;
+    border-radius: 3px !important;
+    padding: 5px 10px !important;
+    margin-left: 5px !important;
 }
 
-/* Botones de paginación */
 .dataTables_wrapper .dataTables_paginate .paginate_button {
-    background: var(--dark-bg) !important;
     color: var(--gold) !important;
     border: 1px solid rgba(212, 175, 55, 0.3) !important;
-    border-radius: 3px;
+    border-radius: 3px !important;
+    background: var(--dark-bg) !important;
+    margin: 0 3px !important;
+    padding: 5px 10px !important;
+    cursor: pointer;
 }
 
-.dataTables_wrapper .dataTables_paginate .paginate_button.current, 
+.dataTables_wrapper .dataTables_paginate .paginate_button.current,
 .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
     background: var(--crimson) !important;
     color: var(--text-light) !important;
@@ -592,33 +567,346 @@ table.dataTable tbody td {
 .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
     background: rgba(212, 175, 55, 0.2) !important;
     color: var(--text-light) !important;
+    border-color: var(--gold) !important;
 }
 
-/* Mejorar botones de acción */
-.planet-actions {
+.dataTables_wrapper .dataTables_paginate .paginate_button.disabled,
+.dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover {
+    color: #666 !important;
+    border-color: rgba(212, 175, 55, 0.1) !important;
+    background: var(--dark-secondary) !important;
+    cursor: default;
+}
+
+/* Estilos para responsive DataTables */
+.dtr-details {
+    width: 100%;
+    padding: 10px !important;
+    background-color: var(--dark-bg) !important;
+}
+
+.dtr-details li {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.dtr-details .dtr-title {
+    color: var(--gold) !important;
+    width: 40% !important;
+    font-weight: bold !important;
+}
+
+.dtr-details .dtr-data {
+    color: var(--text-light) !important;
+    width: 60% !important;
+}
+
+table.dataTable.dtr-inline.collapsed > tbody > tr > td.dtr-control:before,
+table.dataTable.dtr-inline.collapsed > tbody > tr > th.dtr-control:before {
+    background-color: var(--gold) !important;
+    border-color: var(--dark-bg) !important;
+    top: 50% !important;
+    left: 5px !important;
+    height: 16px !important;
+    width: 16px !important;
+    margin-top: -8px !important;
+    line-height: 16px !important;
+    font-size: 12px !important;
+    box-shadow: none !important;
+}
+
+table.dataTable.dtr-inline.collapsed > tbody > tr.parent > td.dtr-control:before,
+table.dataTable.dtr-inline.collapsed > tbody > tr.parent > th.dtr-control:before {
+    background-color: var(--crimson) !important;
+}
+
+/* Estilos para los botones de acción */
+.planet-actions, .continent-actions {
     display: flex;
     gap: 10px;
     justify-content: center;
+    align-items: center;
+    flex-wrap: nowrap;
 }
 
-.planet-actions button {
+.planet-actions button, .continent-actions button {
     background: none;
     border: none;
-    padding: 6px;
-    cursor: pointer;
-    transition: all 0.3s ease;
     color: var(--text-faded);
+    cursor: pointer;
+    transition: color 0.3s ease;
+    padding: 5px;
+    font-size: 1.1rem;
 }
 
-.planet-actions .view-btn:hover {
+.continent-actions .view-btn:hover, .planet-actions .view-btn:hover {
     color: #4fa4ff;
 }
 
-.planet-actions .edit-btn:hover {
+.continent-actions .edit-btn:hover, .planet-actions .edit-btn:hover {
     color: var(--gold);
 }
 
-.planet-actions .delete-btn:hover {
+.continent-actions .delete-btn:hover, .planet-actions .delete-btn:hover {
     color: var(--crimson);
 }
 
+/* Estilos para modales */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 1100;
+    overflow-y: auto;
+    padding-top: 50px;
+    padding-bottom: 50px;
+}
+
+.modal-content {
+    background-color: var(--dark-secondary);
+    margin: 0 auto;
+    padding: 30px;
+    border-radius: 10px;
+    max-width: 600px;
+    width: 90%;
+    box-shadow: 0 5px 30px rgba(0, 0, 0, 0.5);
+    position: relative;
+    border: 1px solid var(--gold);
+}
+
+.close-modal {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 1.8rem;
+    color: var(--text-faded);
+    cursor: pointer;
+    transition: color 0.3s ease;
+    line-height: 1;
+}
+
+.close-modal:hover {
+    color: var(--crimson);
+}
+
+.modal-content h3 {
+    font-family: 'Cinzel', serif;
+    color: var(--gold);
+    margin-bottom: 25px;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+    padding-bottom: 10px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--gold);
+    font-family: "Cinzel", serif;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px;
+    background-color: var(--dark-bg);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 5px;
+    color: var(--text-light);
+    font-family: "Lato", sans-serif;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--gold);
+    box-shadow: 0 0 5px rgba(212, 175, 55, 0.5);
+}
+
+select.form-control {
+    appearance: none;
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23d4af37%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 10px auto;
+    padding-right: 35px;
+}
+
+textarea.form-control {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+/* Estilos específicos para continentes */
+.filter-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.filter-group label {
+    color: var(--gold);
+    margin-bottom: 8px;
+    font-family: "Cinzel", serif;
+    font-size: 0.9rem;
+}
+
+.filter-control {
+    background-color: var(--dark-bg);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    color: var(--text-light);
+    padding: 10px 12px;
+    border-radius: 4px;
+    font-family: "Lato", sans-serif;
+    font-size: 0.95rem;
+}
+
+select.filter-control {
+    appearance: none;
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23d4af37%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 8px auto;
+    padding-right: 30px;
+}
+
+.custom-filters {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 20px;
+    margin-bottom: 25px;
+    background-color: var(--dark-secondary);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.filter-buttons {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+    grid-column: span 1;
+}
+
+.filter-buttons button {
+    padding: 10px 15px;
+}
+
+#filterResults {
+    margin-top: 15px;
+    color: var(--text-faded);
+    font-style: italic;
+    grid-column: 1 / -1;
+    text-align: center;
+}
+
+/* Vista de detalles de continente */
+#continentDetails {
+    margin-top: 20px;
+}
+
+.continent-details .detail-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.continent-details .detail-row:last-child {
+    border-bottom: none;
+}
+
+.continent-details .detail-label {
+    color: var(--gold);
+    font-weight: bold;
+    width: 35%;
+}
+
+.continent-details .detail-value {
+    color: var(--text-light);
+    width: 60%;
+    text-align: right;
+}
+
+.continent-details .detail-row.full-width {
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.continent-details .detail-row.full-width .detail-label {
+    width: 100%;
+    margin-bottom: 8px;
+}
+
+.continent-details .detail-row.full-width .detail-description {
+    width: 100%;
+    background-color: var(--dark-bg);
+    padding: 10px;
+    border-radius: 5px;
+    color: var(--text-faded);
+    text-align: left;
+    max-height: 150px;
+    overflow-y: auto;
+    line-height: 1.6;
+}
+
+/* Vista de detalles de planeta */
+.planet-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.detail-item {
+    padding: 10px;
+    background-color: var(--dark-bg);
+    border-radius: 5px;
+}
+
+.detail-description {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: var(--dark-bg);
+    border-radius: 5px;
+}
+
+.detail-description h4 {
+    color: var(--gold);
+    margin-bottom: 10px;
+}
+
+/* Alertas */
+#alertContainer {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    z-index: 2000;
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.alert {
+    padding: 15px;
+    border-radius: 5px;
+    color: var(--text-light);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0;
+}

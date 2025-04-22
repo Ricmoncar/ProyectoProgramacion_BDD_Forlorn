@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Inicializar DataTables
+    /* Inicialización de DataTables */
     let planetsTable = $('#planetsTable').DataTable({
         language: {
             url: 'https://cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json'
@@ -30,15 +30,15 @@ document.addEventListener('DOMContentLoaded', function() {
         ]
     });
     
-    // Cargar planetas al inicio
+    /* Carga inicial de planetas */
     cargarPlanetas();
     
-    // Event listeners para modales
+    /* Configuración de eventos para modales */
     document.getElementById('addPlanetBtn').addEventListener('click', abrirModalAnadir);
     document.getElementById('cancelBtn').addEventListener('click', cerrarModal);
     document.getElementById('closeViewBtn').addEventListener('click', cerrarModalDetalles);
     
-    // Event listeners para cerrar modales con el botón X
+    /* Configuración de eventos para cerrar modales */
     let closeButtons = document.querySelectorAll('.close-modal');
     closeButtons.forEach(function(btn) {
         btn.addEventListener('click', function() {
@@ -47,13 +47,16 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Event listener para formulario
+    /* Configuración del formulario */
     document.getElementById('planetForm').addEventListener('submit', function(e) {
         e.preventDefault();
         guardarPlaneta();
     });
 });
 
+/**
+ * Carga la lista de planetas desde el servidor
+ */
 function cargarPlanetas() {
     fetch("http://localhost:8080/listar_planetas")
         .then(res => {
@@ -63,7 +66,6 @@ function cargarPlanetas() {
             return res.json();
         })
         .then(planetas => {
-            // Limpiar y recargar la tabla
             let table = $('#planetsTable').DataTable();
             table.clear();
             table.rows.add(planetas).draw();
@@ -74,41 +76,47 @@ function cargarPlanetas() {
         });
 }
 
+/**
+ * Abre el modal para añadir un nuevo planeta
+ */
 function abrirModalAnadir() {
-    // Resetear el formulario
     document.getElementById('modalTitle').textContent = 'Añadir Nuevo Planeta';
     document.getElementById('planetForm').reset();
     document.getElementById('planetId').value = '';
     
-    // Mostrar el modal
     document.getElementById('planetModal').style.display = 'block';
 }
 
+/**
+ * Cierra el modal de añadir/editar planeta
+ */
 function cerrarModal() {
     document.getElementById('planetModal').style.display = 'none';
 }
 
+/**
+ * Cierra el modal de detalles del planeta
+ */
 function cerrarModalDetalles() {
     document.getElementById('viewPlanetModal').style.display = 'none';
 }
 
+/**
+ * Abre el modal de edición con los datos del planeta seleccionado
+ */
 function editarPlaneta(id) {
-    // Buscar el planeta en la tabla
     let table = $('#planetsTable').DataTable();
     let planetaData = table.rows().data().toArray().find(planeta => planeta.id == id);
     
     if (planetaData) {
-        // Actualizar título modal
         document.getElementById('modalTitle').textContent = 'Editar Planeta';
         
-        // Llenar el formulario con los datos del planeta
         document.getElementById('planetId').value = planetaData.id;
         document.getElementById('planetName').value = planetaData.nombre;
         document.getElementById('planetLocation').value = planetaData.ubicacion || '';
         document.getElementById('planetHabitable').value = planetaData.habitable;
         document.getElementById('planetWaterLevel').value = planetaData.nivelAgua || '';
         
-        // Si hay fecha de creación, formatearla correctamente para el input date
         if (planetaData.fechaCreacion) {
             let fecha = new Date(planetaData.fechaCreacion);
             let fechaFormateada = fecha.toISOString().split('T')[0];
@@ -121,7 +129,6 @@ function editarPlaneta(id) {
         document.getElementById('planetDensity').value = planetaData.densidad || '';
         document.getElementById('planetDescription').value = planetaData.descripcion || '';
         
-        // Mostrar el modal
         document.getElementById('planetModal').style.display = 'block';
     } else {
         console.error('No se encontró el planeta con ID:', id);
@@ -129,6 +136,9 @@ function editarPlaneta(id) {
     }
 }
 
+/**
+ * Guarda un nuevo planeta o actualiza uno existente
+ */
 function guardarPlaneta() {
     const formData = new FormData();
     formData.append('nombre', document.getElementById('planetName').value);
@@ -145,16 +155,13 @@ function guardarPlaneta() {
         formData.append('id', planetId);
     }
     
-    // Construir la URL y opciones
     const url = planetId ? 'http://localhost:8080/actualizar_planeta' : 'http://localhost:8080/aniadir_planeta';
     
-    // Convertir FormData a URLSearchParams para enviar como query parameters
     const params = new URLSearchParams();
     for (const pair of formData) {
         params.append(pair[0], pair[1]);
     }
     
-    // Hacer la petición
     fetch(`${url}?${params.toString()}`)
         .then(res => {
             if (!res.ok) {
@@ -173,6 +180,9 @@ function guardarPlaneta() {
         });
 }
 
+/**
+ * Elimina un planeta tras confirmación del usuario
+ */
 function eliminarPlaneta(id) {
     if (confirm('¿Está seguro de que desea eliminar este planeta? Esta acción no se puede deshacer.')) {
         fetch(`http://localhost:8080/eliminar_planeta?id=${id}`)
@@ -193,16 +203,16 @@ function eliminarPlaneta(id) {
     }
 }
 
+/**
+ * Muestra los detalles de un planeta específico
+ */
 function verPlaneta(id) {
-    // Buscar el planeta en la tabla
     let table = $('#planetsTable').DataTable();
     let planetaData = table.rows().data().toArray().find(planeta => planeta.id == id);
     
     if (planetaData) {
-        // Actualizar título del modal
         document.getElementById('viewPlanetName').textContent = planetaData.nombre;
         
-        // Crear contenido HTML para los detalles
         let fechaFormateada = '';
         if (planetaData.fechaCreacion) {
             let fecha = new Date(planetaData.fechaCreacion);
@@ -241,11 +251,9 @@ function verPlaneta(id) {
         `;
         
         document.getElementById('planetDetails').innerHTML = detallesHTML;
-        
         document.getElementById('viewPlanetModal').style.display = 'block';
     } else {
         console.error('No se encontró el planeta con ID:', id);
         alert('Error al cargar los detalles del planeta.');
     }
 }
-
