@@ -208,8 +208,28 @@ public class AplicacionSQLController {
     }
 
 /**
+ * añadir bioma 
+ */
+
+@GetMapping("/aniadir_bioma")
+public ResponseEntity<?> aniadirBioma(
+        @RequestParam String nombre, 
+        @RequestParam Integer continenteId, 
+        @RequestParam String clima, 
+        @RequestParam(required = false) Float porcentajeHumedad, 
+        @RequestParam(required = false) String precipitaciones, 
+        @RequestParam(required = false) Float temperaturaMedia) {
+    try {
+        return ResponseEntity.ok().body(servicio.aniadirBioma(nombre, continenteId, clima, porcentajeHumedad, precipitaciones, temperaturaMedia));
+    } catch (SQLException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+    }
+}
+
+/**
  * Elimina un bioma por su ID
  */
+
 @GetMapping("/eliminar_bioma")
 public ResponseEntity<?> eliminarBioma(@RequestParam Integer id) {
     try {
