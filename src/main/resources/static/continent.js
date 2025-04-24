@@ -45,7 +45,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 target: 'tr'
             }
         },
-        order: [[1, 'asc']]
+        order: [[1, 'asc']], // Ordenar por nombre en lugar de ID para evitar problemas de visualización
+        // Solución al problema de visualización con colores de fondo
+        createdRow: function(row, data, dataIndex) {
+            // Garantiza que todas las filas tengan el fondo correcto
+            $(row).css('background-color', dataIndex % 2 === 0 ? 'rgba(30, 30, 30, 0.8)' : 'var(--dark-secondary)');
+        }
     });
 
     /* Carga inicial de datos */
@@ -68,7 +73,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (applyFiltersBtn) applyFiltersBtn.addEventListener('click', aplicarFiltros);
     if (resetFiltersBtn) resetFiltersBtn.addEventListener('click', resetearFiltros);
 
-    /* Configuración de eventos para cerrar modales */
+    /* Configuración de eventos apara cerrar modales */
     let closeButtons = document.querySelectorAll('.close-modal');
     closeButtons.forEach(function(btn) {
         btn.addEventListener('click', function() {
@@ -99,8 +104,23 @@ document.addEventListener('DOMContentLoaded', function() {
             cerrarModalDetalles();
         }
     });
+    fixTableDisplay();
 });
 
+function fixTableDisplay() {
+    setTimeout(function() {
+        $('table.dataTable tbody td').css('background-color', 'inherit');
+        
+        $('table.dataTable tbody tr:odd').css('background-color', 'rgba(30, 30, 30, 0.8)');
+        $('table.dataTable tbody tr:even').css('background-color', 'var(--dark-secondary)');
+        
+        $('.dataTable').on('draw.dt', function() {
+            $(this).find('tbody tr:odd').css('background-color', 'rgba(30, 30, 30, 0.8)');
+            $(this).find('tbody tr:even').css('background-color', 'var(--dark-secondary)');
+            $(this).find('tbody td').css('background-color', 'inherit');
+        });
+    }, 100);
+}
 /**
  * Carga la lista de planetas desde el servidor
  */
@@ -175,6 +195,11 @@ function cargarContinentes() {
             table.clear();
             if (Array.isArray(continentes)) {
                 table.rows.add(continentes).draw();
+                
+                // Corrige el problema de visualización repintando las filas
+                $('#continentsTable tbody tr').each(function(index) {
+                    $(this).css('background-color', index % 2 === 0 ? 'rgba(30, 30, 30, 0.8)' : 'var(--dark-secondary)');
+                });
             } else {
                 console.error("La respuesta de listar_continentes no es un array:", continentes);
                 mostrarAlerta('error', 'Error: Formato de datos de continentes inesperado.');
@@ -422,5 +447,193 @@ function guardarContinente() {
     const tamanio = tamanioInput.value ? parseFloat(tamanioInput.value) : null;
     const descripcion = document.getElementById('continentDescription').value.trim();
 
+    // Validación básica
+    if (!nombre) {
+        mostrarAlerta('error', 'El nombre del continente es obligatorio.');
+        return;
+    }
+
+    if (!planetaId) {
+        mostrarAlerta('error', 'Debe seleccionar un planeta.');
+        return;
+    }
+
     const habitableSelect = document.getElementById('continentHabitable');
     const habitable = habitableSelect ? habitableSelect.value === '1' : false;
+
+    // Construir la URL con los parámetros
+    let url = id ? 'http://localhost:8080/actualizar_continente?' : 'http://localhost:8080/aniadir_continente?';
+    
+    const params = new URLSearchParams();
+    if (id) params.append('id', id);
+    params.append('nombre', nombre);
+    params.append('planetaId', planetaId);
+    params.append('hemisferio', hemisferio);
+    params.append('clima', clima);
+    if (tamanio !== null) params.append('tamanio', tamanio);
+    params.append('habitable', habitable);
+    params.append('descripcion', descripcion);
+    
+    url += params.toString();
+
+    // Enviar la petición
+    fetch(url)
+        .then(res => {
+            if (!res.ok) {
+                return res.text().then(text => {
+                    throw new Error(`Error HTTP ${res.status}: ${res.statusText}. Detalle: ${text}`);
+                });
+            }
+            return res.text();
+        })
+        .then(resultado => {
+            mostrarAlerta('success', id ? 'Continente actualizado correctamente.' : 'Continente añadido correctamente.');
+            cerrarModal();
+            cargarContinentes();
+        })
+        .catch(error => {
+            console.error('Error al guardar continente:', error);
+            mostrarAlerta('error', `Error al guardar continente: ${error.message}`);
+        });
+}
+
+/**
+ * Aplica filtros seleccionados para filtrar continentes
+ */
+function aplicarFiltros() {
+    const planetaId = document.getElementById('filterPlaneta').value;
+    const hemisferio = document.getElementById('filterHemisferio').value;
+    const clima = document.getElementById('filterClima').value;
+    const habitableSelect = document.getElementById('filterHabitable');
+    const habitable = habitableSelect && habitableSelect.value ? habitableSelect.value === 'true' : null;
+    
+    // Construir la URL con los parámetros
+    let url = 'http://localhost:8080/filtrar_continentes?';
+    const params = new URLSearchParams();
+    
+    if (planetaId) params.append('planetaId', planetaId);
+    if (hemisferio) params.append('hemisferio', hemisferio);
+    if (clima) params.append('clima', clima);
+    if (habitable !== null) params.append('habitable', habitable);
+    
+    url += params.toString();
+    
+    // Mostrar indicador de carga
+    const filterResults = document.getElementById('filterResults');
+    if (filterResults) filterResults.textContent = 'Aplicando filtros...';
+    
+    fetch(url)
+        .then(res => {
+            if (!res.ok) {
+                return res.text().then(text => {
+                    throw new Error(`Error HTTP ${res.status}: ${res.statusText}. Detalle: ${text}`);
+                });
+            }
+            const contentType = res.headers.get("content-type");
+            if (!contentType || !contentType.includes("application/json")) {
+                return res.text().then(text => {
+                    throw new TypeError(`Respuesta inesperada del servidor (no es JSON): ${text}`);
+                });
+            }
+            return res.json();
+        })
+        .then(continentes => {
+            let table = $('#continentsTable').DataTable();
+            table.clear();
+            
+            if (Array.isArray(continentes)) {
+                table.rows.add(continentes).draw();
+                
+                // Corrige el problema de visualización repintando las filas
+                $('#continentsTable tbody tr').each(function(index) {
+                    $(this).css('background-color', index % 2 === 0 ? 'rgba(30, 30, 30, 0.8)' : 'var(--dark-secondary)');
+                });
+                
+                if (filterResults) {
+                    filterResults.textContent = `Se encontraron ${continentes.length} continentes con los filtros seleccionados.`;
+                }
+            } else {
+                console.error("La respuesta de filtrar_continentes no es un array:", continentes);
+                mostrarAlerta('error', 'Error: Formato de datos de continentes inesperado.');
+                if (filterResults) filterResults.textContent = '';
+            }
+        })
+        .catch(error => {
+            console.error('Error al filtrar continentes:', error);
+            mostrarAlerta('error', `Error al filtrar continentes: ${error.message}`);
+            if (filterResults) filterResults.textContent = '';
+        });
+}
+
+/**
+ * Resetea todos los filtros y carga todos los continentes
+ */
+function resetearFiltros() {
+    const filterPlaneta = document.getElementById('filterPlaneta');
+    const filterHemisferio = document.getElementById('filterHemisferio');
+    const filterClima = document.getElementById('filterClima');
+    const filterHabitable = document.getElementById('filterHabitable');
+    
+    if (filterPlaneta) filterPlaneta.value = '';
+    if (filterHemisferio) filterHemisferio.value = '';
+    if (filterClima) filterClima.value = '';
+    if (filterHabitable) filterHabitable.value = '';
+    
+    const filterResults = document.getElementById('filterResults');
+    if (filterResults) filterResults.textContent = '';
+    
+    cargarContinentes();
+}
+
+/**
+ * Muestra alertas en la parte superior derecha de la pantalla
+ */
+function mostrarAlerta(tipo, mensaje) {
+    const alertContainer = document.getElementById('alertContainer');
+    if (!alertContainer) {
+        console.error("Contenedor de alertas no encontrado");
+        alert(mensaje);
+        return;
+    }
+
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${tipo}`;
+    
+    // Color según el tipo de alerta
+    switch (tipo) {
+        case 'success':
+            alertDiv.style.backgroundColor = 'var(--success)';
+            break;
+        case 'error':
+            alertDiv.style.backgroundColor = 'var(--error)';
+            break;
+        case 'info':
+            alertDiv.style.backgroundColor = 'var(--info)';
+            break;
+        case 'warning':
+            alertDiv.style.backgroundColor = 'var(--warning)';
+            break;
+    }
+    
+    alertDiv.innerHTML = `
+        <span>${mensaje}</span>
+        <button class="close-alert">&times;</button>
+    `;
+    
+    alertContainer.appendChild(alertDiv);
+    
+    // Añadir evento para cerrar la alerta
+    const closeBtn = alertDiv.querySelector('.close-alert');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', function() {
+            alertDiv.remove();
+        });
+    }
+    
+    // Auto-cerrar después de 5 segundos
+    setTimeout(() => {
+        if (alertDiv.parentNode) {
+            alertDiv.remove();
+        }
+    }, 5000);
+}

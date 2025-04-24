@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import com.daw.controllers.Continente;
 import com.daw.controllers.Planeta;
+import com.daw.controllers.Bioma;
 
 @Service
 public class Servicio {
@@ -348,4 +349,236 @@ public class Servicio {
         continente.setDescripcion(rs.getString("descripcion"));
         return continente;
     }
+
+
+// Agregar estos métodos a la clase Servicio.java existente
+
+/**
+ * Busca biomas que coincidan con el nombre proporcionado
+ */
+public List<Bioma> buscarBiomas(String nombre) throws SQLException {
+    List<Bioma> lista = new ArrayList<>();
+    
+    String sql = "SELECT b.*, c.nombre as continenteNombre FROM bioma b JOIN continente c ON b.ContinenteID = c.id WHERE b.nombre LIKE ?";
+    try (Connection con = DriverManager.getConnection(url);
+         PreparedStatement ps = con.prepareStatement(sql)) {
+        ps.setString(1, "%" + nombre + "%");
+        try (ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                Bioma bioma = mapRowToBioma(rs);
+                lista.add(bioma);
+            }
+        }
+    }
+    
+    return lista;
+}
+
+/**
+ * Añade un nuevo bioma a la base de datos
+ */
+public String aniadirBioma(String nombre, Integer continenteId, String clima, Float porcentajeHumedad, 
+                           String precipitaciones, Float temperaturaMedia) throws SQLException {
+    int rowsAffected = 0;
+    
+    String sql = "INSERT INTO bioma (nombre, ContinenteID, clima, PorcentajeHumedad, Precipitaciones, TemperaturaMedia) VALUES (?, ?, ?, ?, ?, ?)";
+    try (Connection con = DriverManager.getConnection(url);
+         PreparedStatement ps = con.prepareStatement(sql)) {
+        ps.setString(1, nombre);
+        ps.setInt(2, continenteId);
+        ps.setString(3, clima);
+        
+        if (porcentajeHumedad != null) {
+            ps.setFloat(4, porcentajeHumedad);
+        } else {
+            ps.setNull(4, java.sql.Types.FLOAT);
+        }
+        
+        ps.setString(5, precipitaciones);
+        
+        if (temperaturaMedia != null) {
+            ps.setFloat(6, temperaturaMedia);
+        } else {
+            ps.setNull(6, java.sql.Types.FLOAT);
+        }
+        
+        rowsAffected = ps.executeUpdate();
+    }
+    
+    return rowsAffected + " filas afectadas";
+}
+
+/**
+ * Elimina un bioma por su ID
+ */
+public String eliminarBioma(Integer id) throws SQLException {
+    int rowsAffected = 0;
+    
+    try (Connection con = DriverManager.getConnection(url);
+         PreparedStatement ps = con.prepareStatement("DELETE FROM bioma WHERE id = ?")) {
+        ps.setInt(1, id);
+        rowsAffected = ps.executeUpdate();
+    }
+    
+    return rowsAffected + " filas afectadas";
+}
+
+/**
+ * Actualiza los datos de un bioma existente
+ */
+public String actualizarBioma(Integer id, String nombre, Integer continenteId, String clima, 
+                              Float porcentajeHumedad, String precipitaciones, Float temperaturaMedia) throws SQLException {
+    int rowsAffected = 0;
+    
+    String sql = "UPDATE bioma SET nombre = ?, ContinenteID = ?, clima = ?, PorcentajeHumedad = ?, " +
+                "Precipitaciones = ?, TemperaturaMedia = ? WHERE id = ?";
+    try (Connection con = DriverManager.getConnection(url);
+         PreparedStatement ps = con.prepareStatement(sql)) {
+        ps.setString(1, nombre);
+        ps.setInt(2, continenteId);
+        ps.setString(3, clima);
+        
+        if (porcentajeHumedad != null) {
+            ps.setFloat(4, porcentajeHumedad);
+        } else {
+            ps.setNull(4, java.sql.Types.FLOAT);
+        }
+        
+        ps.setString(5, precipitaciones);
+        
+        if (temperaturaMedia != null) {
+            ps.setFloat(6, temperaturaMedia);
+        } else {
+            ps.setNull(6, java.sql.Types.FLOAT);
+        }
+        
+        ps.setInt(7, id);
+        rowsAffected = ps.executeUpdate();
+    }
+    
+    return rowsAffected + " filas afectadas";
+}
+
+/**
+ * Obtiene la lista de todos los biomas
+ */
+public List<Bioma> listarBiomas() throws SQLException {
+    List<Bioma> lista = new ArrayList<>();
+    
+    String sql = "SELECT b.*, c.nombre as continenteNombre FROM bioma b JOIN continente c ON b.ContinenteID = c.id";
+    try (Connection con = DriverManager.getConnection(url);
+         Statement st = con.createStatement();
+         ResultSet rs = st.executeQuery(sql)) {
+        while (rs.next()) {
+            Bioma bioma = mapRowToBioma(rs);
+            lista.add(bioma);
+        }
+    }
+    
+    return lista;
+}
+
+/**
+ * Obtiene un bioma específico por su ID
+ */
+public Bioma obtenerBiomaPorId(Integer id) throws SQLException {
+    Bioma bioma = null;
+    
+    String sql = "SELECT b.*, c.nombre as continenteNombre FROM bioma b JOIN continente c ON b.ContinenteID = c.id WHERE b.id = ?";
+    try (Connection con = DriverManager.getConnection(url);
+         PreparedStatement ps = con.prepareStatement(sql)) {
+        ps.setInt(1, id);
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                bioma = mapRowToBioma(rs);
+            }
+        }
+    }
+    
+    return bioma;
+}
+
+/**
+ * Filtra biomas según varios criterios opcionales
+ */
+public List<Bioma> filtrarBiomas(Integer continenteId, String clima, Float humedadMinima, 
+                                Float tempMin, Float tempMax) throws SQLException {
+    List<Bioma> lista = new ArrayList<>();
+    
+    StringBuilder query = new StringBuilder(
+        "SELECT b.*, c.nombre as continenteNombre FROM bioma b " +
+        "JOIN continente c ON b.ContinenteID = c.id WHERE 1=1"
+    );
+    List<Object> params = new ArrayList<>();
+
+    if (continenteId != null) {
+        query.append(" AND b.ContinenteID = ?");
+        params.add(continenteId);
+    }
+
+    if (clima != null && !clima.isEmpty()) {
+        query.append(" AND b.clima = ?");
+        params.add(clima);
+    }
+
+    if (humedadMinima != null) {
+        query.append(" AND b.PorcentajeHumedad >= ?");
+        params.add(humedadMinima);
+    }
+
+    if (tempMin != null) {
+        query.append(" AND b.TemperaturaMedia >= ?");
+        params.add(tempMin);
+    }
+
+    if (tempMax != null) {
+        query.append(" AND b.TemperaturaMedia <= ?");
+        params.add(tempMax);
+    }
+
+    try (Connection con = DriverManager.getConnection(url);
+         PreparedStatement ps = con.prepareStatement(query.toString())) {
+
+        // Configurar parámetros dinámicamente
+        for (int i = 0; i < params.size(); i++) {
+            ps.setObject(i + 1, params.get(i));
+        }
+
+        try (ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                Bioma bioma = mapRowToBioma(rs);
+                lista.add(bioma);
+            }
+        }
+    }
+    
+    return lista;
+}
+
+/**
+ * Método auxiliar para mapear una fila de ResultSet a un objeto Bioma
+ */
+private Bioma mapRowToBioma(ResultSet rs) throws SQLException {
+    Bioma bioma = new Bioma();
+    bioma.setId(rs.getInt("id"));
+    bioma.setNombre(rs.getString("nombre"));
+    bioma.setContinenteId(rs.getInt("ContinenteID"));
+    bioma.setContinenteNombre(rs.getString("continenteNombre"));
+    bioma.setClima(rs.getString("clima"));
+    
+    // Manejar valores nulos
+    float porcentajeHumedad = rs.getFloat("PorcentajeHumedad");
+    if (!rs.wasNull()) {
+        bioma.setPorcentajeHumedad(porcentajeHumedad);
+    }
+    
+    bioma.setPrecipitaciones(rs.getString("Precipitaciones"));
+    
+    float temperaturaMedia = rs.getFloat("TemperaturaMedia");
+    if (!rs.wasNull()) {
+        bioma.setTemperaturaMedia(temperaturaMedia);
+    }
+    
+    return bioma;
+}
 }

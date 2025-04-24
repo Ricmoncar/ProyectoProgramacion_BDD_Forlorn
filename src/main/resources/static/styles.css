@@ -910,3 +910,240 @@ select.filter-control {
     align-items: center;
     box-shadow: 0;
 }
+
+table.dataTable tbody td {
+    background-color: inherit !important;
+    color: var(--text-light) !important;
+}
+
+/* Fix for highlighted/selected rows and cells */
+table.dataTable tbody tr.selected,
+table.dataTable tbody td.selected,
+table.dataTable tbody th.selected {
+    background-color: rgba(212, 175, 55, 0.1) !important;
+    color: var(--gold) !important;
+}
+
+/* Ensure even rows have the correct background */
+table.dataTable tbody tr:nth-child(even) {
+    background-color: var(--dark-secondary) !important;
+}
+
+/* Ensure odd rows have the correct background */
+table.dataTable tbody tr:nth-child(odd) {
+    background-color: rgba(30, 30, 30, 0.8) !important;
+}
+
+/* Override hover effect to maintain readability */
+table.dataTable tbody tr:hover {
+    background-color: rgba(212, 175, 55, 0.1) !important;
+}
+
+/* Fix for sorting highlight */
+table.dataTable thead th.sorting_asc,
+table.dataTable thead th.sorting_desc {
+    background-color: rgba(212, 175, 55, 0.2) !important;
+}
+
+/* Fix for any other DataTables specific styling that might interfere */
+.dataTables_wrapper .dataTables_scroll div.dataTables_scrollBody > table > tbody > tr > td {
+    background-color: inherit !important;
+}
+
+/* Añadir estos estilos al final de tu archivo styles.css */
+
+/* Hero específico para biomas */
+.biome-hero {
+    height: 50vh;
+    background: linear-gradient(rgba(18, 18, 18, 0.7), rgba(18, 18, 18, 0.9)),
+        url("img/biomas.jpg") no-repeat center center/cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: var(--text-light);
+    padding: 20px;
+}
+
+.biome-hero .hero-content h1 {
+    font-family: 'Cinzel', serif;
+    font-size: 3rem;
+    margin-bottom: 15px;
+    color: var(--gold);
+}
+
+.biome-hero .hero-content p {
+    font-size: 1.1rem;
+    max-width: 800px;
+    margin: 0 auto;
+    color: var(--text-faded);
+}
+
+/* Estilos para el slider de humedad */
+.range-slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 8px;
+    border-radius: 4px;
+    background: #2a2a2a;
+    outline: none;
+    margin-bottom: 10px;
+}
+
+.range-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--gold);
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.range-slider::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--gold);
+    cursor: pointer;
+    transition: background 0.3s ease;
+    border: none;
+}
+
+.range-slider::-webkit-slider-thumb:hover {
+    background: var(--crimson);
+}
+
+.range-slider::-moz-range-thumb:hover {
+    background: var(--crimson);
+}
+
+/* Contador de valor del slider */
+#humedadValue {
+    display: inline-block;
+    margin-left: 10px;
+    color: var(--gold);
+    font-weight: bold;
+    width: 40px;
+    text-align: center;
+}
+
+/* Estilos para las acciones de bioma */
+.biome-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+.biome-actions button {
+    background: none;
+    border: none;
+    color: var(--text-faded);
+    cursor: pointer;
+    transition: color 0.3s ease;
+    padding: 5px;
+    font-size: 1.1rem;
+}
+
+.biome-actions .view-btn:hover {
+    color: #4fa4ff;
+}
+
+.biome-actions .edit-btn:hover {
+    color: var(--gold);
+}
+
+.biome-actions .delete-btn:hover {
+    color: var(--crimson);
+}
+
+/* Estilos para la vista de detalles de bioma */
+.biome-details {
+    margin-top: 20px;
+}
+
+.biome-details .detail-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.biome-details .detail-row:last-child {
+    border-bottom: none;
+}
+
+.biome-details .detail-label {
+    color: var(--gold);
+    font-weight: bold;
+    width: 35%;
+}
+
+.biome-details .detail-value {
+    color: var(--text-light);
+    width: 60%;
+    text-align: right;
+}
+
+/* Estilos adicionales para alertas */
+.alert {
+    padding: 15px;
+    border-radius: 5px;
+    color: var(--text-light);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    margin-bottom: 10px;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.close-alert {
+    background: none;
+    border: none;
+    color: var(--text-light);
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0 5px;
+}
+
+/* Arreglo para tablas en tema oscuro */
+table.dataTable tbody td {
+    background-color: inherit !important;
+    color: var(--text-light) !important;
+}
+
+table.dataTable tbody tr:nth-child(even) {
+    background-color: var(--dark-secondary) !important;
+}
+
+table.dataTable tbody tr:nth-child(odd) {
+    background-color: rgba(30, 30, 30, 0.8) !important;
+}
+
+table.dataTable tbody tr:hover {
+    background-color: rgba(212, 175, 55, 0.1) !important;
+}
+
+table.dataTable thead th.sorting_asc,
+table.dataTable thead th.sorting_desc {
+    background-color: rgba(212, 175, 55, 0.2) !important;
+}
+
+.dataTables_wrapper .dataTables_scroll div.dataTables_scrollBody > table > tbody > tr > td {
+    background-color: inherit !important;
+}

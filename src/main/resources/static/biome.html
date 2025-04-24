@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Continentes - Crónicas del Destino</title>
+    <title>Biomas - Crónicas del Destino</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
@@ -12,7 +12,7 @@
     <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
-    <script src="continent.js"></script>
+    <script src="biome.js"></script>
 </head>
 <body>
     <!-- Contenedor de alertas -->
@@ -25,8 +25,8 @@
             <nav class="nav-links">
                 <a href="index.html">Inicio</a>
                 <a href="planet.html">Planetas</a>
-                <a href="continent.html" class="active">Continentes</a>
-                <a href="biome.html">Biomas</a>
+                <a href="continent.html">Continentes</a>
+                <a href="biome.html" class="active">Biomas</a>
                 <a href="#">?</a>
                 <a href="#">?</a>
             </nav>
@@ -34,37 +34,25 @@
     </header>
 
     <!-- Sección de héroe -->
-    <section class="hero continent-hero">
+    <section class="hero biome-hero">
         <div class="hero-content">
-            <h1>Continentes de Forlorn</h1>
-            <p>Explora las vastas extensiones de tierra que conforman los diversos planetas del universo de Forlorn. Cada continente alberga sus propios ecosistemas, climas y secretos por descubrir.</p>
+            <h1>Biomas de Forlorn</h1>
+            <p>Descubre los diversos ecosistemas que conforman la naturaleza de este vasto universo. Desde frondosos bosques hasta inhóspitos desiertos, cada bioma alberga su propia flora, fauna y condiciones climáticas.</p>
         </div>
     </section>
 
     <!-- Sección principal -->
     <section class="section">
         <div class="container">
-            <h2 class="section-title">Catálogo de Continentes</h2>
+            <h2 class="section-title">Catálogo de Biomas</h2>
 
             <!-- Filtros personalizados -->
             <div class="custom-filters">
                 <div class="filter-group">
-                    <label for="filterPlaneta">Planeta:</label>
-                    <select id="filterPlaneta" class="filter-control">
+                    <label for="filterContinente">Continente:</label>
+                    <select id="filterContinente" class="filter-control">
                         <option value="">Todos</option>
                         <!-- Se llenará dinámicamente desde el JS -->
-                    </select>
-                </div>
-
-                <div class="filter-group">
-                    <label for="filterHemisferio">Hemisferio:</label>
-                    <select id="filterHemisferio" class="filter-control">
-                        <option value="">Todos</option>
-                        <option value="Norte">Norte</option>
-                        <option value="Sur">Sur</option>
-                        <option value="Este">Este</option>
-                        <option value="Oeste">Oeste</option>
-                        <option value="Central">Central</option>
                     </select>
                 </div>
 
@@ -79,15 +67,24 @@
                         <option value="Continental">Continental</option>
                         <option value="Mediterráneo">Mediterráneo</option>
                         <option value="Montañoso">Montañoso</option>
+                        <option value="Húmedo">Húmedo</option>
+                        <option value="Árido">Árido</option>
                     </select>
                 </div>
 
                 <div class="filter-group">
-                    <label for="filterHabitable">Habitable:</label>
-                    <select id="filterHabitable" class="filter-control">
+                    <label for="filterHumedad">Humedad Mínima:</label>
+                    <input type="range" id="filterHumedad" class="filter-control range-slider" min="0" max="100" value="0">
+                    <span id="humedadValue">0%</span>
+                </div>
+
+                <div class="filter-group">
+                    <label for="filterTemperatura">Temperatura Media:</label>
+                    <select id="filterTemperatura" class="filter-control">
                         <option value="">Todos</option>
-                        <option value="true">Sí</option>
-                        <option value="false">No</option>
+                        <option value="baja">Baja (< 10°C)</option>
+                        <option value="media">Media (10-25°C)</option>
+                        <option value="alta">Alta (> 25°C)</option>
                     </select>
                 </div>
 
@@ -101,23 +98,23 @@
 
             <!-- Barra de acción para el botón Añadir -->
             <div class="action-bar" style="margin-bottom: 20px; text-align: right;">
-                <button id="addContinentBtn" class="btn">
-                    <i class="fas fa-plus"></i> Añadir Continente
+                <button id="addBiomeBtn" class="btn">
+                    <i class="fas fa-plus"></i> Añadir Bioma
                 </button>
             </div>
 
             <!-- Contenedor de DataTables -->
             <div class="table-container">
-                <table id="continentsTable" class="display responsive nowrap" style="width:100%">
+                <table id="biomesTable" class="display responsive nowrap" style="width:100%">
                     <thead>
                         <tr>
                             <th>ID</th>
                             <th>Nombre</th>
-                            <th>Planeta</th>
-                            <th>Hemisferio</th>
+                            <th>Continente</th>
                             <th>Clima</th>
-                            <th>Tamaño (km²)</th>
-                            <th>Habitable</th>
+                            <th>Humedad (%)</th>
+                            <th>Precipitaciones</th>
+                            <th>Temperatura (°C)</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -127,41 +124,30 @@
                 </table>
             </div>
 
-            <!-- Modal de Añadir/Editar Continente -->
-            <div id="continentModal" class="modal">
+            <!-- Modal de Añadir/Editar Bioma -->
+            <div id="biomeModal" class="modal">
                 <div class="modal-content">
                     <span class="close-modal">×</span>
-                    <h3 id="continentModalTitle">Añadir/Editar Continente</h3>
-                    <form id="continentForm">
-                        <input type="hidden" id="continentId">
+                    <h3 id="biomeModalTitle">Añadir/Editar Bioma</h3>
+                    <form id="biomeForm">
+                        <input type="hidden" id="biomeId">
 
                         <div class="form-group">
-                            <label for="continentName">Nombre:</label>
-                            <input type="text" id="continentName" class="form-control" required>
+                            <label for="biomeName">Nombre:</label>
+                            <input type="text" id="biomeName" class="form-control" required>
                         </div>
 
                         <div class="form-group">
-                            <label for="continentPlanet">Planeta:</label>
-                            <select id="continentPlanet" class="form-control" required>
-                                <option value="">Seleccione un planeta</option>
+                            <label for="biomeContinent">Continente:</label>
+                            <select id="biomeContinent" class="form-control" required>
+                                <option value="">Seleccione un continente</option>
                                 <!-- Se llenará dinámicamente desde el JS -->
                             </select>
                         </div>
 
                         <div class="form-group">
-                            <label for="continentHemisphere">Hemisferio:</label>
-                            <select id="continentHemisphere" class="form-control">
-                                <option value="Norte">Norte</option>
-                                <option value="Sur">Sur</option>
-                                <option value="Este">Este</option>
-                                <option value="Oeste">Oeste</option>
-                                <option value="Central">Central</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="continentClimate">Clima:</label>
-                            <select id="continentClimate" class="form-control">
+                            <label for="biomeClimate">Clima:</label>
+                            <select id="biomeClimate" class="form-control">
                                 <option value="Tropical">Tropical</option>
                                 <option value="Templado">Templado</option>
                                 <option value="Desértico">Desértico</option>
@@ -169,41 +155,46 @@
                                 <option value="Continental">Continental</option>
                                 <option value="Mediterráneo">Mediterráneo</option>
                                 <option value="Montañoso">Montañoso</option>
+                                <option value="Húmedo">Húmedo</option>
+                                <option value="Árido">Árido</option>
                             </select>
                         </div>
 
                         <div class="form-group">
-                            <label for="continentSize">Tamaño (km²):</label>
-                            <input type="number" id="continentSize" class="form-control" min="0" step="any">
+                            <label for="biomeHumidity">Porcentaje de Humedad (%):</label>
+                            <input type="number" id="biomeHumidity" class="form-control" min="0" max="100" step="0.1">
                         </div>
 
                         <div class="form-group">
-                            <label for="continentHabitable">Habitable:</label>
-                            <select id="continentHabitable" class="form-control">
-                                <option value="1">Sí</option>
-                                <option value="0">No</option>
+                            <label for="biomePrecipitation">Precipitaciones:</label>
+                            <select id="biomePrecipitation" class="form-control">
+                                <option value="Escasas">Escasas</option>
+                                <option value="Moderadas">Moderadas</option>
+                                <option value="Abundantes">Abundantes</option>
+                                <option value="Extremas">Extremas</option>
+                                <option value="Inexistentes">Inexistentes</option>
                             </select>
                         </div>
 
                         <div class="form-group">
-                            <label for="continentDescription">Descripción:</label>
-                            <textarea id="continentDescription" class="form-control"></textarea>
+                            <label for="biomeTemperature">Temperatura Media (°C):</label>
+                            <input type="number" id="biomeTemperature" class="form-control" step="0.1">
                         </div>
 
                         <div class="form-actions">
                             <button type="button" class="btn" id="cancelBtn" style="background-color: #555; border-color: #444;">Cancelar</button>
-                            <button type="submit" class="btn">Guardar Continente</button>
+                            <button type="submit" class="btn">Guardar Bioma</button>
                         </div>
                     </form>
                 </div>
             </div>
 
-            <!-- Modal de Ver Detalles de Continente -->
-            <div id="viewContinentModal" class="modal">
+            <!-- Modal de Ver Detalles de Bioma -->
+            <div id="viewBiomeModal" class="modal">
                 <div class="modal-content">
                     <span class="close-modal">×</span>
-                    <h3 id="viewContinentTitle">Detalles del Continente</h3>
-                    <div id="continentDetails">
+                    <h3 id="viewBiomeTitle">Detalles del Bioma</h3>
+                    <div id="biomeDetails">
                         <!-- Los detalles se poblarán mediante JS -->
                     </div>
                     <div class="form-actions">
@@ -234,7 +225,7 @@
                     <ul class="footer-links">
                         <li><a href="planet.html">Planetas</a></li>
                         <li><a href="continent.html">Continentes</a></li>
-                        <li><a href="#">Biomas</a></li>
+                        <li><a href="biome.html">Biomas</a></li>
                         <li><a href="#">Imperios</a></li>
                         <li><a href="#">Razas</a></li>
                     </ul>

@@ -206,4 +206,82 @@ public class AplicacionSQLController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
+
+/**
+ * Elimina un bioma por su ID
+ */
+@GetMapping("/eliminar_bioma")
+public ResponseEntity<?> eliminarBioma(@RequestParam Integer id) {
+    try {
+        return ResponseEntity.ok().body(servicio.eliminarBioma(id));
+    } catch (SQLException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+    }
+}
+
+/**
+ * Actualiza los datos de un bioma existente
+ */
+@GetMapping("/actualizar_bioma")
+public ResponseEntity<?> actualizarBioma(
+        @RequestParam Integer id,
+        @RequestParam String nombre, 
+        @RequestParam Integer continenteId, 
+        @RequestParam String clima, 
+        @RequestParam(required = false) Float porcentajeHumedad, 
+        @RequestParam(required = false) String precipitaciones, 
+        @RequestParam(required = false) Float temperaturaMedia) {
+    try {
+        return ResponseEntity.ok().body(servicio.actualizarBioma(id, nombre, continenteId, clima, 
+                                     porcentajeHumedad, precipitaciones, temperaturaMedia));
+    } catch (SQLException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+    }
+}
+
+/**
+ * Lista todos los biomas
+ */
+@GetMapping("/listar_biomas")
+public ResponseEntity<?> listarBiomas() {
+    try {
+        return ResponseEntity.ok().body(servicio.listarBiomas());
+    } catch (SQLException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+    }
+}
+
+/**
+ * Obtiene un bioma específico por su ID
+ */
+@GetMapping("/obtener_bioma")
+public ResponseEntity<?> obtenerBiomaPorId(@RequestParam Integer id) {
+    try {
+        Bioma bioma = servicio.obtenerBiomaPorId(id);
+        if (bioma != null) {
+            return ResponseEntity.ok().body(bioma);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Bioma no encontrado");
+        }
+    } catch (SQLException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+    }
+}
+
+/**
+ * Filtra biomas según varios criterios opcionales
+ */
+@GetMapping("/filtrar_biomas")
+public ResponseEntity<?> filtrarBiomas(
+        @RequestParam(required = false) Integer continenteId,
+        @RequestParam(required = false) String clima,
+        @RequestParam(required = false) Float humedadMinima,
+        @RequestParam(required = false) Float tempMin,
+        @RequestParam(required = false) Float tempMax) {
+    try {
+        return ResponseEntity.ok().body(servicio.filtrarBiomas(continenteId, clima, humedadMinima, tempMin, tempMax));
+    } catch (SQLException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+    }
+}
 }

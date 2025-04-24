@@ -52,8 +52,22 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault();
         guardarPlaneta();
     });
+    fixTableDisplay();
 });
-
+function fixTableDisplay() {
+    setTimeout(function() {
+        $('table.dataTable tbody td').css('background-color', 'inherit');
+        
+        $('table.dataTable tbody tr:odd').css('background-color', 'rgba(30, 30, 30, 0.8)');
+        $('table.dataTable tbody tr:even').css('background-color', 'var(--dark-secondary)');
+        
+        $('.dataTable').on('draw.dt', function() {
+            $(this).find('tbody tr:odd').css('background-color', 'rgba(30, 30, 30, 0.8)');
+            $(this).find('tbody tr:even').css('background-color', 'var(--dark-secondary)');
+            $(this).find('tbody td').css('background-color', 'inherit');
+        });
+    }, 100);
+}
 /**
  * Carga la lista de planetas desde el servidor
  */
