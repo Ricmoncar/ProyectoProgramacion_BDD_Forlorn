@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-    /* Inicialización de DataTables */
+    /* Inicialización de tabla de continentes */
     let continentsTable = $('#continentsTable').DataTable({
         language: {
             url: 'https://cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json'
@@ -45,8 +45,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 target: 'tr'
             }
         },
-        order: [[1, 'asc']], // Ordenar por nombre en lugar de ID para evitar problemas de visualización
-        // Solución al problema de visualización con colores de fondo
+        order: [[1, 'asc']], // Ordenar por nombre en lugar de ID
+        // Configuración para solucionar problemas de visualización
         createdRow: function(row, data, dataIndex) {
             // Garantiza que todas las filas tengan el fondo correcto
             $(row).css('background-color', dataIndex % 2 === 0 ? 'rgba(30, 30, 30, 0.8)' : 'var(--dark-secondary)');
@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (applyFiltersBtn) applyFiltersBtn.addEventListener('click', aplicarFiltros);
     if (resetFiltersBtn) resetFiltersBtn.addEventListener('click', resetearFiltros);
 
-    /* Configuración de eventos apara cerrar modales */
+    /* Configuración de eventos para cerrar modales */
     let closeButtons = document.querySelectorAll('.close-modal');
     closeButtons.forEach(function(btn) {
         btn.addEventListener('click', function() {
@@ -104,9 +104,14 @@ document.addEventListener('DOMContentLoaded', function() {
             cerrarModalDetalles();
         }
     });
+    
+    // Corregir visualización de la tabla
     fixTableDisplay();
 });
 
+/**
+ * Corrige problemas de visualización en las tablas con tema oscuro
+ */
 function fixTableDisplay() {
     setTimeout(function() {
         $('table.dataTable tbody td').css('background-color', 'inherit');
@@ -121,8 +126,9 @@ function fixTableDisplay() {
         });
     }, 100);
 }
+
 /**
- * Carga la lista de planetas desde el servidor
+ * Carga la lista de planetas para los selectores
  */
 function cargarPlanetas() {
     fetch("http://localhost:8080/listar_planetas")
