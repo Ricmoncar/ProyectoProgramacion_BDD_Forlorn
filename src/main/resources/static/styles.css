@@ -916,7 +916,6 @@ table.dataTable tbody td {
     color: var(--text-light) !important;
 }
 
-/* Fix for highlighted/selected rows and cells */
 table.dataTable tbody tr.selected,
 table.dataTable tbody td.selected,
 table.dataTable tbody th.selected {
@@ -924,28 +923,23 @@ table.dataTable tbody th.selected {
     color: var(--gold) !important;
 }
 
-/* Ensure even rows have the correct background */
 table.dataTable tbody tr:nth-child(even) {
     background-color: var(--dark-secondary) !important;
 }
 
-/* Ensure odd rows have the correct background */
 table.dataTable tbody tr:nth-child(odd) {
     background-color: rgba(30, 30, 30, 0.8) !important;
 }
 
-/* Override hover effect to maintain readability */
 table.dataTable tbody tr:hover {
     background-color: rgba(212, 175, 55, 0.1) !important;
 }
 
-/* Fix for sorting highlight */
 table.dataTable thead th.sorting_asc,
 table.dataTable thead th.sorting_desc {
     background-color: rgba(212, 175, 55, 0.2) !important;
 }
 
-/* Fix for any other DataTables specific styling that might interfere */
 .dataTables_wrapper .dataTables_scroll div.dataTables_scrollBody > table > tbody > tr > td {
     background-color: inherit !important;
 }
