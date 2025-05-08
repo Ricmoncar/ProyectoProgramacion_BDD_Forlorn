@@ -1150,3 +1150,311 @@ table.dataTable thead th.sorting_desc {
     background-color: inherit !important;
 }
 
+/* Estilos para la página de Personas */
+
+/* Hero específico para personas */
+.person-hero {
+    height: 50vh;
+    background: linear-gradient(rgba(18, 18, 18, 0.7), rgba(18, 18, 18, 0.9)),
+        url("img/people.jpg") no-repeat center center/cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: var(--text-light);
+    padding: 20px;
+}
+
+.person-hero .hero-content h1 {
+    font-family: 'Cinzel', serif;
+    font-size: 3rem;
+    margin-bottom: 15px;
+    color: var(--gold);
+}
+
+.person-hero .hero-content p {
+    font-size: 1.1rem;
+    max-width: 800px;
+    margin: 0 auto;
+    color: var(--text-faded);
+}
+
+/* Estilos para el formulario por secciones */
+.form-section {
+    background-color: rgba(18, 18, 18, 0.5);
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.form-section h4 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.form-grid .full-width {
+    grid-column: 1 / -1;
+}
+
+.stats-grid {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+}
+
+/* Estilos para las pestañas de equipamiento */
+.tabs-container {
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.tabs {
+    display: flex;
+    background-color: var(--dark-bg);
+    border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.tab-btn {
+    background: none;
+    border: none;
+    color: var(--text-faded);
+    padding: 10px 15px;
+    cursor: pointer;
+    flex: 1;
+    text-align: center;
+    border-right: 1px solid rgba(212, 175, 55, 0.2);
+    transition: all 0.3s ease;
+}
+
+.tab-btn:last-child {
+    border-right: none;
+}
+
+.tab-btn.active {
+    background-color: rgba(212, 175, 55, 0.1);
+    color: var(--gold);
+}
+
+.tab-content {
+    padding: 15px;
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Lista de equipamiento */
+.equipment-list {
+    min-height: 100px;
+    margin-bottom: 15px;
+}
+
+.no-items {
+    color: var(--text-faded);
+    font-style: italic;
+    text-align: center;
+    padding: 20px 0;
+}
+
+.equipment-item-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.equipment-item-list li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 10px;
+    margin-bottom: 5px;
+    background-color: var(--dark-bg);
+    border-radius: 4px;
+}
+
+.equipment-name {
+    font-weight: bold;
+    color: var(--gold);
+}
+
+.equipment-property {
+    color: var(--text-faded);
+    font-size: 0.9rem;
+}
+
+.btn-icon {
+    background: none;
+    border: none;
+    color: var(--text-faded);
+    cursor: pointer;
+    transition: color 0.3s ease;
+    padding: 5px;
+    font-size: 1rem;
+}
+
+.btn-icon:hover {
+    color: var(--crimson);
+}
+
+.btn-small {
+    padding: 8px 15px;
+    font-size: 0.9rem;
+}
+
+.add-equipment-btn {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+/* Detalles de persona */
+.person-details {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.person-section {
+    background-color: var(--dark-bg);
+    border-radius: 5px;
+    padding: 15px;
+    border: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.person-section h4 {
+    color: var(--gold);
+    margin-top: 0;
+    margin-bottom: 15px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.person-section h5 {
+    color: var(--gold);
+    margin-top: 15px;
+    margin-bottom: 10px;
+}
+
+.detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.detail-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.detail-label {
+    color: var(--text-faded);
+    font-size: 0.9rem;
+    margin-bottom: 4px;
+}
+
+.detail-value {
+    color: var(--text-light);
+}
+
+.detail-description {
+    margin-top: 10px;
+}
+
+.detail-description .detail-label {
+    margin-bottom: 8px;
+    display: block;
+}
+
+.detail-description p {
+    background-color: rgba(30, 30, 30, 0.8);
+    padding: 10px;
+    border-radius: 4px;
+    margin: 0;
+    color: var(--text-light);
+}
+
+.stats-display {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 10px;
+}
+
+.stat-item {
+    background-color: rgba(30, 30, 30, 0.8);
+    padding: 8px;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.stat-item span {
+    font-weight: bold;
+    color: var(--gold);
+    margin-left: 5px;
+}
+
+.equipment-section {
+    margin-bottom: 15px;
+}
+
+.equipment-list {
+    list-style: none;
+    padding: 0;
+}
+
+.equipment-list li {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.equipment-status {
+    color: var(--text-faded);
+    font-size: 0.9rem;
+}
+
+.equipment-status.equipped {
+    color: var(--gold);
+}
+
+/* Estilos para acciones de personas */
+.person-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+.person-actions button {
+    background: none;
+    border: none;
+    color: var(--text-faded);
+    cursor: pointer;
+    transition: color 0.3s ease;
+    padding: 5px;
+    font-size: 1.1rem;
+}
+
+.person-actions .view-btn:hover {
+    color: #4fa4ff;
+}
+
+.person-actions .edit-btn:hover {
+    color: var(--gold);
+}
+
+.person-actions .delete-btn:hover {
+    color: var(--crimson);
+}
+

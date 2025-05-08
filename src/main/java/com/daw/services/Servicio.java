@@ -1696,4 +1696,974 @@ public List<Guerra> filtrarGuerras(String estado, Integer imperioId) throws SQLE
     return lista;
     
 }
-}
+
+
+  /* ----- Métodos para gestión de Personas ----- */
+    
+    /**
+     * Busca personas que coincidan con el nombre o apellido proporcionado
+     */
+    public List<Persona> buscarPersonas(String nombre) throws SQLException {
+        List<Persona> lista = new ArrayList<>();
+        
+        String sql = "SELECT p.*, r.nombre as raza_nombre, i.nombre as imperio_nombre " +
+                     "FROM persona p " +
+                     "LEFT JOIN raza r ON p.RazaID = r.ID " +
+                     "LEFT JOIN imperio i ON p.ImperioID = i.ID " +
+                     "WHERE p.Nombre LIKE ? OR p.Apellido LIKE ?";
+                     
+        try (Connection con = DriverManager.getConnection(url);
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, "%" + nombre + "%");
+            ps.setString(2, "%" + nombre + "%");
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Persona persona = mapRowToPersonaBasica(rs);
+                    cargarRelacionesPersona(con, persona);
+                    lista.add(persona);
+                }
+            }
+        }
+        
+        return lista;
+    }
+    
+    /**
+     * Añade una nueva persona a la base de datos
+     */
+    public String aniadirPersona(Persona persona) throws SQLException {
+        try (Connection con = DriverManager.getConnection(url)) {
+            con.setAutoCommit(false);
+            
+            try {
+                // 1. Primero creamos las estadísticas
+                Integer estadisticasId = insertarEstadisticas(con, persona.getEstadisticas());
+                
+                // 2. Luego creamos la persona
+                Integer personaId = insertarPersona(con, persona, estadisticasId);
+                
+                // 3. Ahora manejamos las relaciones muchos a muchos
+                if (persona.getArmas() != null && !persona.getArmas().isEmpty()) {
+                    insertarArmasPersona(con, personaId, persona.getArmas());
+                }
+                
+                if (persona.getArmaduras() != null && !persona.getArmaduras().isEmpty()) {
+                    insertarArmadurasPersona(con, personaId, persona.getArmaduras());
+                }
+                
+                if (persona.getHerramientas() != null && !persona.getHerramientas().isEmpty()) {
+                    insertarHerramientasPersona(con, personaId, persona.getHerramientas());
+                }
+                
+                if (persona.getArcanas() != null && !persona.getArcanas().isEmpty()) {
+                    insertarArcanasPersona(con, personaId, persona.getArcanas());
+                }
+                
+                con.commit();
+                return "Persona añadida correctamente con ID: " + personaId;
+            } catch (SQLException e) {
+                con.rollback();
+                throw e;
+            } finally {
+                con.setAutoCommit(true);
+            }
+        }
+    }
+    
+    /**
+     * Actualiza una persona existente
+     */
+    public String actualizarPersona(Persona persona) throws SQLException {
+        if (persona.getId() == null) {
+            throw new SQLException("ID de persona no proporcionado para actualización");
+        }
+        
+        try (Connection con = DriverManager.getConnection(url)) {
+            con.setAutoCommit(false);
+            
+            try {
+                // 1. Verificamos si la persona existe
+                boolean personaExiste = false;
+                Integer estadisticasId = null;
+                
+                try (PreparedStatement ps = con.prepareStatement("SELECT EstadisticasID FROM persona WHERE ID = ?")) {
+                    ps.setInt(1, persona.getId());
+                    try (ResultSet rs = ps.executeQuery()) {
+                        if (rs.next()) {
+                            personaExiste = true;
+                            estadisticasId = rs.getInt("EstadisticasID");
+                            if (rs.wasNull()) {
+                                estadisticasId = null;
+                            }
+                        }
+                    }
+                }
+                
+                if (!personaExiste) {
+                    throw new SQLException("Persona con ID " + persona.getId() + " no existe");
+                }
+                
+                // 2. Actualizamos las estadísticas o creamos nuevas
+                if (estadisticasId != null) {
+                    actualizarEstadisticas(con, estadisticasId, persona.getEstadisticas());
+                } else {
+                    estadisticasId = insertarEstadisticas(con, persona.getEstadisticas());
+                }
+                
+                // 3. Actualizamos la persona
+                actualizarPersona(con, persona, estadisticasId);
+                
+                // 4. Manejamos relaciones muchos a muchos
+                // Primero borramos todas las relaciones existentes
+                eliminarRelacionesPersona(con, persona.getId());
+                
+                // Luego insertamos las nuevas relaciones
+                if (persona.getArmas() != null && !persona.getArmas().isEmpty()) {
+                    insertarArmasPersona(con, persona.getId(), persona.getArmas());
+                }
+                
+                if (persona.getArmaduras() != null && !persona.getArmaduras().isEmpty()) {
+                    insertarArmadurasPersona(con, persona.getId(), persona.getArmaduras());
+                }
+                
+                if (persona.getHerramientas() != null && !persona.getHerramientas().isEmpty()) {
+                    insertarHerramientasPersona(con, persona.getId(), persona.getHerramientas());
+                }
+                
+                if (persona.getArcanas() != null && !persona.getArcanas().isEmpty()) {
+                    insertarArcanasPersona(con, persona.getId(), persona.getArcanas());
+                }
+                
+                con.commit();
+                return "Persona actualizada correctamente";
+            } catch (SQLException e) {
+                con.rollback();
+                throw e;
+            } finally {
+                con.setAutoCommit(true);
+            }
+        }
+    }
+    
+    /**
+     * Elimina una persona por su ID
+     */
+    public String eliminarPersona(Integer id) throws SQLException {
+        try (Connection con = DriverManager.getConnection(url)) {
+            con.setAutoCommit(false);
+            
+            try {
+                // 1. Obtenemos el ID de estadísticas
+                Integer estadisticasId = null;
+                try (PreparedStatement ps = con.prepareStatement("SELECT EstadisticasID FROM persona WHERE ID = ?")) {
+                    ps.setInt(1, id);
+                    try (ResultSet rs = ps.executeQuery()) {
+                        if (rs.next()) {
+                            estadisticasId = rs.getInt("EstadisticasID");
+                            if (rs.wasNull()) {
+                                estadisticasId = null;
+                            }
+                        }
+                    }
+                }
+                
+                // 2. Eliminamos todas las relaciones
+                eliminarRelacionesPersona(con, id);
+                
+                // 3. Eliminamos la persona
+                int rowsAffected = 0;
+                try (PreparedStatement ps = con.prepareStatement("DELETE FROM persona WHERE ID = ?")) {
+                    ps.setInt(1, id);
+                    rowsAffected = ps.executeUpdate();
+                }
+                
+                // 4. Si existe, eliminamos las estadísticas
+                if (estadisticasId != null) {
+                    try (PreparedStatement ps = con.prepareStatement("DELETE FROM estadisticas WHERE ID = ?")) {
+                        ps.setInt(1, estadisticasId);
+                        ps.executeUpdate();
+                    }
+                }
+                
+                con.commit();
+                return rowsAffected + " filas afectadas";
+            } catch (SQLException e) {
+                con.rollback();
+                throw e;
+            } finally {
+                con.setAutoCommit(true);
+            }
+        }
+    }
+    
+    /**
+     * Lista todas las personas
+     */
+    public List<Persona> listarPersonas() throws SQLException {
+        List<Persona> lista = new ArrayList<>();
+        
+        String sql = "SELECT p.*, r.nombre as raza_nombre, i.nombre as imperio_nombre " +
+                     "FROM persona p " +
+                     "LEFT JOIN raza r ON p.RazaID = r.ID " +
+                     "LEFT JOIN imperio i ON p.ImperioID = i.ID";
+        
+        try (Connection con = DriverManager.getConnection(url);
+             Statement st = con.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
+            while (rs.next()) {
+                Persona persona = mapRowToPersonaBasica(rs);
+                cargarRelacionesPersona(con, persona);
+                lista.add(persona);
+            }
+        }
+        
+        return lista;
+    }
+    
+    /**
+     * Obtiene una persona específica por su ID
+     */
+    public Persona obtenerPersonaPorId(Integer id) throws SQLException {
+        Persona persona = null;
+        
+        String sql = "SELECT p.*, r.nombre as raza_nombre, i.nombre as imperio_nombre " +
+                     "FROM persona p " +
+                     "LEFT JOIN raza r ON p.RazaID = r.ID " +
+                     "LEFT JOIN imperio i ON p.ImperioID = i.ID " +
+                     "WHERE p.ID = ?";
+        
+        try (Connection con = DriverManager.getConnection(url);
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    persona = mapRowToPersonaBasica(rs);
+                    cargarRelacionesPersona(con, persona);
+                }
+            }
+        }
+        
+        return persona;
+    }
+    
+    /**
+     * Filtra personas según varios criterios opcionales
+     */
+    public List<Persona> filtrarPersonas(Integer razaId, Integer imperioId, String profesion, Integer nivelMin) throws SQLException {
+        List<Persona> lista = new ArrayList<>();
+        
+        StringBuilder query = new StringBuilder(
+            "SELECT p.*, r.nombre as raza_nombre, i.nombre as imperio_nombre " +
+            "FROM persona p " +
+            "LEFT JOIN raza r ON p.RazaID = r.ID " +
+            "LEFT JOIN imperio i ON p.ImperioID = i.ID " +
+            "LEFT JOIN estadisticas e ON p.EstadisticasID = e.ID " +
+            "WHERE 1=1"
+        );
+        List<Object> params = new ArrayList<>();
+
+        if (razaId != null) {
+            query.append(" AND p.RazaID = ?");
+            params.add(razaId);
+        }
+
+        if (imperioId != null) {
+            query.append(" AND p.ImperioID = ?");
+            params.add(imperioId);
+        }
+
+        if (profesion != null && !profesion.isEmpty()) {
+            query.append(" AND p.Profesion = ?");
+            params.add(profesion);
+        }
+
+        if (nivelMin != null) {
+            query.append(" AND e.LVL >= ?");
+            params.add(nivelMin);
+        }
+
+        try (Connection con = DriverManager.getConnection(url);
+             PreparedStatement ps = con.prepareStatement(query.toString())) {
+
+            // Configurar parámetros dinámicamente
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Persona persona = mapRowToPersonaBasica(rs);
+                    cargarRelacionesPersona(con, persona);
+                    lista.add(persona);
+                }
+            }
+        }
+        
+        return lista;
+    }
+    
+    /**
+     * Lista todas las armas disponibles
+     */
+    public List<Arma> listarArmas() throws SQLException {
+        List<Arma> lista = new ArrayList<>();
+        
+        try (Connection con = DriverManager.getConnection(url);
+             Statement st = con.createStatement();
+             ResultSet rs = st.executeQuery("SELECT * FROM arma")) {
+            while (rs.next()) {
+                Arma arma = new Arma();
+                arma.setMaterial(rs.getString("Material"));
+                arma.setDescripcion(rs.getString("Descripcion"));
+                arma.setPeso(rs.getFloat("Peso"));
+                arma.setPvp(rs.getFloat("PVP"));
+                arma.setOrigen(rs.getString("Origen"));
+                arma.setFechaCreacion(rs.getDate("FechaCreacion"));
+                lista.add(arma);
+            }
+        }
+        
+        return lista;
+    }
+    
+    /**
+     * Lista todas las armaduras disponibles
+     */
+    public List<Armadura> listarArmaduras() throws SQLException {
+        List<Armadura> lista = new ArrayList<>();
+        
+        try (Connection con = DriverManager.getConnection(url);
+             Statement st = con.createStatement();
+             ResultSet rs = st.executeQuery("SELECT * FROM armadura")) {
+            while (rs.next()) {
+                Armadura armadura = new Armadura();
+                armadura.setId(rs.getInt("ID"));
+                armadura.setNombre(rs.getString("Nombre"));
+                armadura.setBufoEstadisticas(rs.getString("BufoEstadisticas"));
+                armadura.setMaterial(rs.getString("Material"));
+                armadura.setDescripcion(rs.getString("Descripcion"));
+                armadura.setPeso(rs.getFloat("Peso"));
+                armadura.setPvp(rs.getFloat("PVP"));
+                armadura.setOrigen(rs.getString("Origen"));
+                armadura.setFechaCreacion(rs.getDate("FechaCreacion"));
+                lista.add(armadura);
+            }
+        }
+        
+        return lista;
+    }
+    
+    /**
+     * Lista todas las herramientas disponibles
+     */
+    public List<Herramienta> listarHerramientas() throws SQLException {
+        List<Herramienta> lista = new ArrayList<>();
+        
+        try (Connection con = DriverManager.getConnection(url);
+             Statement st = con.createStatement();
+             ResultSet rs = st.executeQuery("SELECT * FROM herramienta")) {
+            while (rs.next()) {
+                Herramienta herramienta = new Herramienta();
+                herramienta.setId(rs.getInt("ID"));
+                herramienta.setNombre(rs.getString("Nombre"));
+                herramienta.setBufoEstadisticas(rs.getString("BufoEstadisticas"));
+                herramienta.setMaterial(rs.getString("Material"));
+                herramienta.setDescripcion(rs.getString("Descripcion"));
+                herramienta.setPeso(rs.getFloat("Peso"));
+                herramienta.setPvp(rs.getFloat("PVP"));
+                herramienta.setUso(rs.getString("Uso"));
+                herramienta.setOrigen(rs.getString("Origen"));
+                herramienta.setFechaCreacion(rs.getDate("FechaCreacion"));
+                lista.add(herramienta);
+            }
+        }
+        
+        return lista;
+    }
+    
+    /**
+     * Lista todas las arcanas disponibles
+     */
+    public List<Arcana> listarArcanas() throws SQLException {
+        List<Arcana> lista = new ArrayList<>();
+        
+        try (Connection con = DriverManager.getConnection(url);
+             Statement st = con.createStatement();
+             ResultSet rs = st.executeQuery("SELECT * FROM arcana")) {
+            while (rs.next()) {
+                Arcana arcana = new Arcana();
+                arcana.setId(rs.getInt("ID"));
+                arcana.setTipo(rs.getString("Tipo"));
+                arcana.setMaestria(rs.getString("Maestria"));
+                arcana.setDificultad(rs.getString("Dificultad"));
+                arcana.setFecha(rs.getDate("Fecha"));
+                lista.add(arcana);
+            }
+        }
+        
+        return lista;
+    }
+    
+    /* ----- Métodos auxiliares para personas ----- */
+    
+    /**
+     * Mapea una fila de ResultSet a un objeto Persona básico
+     */
+    private Persona mapRowToPersonaBasica(ResultSet rs) throws SQLException {
+        Persona persona = new Persona();
+        persona.setId(rs.getInt("ID"));
+        persona.setNombre(rs.getString("Nombre"));
+        
+        String apellido = rs.getString("Apellido");
+        if (!rs.wasNull()) {
+            persona.setApellido(apellido);
+        }
+        
+        float ancho = rs.getFloat("Ancho");
+        if (!rs.wasNull()) {
+            persona.setAncho(ancho);
+        }
+        
+        float alto = rs.getFloat("Alto");
+        if (!rs.wasNull()) {
+            persona.setAlto(alto);
+        }
+        
+        persona.setDescripcionFisica(rs.getString("DescripcionFisica"));
+        
+        float grasaCorporal = rs.getFloat("PorcentajeGrasaCorporal");
+        if (!rs.wasNull()) {
+            persona.setPorcentajeGrasaCorporal(grasaCorporal);
+        }
+        
+        persona.setPersonalidad(rs.getString("Personalidad"));
+        persona.setOro(rs.getInt("Oro"));
+        persona.setFechaNacimiento(rs.getDate("FechaNacimiento"));
+        persona.setProfesion(rs.getString("Profesion"));
+        persona.setDireccion(rs.getString("Direccion"));
+        
+        // Relaciones one-to-many
+        int razaId = rs.getInt("RazaID");
+        if (!rs.wasNull()) {
+            persona.setRazaId(razaId);
+            // Si hay un join con raza, obtenemos el nombre
+            String razaNombre = rs.getString("raza_nombre");
+            if (razaNombre != null) {
+                Raza raza = new Raza();
+                raza.setId(razaId);
+                raza.setNombre(razaNombre);
+                persona.setRaza(raza);
+            }
+        }
+        
+        int imperioId = rs.getInt("ImperioID");
+        if (!rs.wasNull()) {
+            persona.setImperioId(imperioId);
+            // Si hay un join con imperio, obtenemos el nombre
+            String imperioNombre = rs.getString("imperio_nombre");
+            if (imperioNombre != null) {
+                Imperio imperio = new Imperio();
+                imperio.setId(imperioId);
+                imperio.setNombre(imperioNombre);
+                persona.setImperio(imperio);
+            }
+        }
+        
+        int estadisticasId = rs.getInt("EstadisticasID");
+        if (!rs.wasNull()) {
+            persona.setEstadisticasId(estadisticasId);
+        }
+        
+        return persona;
+    }
+    
+    /**
+     * Carga todas las relaciones de una persona
+     */
+    private void cargarRelacionesPersona(Connection con, Persona persona) throws SQLException {
+        if (persona == null || persona.getId() == null) {
+            return;
+        }
+        
+        // Cargar estadísticas
+        if (persona.getEstadisticasId() != null) {
+            persona.setEstadisticas(obtenerEstadisticasPorId(con, persona.getEstadisticasId()));
+        }
+        
+        // Cargar armas
+        persona.setArmas(obtenerArmasDePersona(con, persona.getId()));
+        
+        // Cargar armaduras
+        persona.setArmaduras(obtenerArmadurasDePersona(con, persona.getId()));
+        
+        // Cargar herramientas
+        persona.setHerramientas(obtenerHerramientasDePersona(con, persona.getId()));
+        
+        // Cargar arcanas
+        persona.setArcanas(obtenerArcanasDePersona(con, persona.getId()));
+    }
+    
+    /**
+     * Obtiene las estadísticas por su ID
+     */
+    private Estadisticas obtenerEstadisticasPorId(Connection con, Integer id) throws SQLException {
+        Estadisticas estadisticas = null;
+        
+        try (PreparedStatement ps = con.prepareStatement("SELECT * FROM estadisticas WHERE ID = ?")) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    estadisticas = new Estadisticas();
+                    estadisticas.setId(rs.getInt("ID"));
+                    estadisticas.setTipo(rs.getString("Tipo"));
+                    estadisticas.setAtk(rs.getInt("ATK"));
+                    estadisticas.setDef(rs.getInt("DEF"));
+                    estadisticas.setHp(rs.getInt("HP"));
+                    estadisticas.setSpe(rs.getInt("SPE"));
+                    estadisticas.setMat(rs.getInt("MAT"));
+                    estadisticas.setMdf(rs.getInt("MDF"));
+                    estadisticas.setXp(rs.getInt("XP"));
+                    estadisticas.setLvl(rs.getInt("LVL"));
+                }
+            }
+        }
+        
+        return estadisticas;
+    }
+    
+    /**
+     * Obtiene las armas equipadas por una persona
+     */
+    private List<Arma> obtenerArmasDePersona(Connection con, Integer personaId) throws SQLException {
+        List<Arma> armas = new ArrayList<>();
+        
+        String sql = "SELECT a.*, pa.Equipada FROM arma a " +
+                     "JOIN persona_arma pa ON a.ID = pa.ArmaID " +
+                     "WHERE pa.PersonaID = ?";
+        
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, personaId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Arma arma = new Arma();
+                    arma.setId(rs.getInt("ID"));
+                    arma.setNombre(rs.getString("Nombre"));
+                    arma.setBufoEstadisticas(rs.getString("BufoEstadisticas"));
+                    arma.setMaterial(rs.getString("Material"));
+                    arma.setDescripcion(rs.getString("Descripcion"));
+                    arma.setPeso(rs.getFloat("Peso"));
+                    arma.setPvp(rs.getFloat("PVP"));
+                    arma.setOrigen(rs.getString("Origen"));
+                    arma.setFechaCreacion(rs.getDate("FechaCreacion"));
+                    arma.setEquipada(rs.getBoolean("Equipada"));
+                    armas.add(arma);
+                }
+            }
+        }
+        
+        return armas;
+    }
+    
+    /**
+     * Obtiene las armaduras equipadas por una persona
+     */
+    private List<Armadura> obtenerArmadurasDePersona(Connection con, Integer personaId) throws SQLException {
+        List<Armadura> armaduras = new ArrayList<>();
+        
+        String sql = "SELECT a.*, pa.Equipada FROM armadura a " +
+                     "JOIN persona_armadura pa ON a.ID = pa.ArmaduraID " +
+                     "WHERE pa.PersonaID = ?";
+        
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, personaId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Armadura armadura = new Armadura();
+                    armadura.setId(rs.getInt("ID"));
+                    armadura.setNombre(rs.getString("Nombre"));
+                    armadura.setBufoEstadisticas(rs.getString("BufoEstadisticas"));
+                    armadura.setMaterial(rs.getString("Material"));
+                    armadura.setDescripcion(rs.getString("Descripcion"));
+                    armadura.setPeso(rs.getFloat("Peso"));
+                    armadura.setPvp(rs.getFloat("PVP"));
+                    armadura.setOrigen(rs.getString("Origen"));
+                    armadura.setFechaCreacion(rs.getDate("FechaCreacion"));
+                    armadura.setEquipada(rs.getBoolean("Equipada"));
+                    armaduras.add(armadura);
+                }
+            }
+        }
+        
+        return armaduras;
+    }
+    
+    /**
+     * Obtiene las herramientas equipadas por una persona
+     */
+    private List<Herramienta> obtenerHerramientasDePersona(Connection con, Integer personaId) throws SQLException {
+        List<Herramienta> herramientas = new ArrayList<>();
+        
+        String sql = "SELECT h.*, ph.Equipada FROM herramienta h " +
+                     "JOIN persona_herramienta ph ON h.ID = ph.HerramientaID " +
+                     "WHERE ph.PersonaID = ?";
+        
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, personaId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Herramienta herramienta = new Herramienta();
+                    herramienta.setId(rs.getInt("ID"));
+                    herramienta.setNombre(rs.getString("Nombre"));
+                    herramienta.setBufoEstadisticas(rs.getString("BufoEstadisticas"));
+                    herramienta.setMaterial(rs.getString("Material"));
+                    herramienta.setDescripcion(rs.getString("Descripcion"));
+                    herramienta.setPeso(rs.getFloat("Peso"));
+                    herramienta.setPvp(rs.getFloat("PVP"));
+                    herramienta.setUso(rs.getString("Uso"));
+                    herramienta.setOrigen(rs.getString("Origen"));
+                    herramienta.setFechaCreacion(rs.getDate("FechaCreacion"));
+                    herramienta.setEquipada(rs.getBoolean("Equipada"));
+                    herramientas.add(herramienta);
+                }
+            }
+        }
+        
+        return herramientas;
+    }
+    
+    /**
+     * Obtiene las arcanas dominadas por una persona
+     */
+    private List<Arcana> obtenerArcanasDePersona(Connection con, Integer personaId) throws SQLException {
+        List<Arcana> arcanas = new ArrayList<>();
+        
+        String sql = "SELECT a.*, pa.Maestria FROM arcana a " +
+                     "JOIN persona_arcana pa ON a.ID = pa.ArcanaID " +
+                     "WHERE pa.PersonaID = ?";
+        
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, personaId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Arcana arcana = new Arcana();
+                    arcana.setId(rs.getInt("ID"));
+                    arcana.setTipo(rs.getString("Tipo"));
+                    arcana.setDificultad(rs.getString("Dificultad"));
+                    arcana.setFecha(rs.getDate("Fecha"));
+                    // Tomamos la maestría de la tabla intermedia
+                    arcana.setMaestria(rs.getString("Maestria"));
+                    arcanas.add(arcana);
+                }
+            }
+        }
+        
+        return arcanas;
+    }
+    
+    /**
+     * Inserta estadísticas y devuelve el ID generado
+     */
+    private Integer insertarEstadisticas(Connection con, Estadisticas estadisticas) throws SQLException {
+        if (estadisticas == null) {
+            // Crear estadísticas por defecto
+            estadisticas = new Estadisticas();
+            estadisticas.setTipo("Personal");
+            estadisticas.setAtk(10);
+            estadisticas.setDef(10);
+            estadisticas.setHp(10);
+            estadisticas.setSpe(10);
+            estadisticas.setMat(10);
+            estadisticas.setMdf(10);
+            estadisticas.setXp(0);
+            estadisticas.setLvl(1);
+        }
+        
+        String sql = "INSERT INTO estadisticas (Tipo, ATK, DEF, HP, SPE, MAT, MDF, XP, LVL) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setString(1, estadisticas.getTipo() != null ? estadisticas.getTipo() : "Personal");
+            ps.setInt(2, estadisticas.getAtk() != null ? estadisticas.getAtk() : 10);
+            ps.setInt(3, estadisticas.getDef() != null ? estadisticas.getDef() : 10);
+            ps.setInt(4, estadisticas.getHp() != null ? estadisticas.getHp() : 10);
+            ps.setInt(5, estadisticas.getSpe() != null ? estadisticas.getSpe() : 10);
+            ps.setInt(6, estadisticas.getMat() != null ? estadisticas.getMat() : 10);
+            ps.setInt(7, estadisticas.getMdf() != null ? estadisticas.getMdf() : 10);
+            ps.setInt(8, estadisticas.getXp() != null ? estadisticas.getXp() : 0);
+            ps.setInt(9, estadisticas.getLvl() != null ? estadisticas.getLvl() : 1);
+            ps.executeUpdate();
+            
+            try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    return generatedKeys.getInt(1);
+                } else {
+                    throw new SQLException("No se generó ID para las estadísticas");
+                }
+            }
+        }
+    }
+    
+    /**
+     * Actualiza estadísticas existentes
+     */
+    private void actualizarEstadisticas(Connection con, Integer id, Estadisticas estadisticas) throws SQLException {
+        if (estadisticas == null) {
+            return;
+        }
+        
+        String sql = "UPDATE estadisticas SET Tipo = ?, ATK = ?, DEF = ?, HP = ?, SPE = ?, MAT = ?, MDF = ?, XP = ?, LVL = ? WHERE ID = ?";
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, estadisticas.getTipo() != null ? estadisticas.getTipo() : "Personal");
+            ps.setInt(2, estadisticas.getAtk() != null ? estadisticas.getAtk() : 10);
+            ps.setInt(3, estadisticas.getDef() != null ? estadisticas.getDef() : 10);
+            ps.setInt(4, estadisticas.getHp() != null ? estadisticas.getHp() : 10);
+            ps.setInt(5, estadisticas.getSpe() != null ? estadisticas.getSpe() : 10);
+            ps.setInt(6, estadisticas.getMat() != null ? estadisticas.getMat() : 10);
+            ps.setInt(7, estadisticas.getMdf() != null ? estadisticas.getMdf() : 10);
+            ps.setInt(8, estadisticas.getXp() != null ? estadisticas.getXp() : 0);
+            ps.setInt(9, estadisticas.getLvl() != null ? estadisticas.getLvl() : 1);
+            ps.setInt(10, id);
+            ps.executeUpdate();
+        }
+    }
+    
+    /**
+     * Inserta una persona y devuelve el ID generado
+     */
+    private Integer insertarPersona(Connection con, Persona persona, Integer estadisticasId) throws SQLException {
+        String sql = "INSERT INTO persona (Nombre, Apellido, Ancho, Alto, DescripcionFisica, PorcentajeGrasaCorporal, " +
+                     "Personalidad, Oro, FechaNacimiento, Profesion, Direccion, RazaID, ImperioID, EstadisticasID) " +
+                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        
+        try (PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setString(1, persona.getNombre());
+            
+            if (persona.getApellido() != null) {
+                ps.setString(2, persona.getApellido());
+            } else {
+                ps.setNull(2, java.sql.Types.VARCHAR);
+            }
+            
+            if (persona.getAncho() != null) {
+                ps.setFloat(3, persona.getAncho());
+            } else {
+                ps.setNull(3, java.sql.Types.FLOAT);
+            }
+            
+            if (persona.getAlto() != null) {
+                ps.setFloat(4, persona.getAlto());
+            } else {
+                ps.setNull(4, java.sql.Types.FLOAT);
+            }
+            
+            ps.setString(5, persona.getDescripcionFisica());
+            
+            if (persona.getPorcentajeGrasaCorporal() != null) {
+                ps.setFloat(6, persona.getPorcentajeGrasaCorporal());
+            } else {
+                ps.setNull(6, java.sql.Types.FLOAT);
+            }
+            
+            ps.setString(7, persona.getPersonalidad());
+            ps.setInt(8, persona.getOro() != null ? persona.getOro() : 0);
+            
+            if (persona.getFechaNacimiento() != null) {
+                ps.setDate(9, persona.getFechaNacimiento());
+            } else {
+                ps.setNull(9, java.sql.Types.DATE);
+            }
+            
+            ps.setString(10, persona.getProfesion());
+            ps.setString(11, persona.getDireccion());
+            
+            if (persona.getRazaId() != null) {
+                ps.setInt(12, persona.getRazaId());
+            } else {
+                ps.setNull(12, java.sql.Types.INTEGER);
+            }
+            
+            if (persona.getImperioId() != null) {
+                ps.setInt(13, persona.getImperioId());
+            } else {
+                ps.setNull(13, java.sql.Types.INTEGER);
+            }
+            
+            ps.setInt(14, estadisticasId);
+            
+            ps.executeUpdate();
+            
+            try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    return generatedKeys.getInt(1);
+                } else {
+                    throw new SQLException("No se generó ID para la persona");
+                }
+            }
+        }
+    }
+    
+    /**
+     * Actualiza una persona existente
+     */
+    private void actualizarPersona(Connection con, Persona persona, Integer estadisticasId) throws SQLException {
+        String sql = "UPDATE persona SET Nombre = ?, Apellido = ?, Ancho = ?, Alto = ?, DescripcionFisica = ?, " +
+                     "PorcentajeGrasaCorporal = ?, Personalidad = ?, Oro = ?, FechaNacimiento = ?, Profesion = ?, " +
+                     "Direccion = ?, RazaID = ?, ImperioID = ?, EstadisticasID = ? WHERE ID = ?";
+        
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, persona.getNombre());
+            
+            if (persona.getApellido() != null) {
+                ps.setString(2, persona.getApellido());
+            } else {
+                ps.setNull(2, java.sql.Types.VARCHAR);
+            }
+            
+            if (persona.getAncho() != null) {
+                ps.setFloat(3, persona.getAncho());
+            } else {
+                ps.setNull(3, java.sql.Types.FLOAT);
+            }
+            
+            if (persona.getAlto() != null) {
+                ps.setFloat(4, persona.getAlto());
+            } else {
+                ps.setNull(4, java.sql.Types.FLOAT);
+            }
+            
+            ps.setString(5, persona.getDescripcionFisica());
+            
+            if (persona.getPorcentajeGrasaCorporal() != null) {
+                ps.setFloat(6, persona.getPorcentajeGrasaCorporal());
+            } else {
+                ps.setNull(6, java.sql.Types.FLOAT);
+            }
+            
+            ps.setString(7, persona.getPersonalidad());
+            ps.setInt(8, persona.getOro() != null ? persona.getOro() : 0);
+            
+            if (persona.getFechaNacimiento() != null) {
+                ps.setDate(9, persona.getFechaNacimiento());
+            } else {
+                ps.setNull(9, java.sql.Types.DATE);
+            }
+            
+            ps.setString(10, persona.getProfesion());
+            ps.setString(11, persona.getDireccion());
+            
+            if (persona.getRazaId() != null) {
+                ps.setInt(12, persona.getRazaId());
+            } else {
+                ps.setNull(12, java.sql.Types.INTEGER);
+            }
+            
+            if (persona.getImperioId() != null) {
+                ps.setInt(13, persona.getImperioId());
+            } else {
+                ps.setNull(13, java.sql.Types.INTEGER);
+            }
+            
+            ps.setInt(14, estadisticasId);
+            ps.setInt(15, persona.getId());
+            
+            ps.executeUpdate();
+        }
+    }
+    
+    /**
+     * Elimina todas las relaciones de una persona
+     */
+    private void eliminarRelacionesPersona(Connection con, Integer personaId) throws SQLException {
+        // Eliminar relaciones con armas
+        try (PreparedStatement ps = con.prepareStatement("DELETE FROM persona_arma WHERE PersonaID = ?")) {
+            ps.setInt(1, personaId);
+            ps.executeUpdate();
+        }
+        
+        // Eliminar relaciones con armaduras
+        try (PreparedStatement ps = con.prepareStatement("DELETE FROM persona_armadura WHERE PersonaID = ?")) {
+            ps.setInt(1, personaId);
+            ps.executeUpdate();
+        }
+        
+        // Eliminar relaciones con herramientas
+        try (PreparedStatement ps = con.prepareStatement("DELETE FROM persona_herramienta WHERE PersonaID = ?")) {
+            ps.setInt(1, personaId);
+            ps.executeUpdate();
+        }
+        
+        // Eliminar relaciones con arcanas
+        try (PreparedStatement ps = con.prepareStatement("DELETE FROM persona_arcana WHERE PersonaID = ?")) {
+            ps.setInt(1, personaId);
+            ps.executeUpdate();
+        }
+    }
+    
+    /**
+     * Inserta relaciones entre una persona y sus armas
+     */
+    private void insertarArmasPersona(Connection con, Integer personaId, List<Arma> armas) throws SQLException {
+        String sql = "INSERT INTO persona_arma (PersonaID, ArmaID, Equipada) VALUES (?, ?, ?)";
+        
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            for (Arma arma : armas) {
+                ps.setInt(1, personaId);
+                ps.setInt(2, arma.getId());
+                ps.setBoolean(3, arma.getEquipada() != null ? arma.getEquipada() : false);
+                ps.addBatch();
+            }
+            ps.executeBatch();
+        }
+    }
+    
+    /**
+     * Inserta relaciones entre una persona y sus armaduras
+     */
+    private void insertarArmadurasPersona(Connection con, Integer personaId, List<Armadura> armaduras) throws SQLException {
+        String sql = "INSERT INTO persona_armadura (PersonaID, ArmaduraID, Equipada) VALUES (?, ?, ?)";
+        
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            for (Armadura armadura : armaduras) {
+                ps.setInt(1, personaId);
+                ps.setInt(2, armadura.getId());
+                ps.setBoolean(3, armadura.getEquipada() != null ? armadura.getEquipada() : false);
+                ps.addBatch();
+            }
+            ps.executeBatch();
+        }
+    }
+    
+    /**
+     * Inserta relaciones entre una persona y sus herramientas
+     */
+    private void insertarHerramientasPersona(Connection con, Integer personaId, List<Herramienta> herramientas) throws SQLException {
+        String sql = "INSERT INTO persona_herramienta (PersonaID, HerramientaID, Equipada) VALUES (?, ?, ?)";
+        
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            for (Herramienta herramienta : herramientas) {
+                ps.setInt(1, personaId);
+                ps.setInt(2, herramienta.getId());
+                ps.setBoolean(3, herramienta.getEquipada() != null ? herramienta.getEquipada() : false);
+                ps.addBatch();
+            }
+            ps.executeBatch();
+        }
+    }
+    
+    /**
+     * Inserta relaciones entre una persona y sus arcanas
+     */
+    private void insertarArcanasPersona(Connection con, Integer personaId, List<Arcana> arcanas) throws SQLException {
+        String sql = "INSERT INTO persona_arcana (PersonaID, ArcanaID) VALUES (?, ?)";
+        
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            for (Arcana arcana : arcanas) {
+                ps.setInt(1, personaId);
+                ps.setInt(2, arcana.getId());
+                ps.addBatch();
+            }
+            ps.executeBatch();
+        }
+    }
+}Id(rs.getInt("ID"));
+                arma.setNombre(rs.getString("Nombre"));
+                arma.setBufoEstadisticas(rs.getString("BufoEstadisticas"));
+                arma.set

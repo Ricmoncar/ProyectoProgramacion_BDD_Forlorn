@@ -621,4 +621,132 @@ public class AplicacionSQLController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
+ /**
+     * Añade una nueva persona a la base de datos
+     */
+    @GetMapping("/aniadir_persona")
+    public ResponseEntity<?> aniadirPersona(@RequestParam Persona persona) {
+        try {
+            return ResponseEntity.ok().body(servicio.aniadirPersona(persona));
+        } catch (SQLException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+    
+    /**
+     * Actualiza una persona existente
+     */
+    @GetMapping("/actualizar_persona")
+    public ResponseEntity<?> actualizarPersona(@RequestParam Persona persona) {
+        try {
+            return ResponseEntity.ok().body(servicio.actualizarPersona(persona));
+        } catch (SQLException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+    
+    /**
+     * Elimina una persona por su ID
+     */
+    @GetMapping("/eliminar_persona")
+    public ResponseEntity<?> eliminarPersona(@RequestParam Integer id) {
+        try {
+            return ResponseEntity.ok().body(servicio.eliminarPersona(id));
+        } catch (SQLException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+    
+    /**
+     * Lista todas las personas
+     */
+    @GetMapping("/listar_personas")
+    public ResponseEntity<?> listarPersonas() {
+        try {
+            return ResponseEntity.ok().body(servicio.listarPersonas());
+        } catch (SQLException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+    
+    /**
+     * Obtiene una persona específica por su ID
+     */
+    @GetMapping("/obtener_persona")
+    public ResponseEntity<?> obtenerPersonaPorId(@RequestParam Integer id) {
+        try {
+            Persona persona = servicio.obtenerPersonaPorId(id);
+            if (persona != null) {
+                return ResponseEntity.ok().body(persona);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Persona no encontrada");
+            }
+        } catch (SQLException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+    
+    /**
+     * Filtra personas según varios criterios opcionales
+     */
+    @GetMapping("/filtrar_personas")
+    public ResponseEntity<?> filtrarPersonas(
+            @RequestParam(required = false) Integer razaId,
+            @RequestParam(required = false) Integer imperioId,
+            @RequestParam(required = false) String profesion,
+            @RequestParam(required = false) Integer nivelMin) {
+        try {
+            return ResponseEntity.ok().body(servicio.filtrarPersonas(razaId, imperioId, profesion, nivelMin));
+        } catch (SQLException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+    
+    /**
+     * Lista todas las armas
+     */
+    @GetMapping("/listar_armas")
+    public ResponseEntity<?> listarArmas() {
+        try {
+            return ResponseEntity.ok().body(servicio.listarArmas());
+        } catch (SQLException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+    
+    /**
+     * Lista todas las armaduras
+     */
+    @GetMapping("/listar_armaduras")
+    public ResponseEntity<?> listarArmaduras() {
+        try {
+            return ResponseEntity.ok().body(servicio.listarArmaduras());
+        } catch (SQLException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+    
+    /**
+     * Lista todas las herramientas
+     */
+    @GetMapping("/listar_herramientas")
+    public ResponseEntity<?> listarHerramientas() {
+        try {
+            return ResponseEntity.ok().body(servicio.listarHerramientas());
+        } catch (SQLException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+    
+    /**
+     * Lista todas las arcanas
+     */
+    @GetMapping("/listar_arcanas")
+    public ResponseEntity<?> listarArcanas() {
+        try {
+            return ResponseEntity.ok().body(servicio.listarArcanas());
+        } catch (SQLException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
 }

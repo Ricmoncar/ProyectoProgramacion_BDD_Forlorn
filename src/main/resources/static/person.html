@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personas - Crónicas del Destino</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.dataTables.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script src="js/person.js"></script>
+</head>
+<body>
+    <!-- Contenedor de alertas -->
+    <div id="alertContainer"></div>
+
+    <!-- Cabecera -->
+    <header>
+        <div class="container nav-container">
+            <a href="index.html" class="logo">Crónicas del <span>Destino</span></a>
+            <nav class="nav-links">
+                <a href="index.html">Inicio</a>
+                <a href="planet.html">Planetas</a>
+                <a href="continent.html">Continentes</a>
+                <a href="biome.html">Biomas</a>
+                <a href="race.html">Razas</a>
+                <a href="empire.html">Imperios</a>
+                <a href="war.html">Guerras</a>
+                <a href="person.html" class="active">Personas</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Sección de héroe -->
+    <section class="hero person-hero">
+        <div class="hero-content">
+            <h1>Personas de Forlorn</h1>
+            <p>Conoce a los habitantes que dan vida a este vasto universo de fantasía. Desde valientes guerreros hasta sabios hechiceros, cada persona tiene su propia historia, habilidades y destino en el mundo de Forlorn.</p>
+        </div>
+    </section>
+
+    <!-- Sección principal -->
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">Registro de Personas</h2>
+
+            <!-- Filtros personalizados -->
+            <div class="custom-filters">
+                <div class="filter-group">
+                    <label for="filterRaza">Raza:</label>
+                    <select id="filterRaza" class="filter-control">
+                        <option value="">Todas</option>
+                        <!-- Se llenará dinámicamente desde el JS -->
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="filterImperio">Imperio:</label>
+                    <select id="filterImperio" class="filter-control">
+                        <option value="">Todos</option>
+                        <!-- Se llenará dinámicamente desde el JS -->
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="filterProfesion">Profesión:</label>
+                    <select id="filterProfesion" class="filter-control">
+                        <option value="">Todas</option>
+                        <option value="Guerrero">Guerrero</option>
+                        <option value="Mago">Mago</option>
+                        <option value="Comerciante">Comerciante</option>
+                        <option value="Artesano">Artesano</option>
+                        <option value="Noble">Noble</option>
+                        <option value="Campesino">Campesino</option>
+                        <option value="Ladrón">Ladrón</option>
+                        <option value="Sacerdote">Sacerdote</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="filterNivelMin">Nivel mínimo:</label>
+                    <input type="range" id="filterNivelMin" class="filter-control range-slider" min="1" max="100" value="1">
+                    <span id="nivelMinValue">1</span>
+                </div>
+
+                <div class="filter-buttons">
+                    <button id="applyFiltersBtn" class="btn">Aplicar Filtros</button>
+                    <button id="resetFiltersBtn" class="btn" style="background-color: #555; border-color: #444;">Resetear</button>
+                </div>
+                
+                <div id="filterResults"></div>
+            </div>
+
+            <!-- Barra de acción para el botón Añadir -->
+            <div class="action-bar" style="margin-bottom: 20px; text-align: right;">
+                <button id="addPersonBtn" class="btn">
+                    <i class="fas fa-plus"></i> Añadir Persona
+                </button>
+            </div>
+
+            <!-- Contenedor de DataTables -->
+            <div class="table-container">
+                <table id="personsTable" class="display responsive nowrap" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Apellido</th>
+                            <th>Raza</th>
+                            <th>Imperio</th>
+                            <th>Profesión</th>
+                            <th>Nivel</th>
+                            <th>Oro</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Los datos se poblarán mediante DataTables -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Modal de Añadir/Editar Persona -->
+            <div id="personModal" class="modal">
+                <div class="modal-content" style="max-width: 800px;">
+                    <span class="close-modal">×</span>
+                    <h3 id="personModalTitle">Añadir Nueva Persona</h3>
+                    <form id="personForm">
+                        <input type="hidden" id="personId">
+
+                        <!-- Información Personal -->
+                        <div class="form-section">
+                            <h4>Información Personal</h4>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="personName">Nombre:</label>
+                                    <input type="text" id="personName" class="form-control" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="personLastName">Apellido:</label>
+                                    <input type="text" id="personLastName" class="form-control">
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="personRaza">Raza:</label>
+                                    <select id="personRaza" class="form-control" required>
+                                        <option value="">Seleccione una raza</option>
+                                        <!-- Se llenará dinámicamente desde el JS -->
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="personImperio">Imperio:</label>
+                                    <select id="personImperio" class="form-control">
+                                        <option value="">Sin imperio</option>
+                                        <!-- Se llenará dinámicamente desde el JS -->
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="personProfesion">Profesión:</label>
+                                    <select id="personProfesion" class="form-control">
+                                        <option value="">Ninguna</option>
+                                        <option value="Guerrero">Guerrero</option>
+                                        <option value="Mago">Mago</option>
+                                        <option value="Comerciante">Comerciante</option>
+                                        <option value="Artesano">Artesano</option>
+                                        <option value="Noble">Noble</option>
+                                        <option value="Campesino">Campesino</option>
+                                        <option value="Ladrón">Ladrón</option>
+                                        <option value="Sacerdote">Sacerdote</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="personOro">Oro:</label>
+                                    <input type="number" id="personOro" class="form-control" min="0" value="0">
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="personFechaNacimiento">Fecha de Nacimiento:</label>
+                                    <input type="date" id="personFechaNacimiento" class="form-control">
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="personDireccion">Dirección:</label>
+                                    <input type="text" id="personDireccion" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Características Físicas -->
+                        <div class="form-section">
+                            <h4>Características Físicas</h4>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="personAlto">Altura (m):</label>
+                                    <input type="number" id="personAlto" class="form-control" step="0.01" min="0">
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="personAncho">Ancho (m):</label>
+                                    <input type="number" id="personAncho" class="form-control" step="0.01" min="0">
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="personGrasaCorporal">% Grasa Corporal:</label>
+                                    <input type="number" id="personGrasaCorporal" class="form-control" step="0.1" min="0" max="100">
+                                </div>
+
+                                <div class="form-group full-width">
+                                    <label for="personDescripcionFisica">Descripción Física:</label>
+                                    <textarea id="personDescripcionFisica" class="form-control" rows="2"></textarea>
+                                </div>
+
+                                <div class="form-group full-width">
+                                    <label for="personPersonalidad">Personalidad:</label>
+                                    <textarea id="personPersonalidad" class="form-control" rows="2"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Estadísticas -->
+                        <div class="form-section">
+                            <h4>Estadísticas</h4>
+                            <div class="form-grid stats-grid">
+                                <div class="form-group">
+                                    <label for="statATK">ATK:</label>
+                                    <input type="number" id="statATK" class="form-control" min="1" max="100" value="10">
+                                </div>
+                                <div class="form-group">
+                                    <label for="statDEF">DEF:</label>
+                                    <input type="number" id="statDEF" class="form-control" min="1" max="100" value="10">
+                                </div>
+                                <div class="form-group">
+                                    <label for="statHP">HP:</label>
+                                    <input type="number" id="statHP" class="form-control" min="1" max="100" value="10">
+                                </div>
+                                <div class="form-group">
+                                    <label for="statSPE">SPE:</label>
+                                    <input type="number" id="statSPE" class="form-control" min="1" max="100" value="10">
+                                </div>
+                                <div class="form-group">
+                                    <label for="statMAT">MAT:</label>
+                                    <input type="number" id="statMAT" class="form-control" min="1" max="100" value="10">
+                                </div>
+                                <div class="form-group">
+                                    <label for="statMDF">MDF:</label>
+                                    <input type="number" id="statMDF" class="form-control" min="1" max="100" value="10">
+                                </div>
+                                <div class="form-group">
+                                    <label for="statXP">XP:</label>
+                                    <input type="number" id="statXP" class="form-control" min="0" value="0">
+                                </div>
+                                <div class="form-group">
+                                    <label for="statLVL">Nivel:</label>
+                                    <input type="number" id="statLVL" class="form-control" min="1" value="1">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Equipamiento -->
+                        <div class="form-section">
+                            <h4>Equipamiento</h4>
+                            <div class="tabs-container">
+                                <div class="tabs">
+                                    <button type="button" class="tab-btn active" data-tab="armas">Armas</button>
+                                    <button type="button" class="tab-btn" data-tab="armaduras">Armaduras</button>
+                                    <button type="button" class="tab-btn" data-tab="herramientas">Herramientas</button>
+                                    <button type="button" class="tab-btn" data-tab="arcana">Arcana</button>
+                                </div>
+                                
+                                <div class="tab-content active" id="armas-tab">
+                                    <div class="equipment-list" id="armas-list">
+                                        <!-- Lista dinámica de armas -->
+                                        <p class="no-items">No hay armas equipadas</p>
+                                    </div>
+                                    <button type="button" class="btn btn-small add-equipment-btn" data-type="arma">
+                                        <i class="fas fa-plus"></i> Añadir Arma
+                                    </button>
+                                </div>
+                                
+                                <div class="tab-content" id="armaduras-tab">
+                                    <div class="equipment-list" id="armaduras-list">
+                                        <!-- Lista dinámica de armaduras -->
+                                        <p class="no-items">No hay armaduras equipadas</p>
+                                    </div>
+                                    <button type="button" class="btn btn-small add-equipment-btn" data-type="armadura">
+                                        <i class="fas fa-plus"></i> Añadir Armadura
+                                    </button>
+                                </div>
+                                
+                                <div class="tab-content" id="herramientas-tab">
+                                    <div class="equipment-list" id="herramientas-list">
+                                        <!-- Lista dinámica de herramientas -->
+                                        <p class="no-items">No hay herramientas equipadas</p>
+                                    </div>
+                                    <button type="button" class="btn btn-small add-equipment-btn" data-type="herramienta">
+                                        <i class="fas fa-plus"></i> Añadir Herramienta
+                                    </button>
+                                </div>
+                                
+                                <div class="tab-content" id="arcana-tab">
+                                    <div class="equipment-list" id="arcana-list">
+                                        <!-- Lista dinámica de arcana -->
+                                        <p class="no-items">No hay arcana dominada</p>
+                                    </div>
+                                    <button type="button" class="btn btn-small add-equipment-btn" data-type="arcana">
+                                        <i class="fas fa-plus"></i> Añadir Arcana
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn" id="cancelBtn" style="background-color: #555; border-color: #444;">Cancelar</button>
+                            <button type="submit" class="btn">Guardar Persona</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Modal para añadir equipamiento -->
+            <div id="equipmentModal" class="modal">
+                <div class="modal-content">
+                    <span class="close-modal">×</span>
+                    <h3 id="equipmentModalTitle">Añadir Equipamiento</h3>
+                    <form id="equipmentForm">
+                        <input type="hidden" id="equipmentType">
+                        
+                        <div class="form-group">
+                            <label for="equipmentSelect">Seleccionar:</label>
+                            <select id="equipmentSelect" class="form-control" required>
+                                <option value="">Seleccione un elemento</option>
+                                <!-- Se llenará dinámicamente desde el JS -->
+                            </select>
+                        </div>
+
+                        <div class="form-group" id="equipadaGroup">
+                            <label for="equipmentEquipped">¿Equipado?:</label>
+                            <select id="equipmentEquipped" class="form-control">
+                                <option value="true">Sí</option>
+                                <option value="false">No</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group" id="maestriaGroup" style="display: none;">
+                            <label for="arcanaMaestria">Maestría:</label>
+                            <select id="arcanaMaestria" class="form-control">
+                                <option value="Novato">Novato</option>
+                                <option value="Aprendiz">Aprendiz</option>
+                                <option value="Adepto">Adepto</option>
+                                <option value="Experto">Experto</option>
+                                <option value="Maestro">Maestro</option>
+                            </select>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn" id="cancelEquipmentBtn" style="background-color: #555; border-color: #444;">Cancelar</button>
+                            <button type="submit" class="btn">Añadir</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Modal de Ver Detalles de Persona -->
+            <div id="viewPersonModal" class="modal">
+                <div class="modal-content" style="max-width: 800px;">
+                    <span class="close-modal">×</span>
+                    <h3 id="viewPersonTitle">Detalles de la Persona</h3>
+                    <div id="personDetails">
+                        <!-- Los detalles se poblarán mediante JS -->
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn" id="closeViewBtn" style="background-color: #555; border-color: #444;">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pie de página -->
+    <footer>
+        <div class="container">
+            <div class="footer-container">
+                <div class="footer-section">
+                    <h3>Crónicas del Destino</h3>
+                    <p>Un mundo de fantasía meticulosamente creado.</p>
+                    <div class="social-links">
+                        <a href="#" aria-label="Facebook" class="social-link">F</a>
+                        <a href="#" aria-label="Twitter" class="social-link">T</a>
+                        <a href="#" aria-label="Instagram" class="social-link">I</a>
+                        <a href="#" aria-label="Discord" class="social-link">D</a>
+                    </div>
+                </div>
+
+                <div class="footer-section">
+                    <h3>Explorar</h3>
+                    <ul class="footer-links">
+                        <li><a href="planet.html">Planetas</a></li>
+                        <li><a href="continent.html">Continentes</a></li>
+                        <li><a href="biome.html">Biomas</a></li>
+                        <li><a href="race.html">Razas</a></li>
+                        <li><a href="empire.html">Imperios</a></li>
+                        <li><a href="war.html">Guerras</a></li>
+                        <li><a href="person.html">Personas</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h3>Operaciones</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Crear Nueva Entidad</a></li>
+                        <li><a href="#">Editar Existentes</a></li>
+                        <li><a href="#">Explorar Base de Datos</a></li>
+                        <li><a href="#">Generar Informes</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h3>Contacto</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Sobre el Creador</a></li>
+                        <li><a href="#">Contribuir</a></li>
+                        <li><a href="#">Reportar Errores</a></li>
+                        <li><a href="#">Sugerir Mejoras</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="copyright">
+                <p>© 2025 Crónicas del Destino. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
