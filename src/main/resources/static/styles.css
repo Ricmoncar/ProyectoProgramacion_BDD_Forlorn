@@ -200,6 +200,7 @@ header {
         url("img/earth.jpg") no-repeat center center/cover;
 }
 
+
 .continent-hero {
     height: 50vh;
     background: linear-gradient(rgba(18, 18, 18, 0.7), rgba(18, 18, 18, 0.9)),
@@ -224,6 +225,13 @@ header {
     max-width: 800px;
     margin: 0 auto;
     color: var(--text-faded);
+}
+
+
+.race-hero {
+    height: 50vh;
+    background: linear-gradient(rgba(18, 18, 18, 0.7), rgba(18, 18, 18, 0.9)),
+        url("img/race.webp") no-repeat center center/cover;
 }
 
 /* Tarjetas de características */
@@ -1141,3 +1149,4 @@ table.dataTable thead th.sorting_desc {
 .dataTables_wrapper .dataTables_scroll div.dataTables_scrollBody > table > tbody > tr > td {
     background-color: inherit !important;
 }
+

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Continentes - Crónicas del Destino</title>
+    <title>Imperios - Crónicas del Destino</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
@@ -12,7 +12,7 @@
     <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
-    <script src="js/continent.js"></script>
+    <script src="js/empire.js"></script>
 </head>
 <body>
     <!-- Contenedor de alertas -->
@@ -25,66 +25,52 @@
             <nav class="nav-links">
                 <a href="index.html">Inicio</a>
                 <a href="planet.html">Planetas</a>
-                <a href="continent.html" class="active">Continentes</a>
+                <a href="continent.html">Continentes</a>
                 <a href="biome.html">Biomas</a>
-                <a href="#">Razas</a>
-                <a href="#">Imperios</a>
+                <a href="race.html">Razas</a>
+                <a href="empire.html" class="active">Imperios</a>
+                <a href="war.html">Guerras</a>
             </nav>
         </div>
     </header>
 
     <!-- Sección de héroe -->
-    <section class="hero continent-hero">
+    <section class="hero empire-hero">
         <div class="hero-content">
-            <h1>Continentes de Forlorn</h1>
-            <p>Explora las vastas extensiones de tierra que conforman los diversos planetas del universo de Forlorn. Cada continente alberga sus propios ecosistemas, climas y secretos por descubrir.</p>
+            <h1>Imperios de Forlorn</h1>
+            <p>Explora los poderosos imperios que dominan los distintos rincones del universo. Desde civilizaciones avanzadas con vastos territorios hasta pequeños reinos luchando por su supervivencia, cada imperio tiene su propia historia, cultura y ambiciones.</p>
         </div>
     </section>
 
     <!-- Sección principal -->
     <section class="section">
         <div class="container">
-            <h2 class="section-title">Catálogo de Continentes</h2>
+            <h2 class="section-title">Catálogo de Imperios</h2>
 
             <!-- Filtros personalizados -->
             <div class="custom-filters">
                 <div class="filter-group">
-                    <label for="filterPlaneta">Planeta:</label>
-                    <select id="filterPlaneta" class="filter-control">
-                        <option value="">Todos</option>
-                        <!-- Se llenará dinámicamente desde el JS -->
+                    <label for="filterPoblacion">Población Mínima:</label>
+                    <input type="number" id="filterPoblacion" class="filter-control" min="0" step="1000" value="0">
+                </div>
+
+                <div class="filter-group">
+                    <label for="filterIdeologia">Ideología:</label>
+                    <select id="filterIdeologia" class="filter-control">
+                        <option value="">Todas</option>
+                        <option value="Monarquía">Monarquía</option>
+                        <option value="República">República</option>
+                        <option value="Dictadura">Dictadura</option>
+                        <option value="Teocracia">Teocracia</option>
+                        <option value="Oligarquía">Oligarquía</option>
+                        <option value="Democracia">Democracia</option>
+                        <option value="Imperio">Imperio</option>
                     </select>
                 </div>
 
                 <div class="filter-group">
-                    <label for="filterHemisferio">Hemisferio:</label>
-                    <select id="filterHemisferio" class="filter-control">
-                        <option value="">Todos</option>
-                        <option value="Norte">Norte</option>
-                        <option value="Sur">Sur</option>
-                        <option value="Este">Este</option>
-                        <option value="Oeste">Oeste</option>
-                        <option value="Central">Central</option>
-                    </select>
-                </div>
-
-                <div class="filter-group">
-                    <label for="filterClima">Clima:</label>
-                    <select id="filterClima" class="filter-control">
-                        <option value="">Todos</option>
-                        <option value="Tropical">Tropical</option>
-                        <option value="Templado">Templado</option>
-                        <option value="Desértico">Desértico</option>
-                        <option value="Polar">Polar</option>
-                        <option value="Continental">Continental</option>
-                        <option value="Mediterráneo">Mediterráneo</option>
-                        <option value="Montañoso">Montañoso</option>
-                    </select>
-                </div>
-
-                <div class="filter-group">
-                    <label for="filterHabitable">Habitable:</label>
-                    <select id="filterHabitable" class="filter-control">
+                    <label for="filterEnGuerra">En Guerra:</label>
+                    <select id="filterEnGuerra" class="filter-control">
                         <option value="">Todos</option>
                         <option value="true">Sí</option>
                         <option value="false">No</option>
@@ -101,23 +87,23 @@
 
             <!-- Barra de acción para el botón Añadir -->
             <div class="action-bar" style="margin-bottom: 20px; text-align: right;">
-                <button id="addContinentBtn" class="btn">
-                    <i class="fas fa-plus"></i> Añadir Continente
+                <button id="addEmpireBtn" class="btn">
+                    <i class="fas fa-plus"></i> Añadir Imperio
                 </button>
             </div>
 
             <!-- Contenedor de DataTables -->
             <div class="table-container">
-                <table id="continentsTable" class="display responsive nowrap" style="width:100%">
+                <table id="empiresTable" class="display responsive nowrap" style="width:100%">
                     <thead>
                         <tr>
                             <th>ID</th>
                             <th>Nombre</th>
-                            <th>Planeta</th>
-                            <th>Hemisferio</th>
-                            <th>Clima</th>
-                            <th>Tamaño (km²)</th>
-                            <th>Habitable</th>
+                            <th>Líder</th>
+                            <th>Población</th>
+                            <th>Ideología</th>
+                            <th>GDP</th>
+                            <th>En Guerra</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -127,83 +113,84 @@
                 </table>
             </div>
 
-            <!-- Modal de Añadir/Editar Continente -->
-            <div id="continentModal" class="modal">
+            <!-- Modal de Añadir/Editar Imperio -->
+            <div id="empireModal" class="modal">
                 <div class="modal-content">
                     <span class="close-modal">×</span>
-                    <h3 id="continentModalTitle">Añadir/Editar Continente</h3>
-                    <form id="continentForm">
-                        <input type="hidden" id="continentId">
+                    <h3 id="empireModalTitle">Añadir/Editar Imperio</h3>
+                    <form id="empireForm">
+                        <input type="hidden" id="empireId">
 
                         <div class="form-group">
-                            <label for="continentName">Nombre:</label>
-                            <input type="text" id="continentName" class="form-control" required>
+                            <label for="empireName">Nombre:</label>
+                            <input type="text" id="empireName" class="form-control" required>
                         </div>
 
                         <div class="form-group">
-                            <label for="continentPlanet">Planeta:</label>
-                            <select id="continentPlanet" class="form-control" required>
-                                <option value="">Seleccione un planeta</option>
-                                <!-- Se llenará dinámicamente desde el JS -->
+                            <label for="empireLeader">Líder:</label>
+                            <input type="text" id="empireLeader" class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="empirePopulation">Población:</label>
+                            <input type="number" id="empirePopulation" class="form-control" min="0" step="1000">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="empireIdeology">Ideología:</label>
+                            <select id="empireIdeology" class="form-control">
+                                <option value="Monarquía">Monarquía</option>
+                                <option value="República">República</option>
+                                <option value="Dictadura">Dictadura</option>
+                                <option value="Teocracia">Teocracia</option>
+                                <option value="Oligarquía">Oligarquía</option>
+                                <option value="Democracia">Democracia</option>
+                                <option value="Imperio">Imperio</option>
                             </select>
                         </div>
 
                         <div class="form-group">
-                            <label for="continentHemisphere">Hemisferio:</label>
-                            <select id="continentHemisphere" class="form-control">
-                                <option value="Norte">Norte</option>
-                                <option value="Sur">Sur</option>
-                                <option value="Este">Este</option>
-                                <option value="Oeste">Oeste</option>
-                                <option value="Central">Central</option>
+                            <label for="empireGDP">GDP (millones):</label>
+                            <input type="number" id="empireGDP" class="form-control" min="0" step="0.1">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="empireSize">Tamaño (km²):</label>
+                            <input type="number" id="empireSize" class="form-control" min="0" step="1000">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="empireFoundationDate">Fecha de Fundación:</label>
+                            <input type="date" id="empireFoundationDate" class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="empireAtWar">En Guerra:</label>
+                            <select id="empireAtWar" class="form-control">
+                                <option value="false">No</option>
+                                <option value="true">Sí</option>
                             </select>
                         </div>
 
                         <div class="form-group">
-                            <label for="continentClimate">Clima:</label>
-                            <select id="continentClimate" class="form-control">
-                                <option value="Tropical">Tropical</option>
-                                <option value="Templado">Templado</option>
-                                <option value="Desértico">Desértico</option>
-                                <option value="Polar">Polar</option>
-                                <option value="Continental">Continental</option>
-                                <option value="Mediterráneo">Mediterráneo</option>
-                                <option value="Montañoso">Montañoso</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="continentSize">Tamaño (km²):</label>
-                            <input type="number" id="continentSize" class="form-control" min="0" step="any">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="continentHabitable">Habitable:</label>
-                            <select id="continentHabitable" class="form-control">
-                                <option value="1">Sí</option>
-                                <option value="0">No</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="continentDescription">Descripción:</label>
-                            <textarea id="continentDescription" class="form-control"></textarea>
+                            <label for="empireDescription">Descripción:</label>
+                            <textarea id="empireDescription" class="form-control"></textarea>
                         </div>
 
                         <div class="form-actions">
                             <button type="button" class="btn" id="cancelBtn" style="background-color: #555; border-color: #444;">Cancelar</button>
-                            <button type="submit" class="btn">Guardar Continente</button>
+                            <button type="submit" class="btn">Guardar Imperio</button>
                         </div>
                     </form>
                 </div>
             </div>
 
-            <!-- Modal de Ver Detalles de Continente -->
-            <div id="viewContinentModal" class="modal">
+            <!-- Modal de Ver Detalles de Imperio -->
+            <div id="viewEmpireModal" class="modal">
                 <div class="modal-content">
                     <span class="close-modal">×</span>
-                    <h3 id="viewContinentTitle">Detalles del Continente</h3>
-                    <div id="continentDetails">
+                    <h3 id="viewEmpireTitle">Detalles del Imperio</h3>
+                    <div id="empireDetails">
                         <!-- Los detalles se poblarán mediante JS -->
                     </div>
                     <div class="form-actions">
@@ -235,8 +222,9 @@
                         <li><a href="planet.html">Planetas</a></li>
                         <li><a href="continent.html">Continentes</a></li>
                         <li><a href="biome.html">Biomas</a></li>
-                        <li><a href="#">Razas</a></li>
-                        <li><a href="#">Imperios</a></li>
+                        <li><a href="race.html">Razas</a></li>
+                        <li><a href="empire.html">Imperios</a></li>
+                        <li><a href="war.html">Guerras</a></li>
                     </ul>
                 </div>
 

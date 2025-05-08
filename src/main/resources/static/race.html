@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Biomas - Crónicas del Destino</title>
+    <title>Razas - Crónicas del Destino</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
@@ -12,7 +12,7 @@
     <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
-    <script src="js/biome.js"></script>
+    <script src="js/race.js"></script>
 </head>
 <body>
     <!-- Contenedor de alertas -->
@@ -26,66 +26,39 @@
                 <a href="index.html">Inicio</a>
                 <a href="planet.html">Planetas</a>
                 <a href="continent.html">Continentes</a>
-                <a href="biome.html" class="active">Biomas</a>
-                <a href="#">Razas</a>
-                <a href="#">Imperios</a>
+                <a href="biome.html">Biomas</a>
+                <a href="race.html" class="active">Razas</a>
+                <a href="empire.html">Imperios</a>
+                <a href="war.html">Guerras</a>
             </nav>
         </div>
     </header>
 
     <!-- Sección de héroe -->
-    <section class="hero biome-hero">
+    <section class="hero race-hero">
         <div class="hero-content">
-            <h1>Biomas de Forlorn</h1>
-            <p>Descubre los diversos ecosistemas que conforman la naturaleza de este vasto universo. Desde frondosos bosques hasta inhóspitos desiertos, cada bioma alberga su propia flora, fauna y condiciones climáticas.</p>
+            <h1>Razas de Forlorn</h1>
+            <p>Descubre las diversas especies que habitan los mundos de Forlorn. Cada raza tiene sus propias características físicas, habilidades innatas y cultura única que las distingue en el vasto universo.</p>
         </div>
     </section>
 
     <!-- Sección principal -->
     <section class="section">
         <div class="container">
-            <h2 class="section-title">Catálogo de Biomas</h2>
+            <h2 class="section-title">Catálogo de Razas</h2>
 
             <!-- Filtros personalizados -->
             <div class="custom-filters">
                 <div class="filter-group">
-                    <label for="filterContinente">Continente:</label>
-                    <select id="filterContinente" class="filter-control">
-                        <option value="">Todos</option>
-                        <!-- Se llenará dinámicamente desde el JS -->
-                    </select>
+                    <label for="filterAltura">Altura Mínima (m):</label>
+                    <input type="range" id="filterAltura" class="filter-control range-slider" min="0" max="3" step="0.1" value="0">
+                    <span id="alturaValue">0m</span>
                 </div>
 
                 <div class="filter-group">
-                    <label for="filterClima">Clima:</label>
-                    <select id="filterClima" class="filter-control">
-                        <option value="">Todos</option>
-                        <option value="Tropical">Tropical</option>
-                        <option value="Templado">Templado</option>
-                        <option value="Desértico">Desértico</option>
-                        <option value="Polar">Polar</option>
-                        <option value="Continental">Continental</option>
-                        <option value="Mediterráneo">Mediterráneo</option>
-                        <option value="Montañoso">Montañoso</option>
-                        <option value="Húmedo">Húmedo</option>
-                        <option value="Árido">Árido</option>
-                    </select>
-                </div>
-
-                <div class="filter-group">
-                    <label for="filterHumedad">Humedad Mínima:</label>
-                    <input type="range" id="filterHumedad" class="filter-control range-slider" min="0" max="100" value="0">
-                    <span id="humedadValue">0%</span>
-                </div>
-
-                <div class="filter-group">
-                    <label for="filterTemperatura">Temperatura Media:</label>
-                    <select id="filterTemperatura" class="filter-control">
-                        <option value="">Todos</option>
-                        <option value="baja">Baja (< 10°C)</option>
-                        <option value="media">Media (10-25°C)</option>
-                        <option value="alta">Alta (> 25°C)</option>
-                    </select>
+                    <label for="filterAncho">Ancho Mínimo (m):</label>
+                    <input type="range" id="filterAncho" class="filter-control range-slider" min="0" max="3" step="0.1" value="0">
+                    <span id="anchoValue">0m</span>
                 </div>
 
                 <div class="filter-buttons">
@@ -98,23 +71,22 @@
 
             <!-- Barra de acción para el botón Añadir -->
             <div class="action-bar" style="margin-bottom: 20px; text-align: right;">
-                <button id="addBiomeBtn" class="btn">
-                    <i class="fas fa-plus"></i> Añadir Bioma
+                <button id="addRaceBtn" class="btn">
+                    <i class="fas fa-plus"></i> Añadir Raza
                 </button>
             </div>
 
             <!-- Contenedor de DataTables -->
             <div class="table-container">
-                <table id="biomesTable" class="display responsive nowrap" style="width:100%">
+                <table id="racesTable" class="display responsive nowrap" style="width:100%">
                     <thead>
                         <tr>
                             <th>ID</th>
                             <th>Nombre</th>
-                            <th>Continente</th>
-                            <th>Clima</th>
-                            <th>Humedad (%)</th>
-                            <th>Precipitaciones</th>
-                            <th>Temperatura (°C)</th>
+                            <th>Altura Promedio (m)</th>
+                            <th>Ancho Promedio (m)</th>
+                            <th>Fecha Concepción</th>
+                            <th>Estadísticas Base</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -124,77 +96,81 @@
                 </table>
             </div>
 
-            <!-- Modal de Añadir/Editar Bioma -->
-            <div id="biomeModal" class="modal">
+            <!-- Modal de Añadir/Editar Raza -->
+            <div id="raceModal" class="modal">
                 <div class="modal-content">
                     <span class="close-modal">×</span>
-                    <h3 id="biomeModalTitle">Añadir/Editar Bioma</h3>
-                    <form id="biomeForm">
-                        <input type="hidden" id="biomeId">
+                    <h3 id="raceModalTitle">Añadir/Editar Raza</h3>
+                    <form id="raceForm">
+                        <input type="hidden" id="raceId">
 
                         <div class="form-group">
-                            <label for="biomeName">Nombre:</label>
-                            <input type="text" id="biomeName" class="form-control" required>
+                            <label for="raceName">Nombre:</label>
+                            <input type="text" id="raceName" class="form-control" required>
                         </div>
 
                         <div class="form-group">
-                            <label for="biomeContinent">Continente:</label>
-                            <select id="biomeContinent" class="form-control" required>
-                                <option value="">Seleccione un continente</option>
-                                <!-- Se llenará dinámicamente desde el JS -->
-                            </select>
+                            <label for="raceHeight">Altura Promedio (m):</label>
+                            <input type="number" id="raceHeight" class="form-control" step="0.01" min="0">
                         </div>
 
                         <div class="form-group">
-                            <label for="biomeClimate">Clima:</label>
-                            <select id="biomeClimate" class="form-control">
-                                <option value="Tropical">Tropical</option>
-                                <option value="Templado">Templado</option>
-                                <option value="Desértico">Desértico</option>
-                                <option value="Polar">Polar</option>
-                                <option value="Continental">Continental</option>
-                                <option value="Mediterráneo">Mediterráneo</option>
-                                <option value="Montañoso">Montañoso</option>
-                                <option value="Húmedo">Húmedo</option>
-                                <option value="Árido">Árido</option>
-                            </select>
+                            <label for="raceWidth">Ancho Promedio (m):</label>
+                            <input type="number" id="raceWidth" class="form-control" step="0.01" min="0">
                         </div>
 
                         <div class="form-group">
-                            <label for="biomeHumidity">Porcentaje de Humedad (%):</label>
-                            <input type="number" id="biomeHumidity" class="form-control" min="0" max="100" step="0.1">
+                            <label for="raceConceptionDate">Fecha de Concepción:</label>
+                            <input type="date" id="raceConceptionDate" class="form-control">
                         </div>
 
                         <div class="form-group">
-                            <label for="biomePrecipitation">Precipitaciones:</label>
-                            <select id="biomePrecipitation" class="form-control">
-                                <option value="Escasas">Escasas</option>
-                                <option value="Moderadas">Moderadas</option>
-                                <option value="Abundantes">Abundantes</option>
-                                <option value="Extremas">Extremas</option>
-                                <option value="Inexistentes">Inexistentes</option>
-                            </select>
+                            <label for="racePhysicalDesc">Descripción Física:</label>
+                            <textarea id="racePhysicalDesc" class="form-control"></textarea>
                         </div>
 
-                        <div class="form-group">
-                            <label for="biomeTemperature">Temperatura Media (°C):</label>
-                            <input type="number" id="biomeTemperature" class="form-control" step="0.1">
+                        <h4>Estadísticas Base</h4>
+                        <div class="stats-grid">
+                            <div class="form-group">
+                                <label for="statATK">ATK:</label>
+                                <input type="number" id="statATK" class="form-control" min="1" max="100" value="10">
+                            </div>
+                            <div class="form-group">
+                                <label for="statDEF">DEF:</label>
+                                <input type="number" id="statDEF" class="form-control" min="1" max="100" value="10">
+                            </div>
+                            <div class="form-group">
+                                <label for="statHP">HP:</label>
+                                <input type="number" id="statHP" class="form-control" min="1" max="100" value="10">
+                            </div>
+                            <div class="form-group">
+                                <label for="statSPE">SPE:</label>
+                                <input type="number" id="statSPE" class="form-control" min="1" max="100" value="10">
+                            </div>
+                            <div class="form-group">
+                                <label for="statMAT">MAT:</label>
+                                <input type="number" id="statMAT" class="form-control" min="1" max="100" value="10">
+                            </div>
+                            <div class="form-group">
+                                <label for="statMDF">MDF:</label>
+                                <input type="number" id="statMDF" class="form-control" min="1" max="100" value="10">
+                            </div>
                         </div>
 
                         <div class="form-actions">
                             <button type="button" class="btn" id="cancelBtn" style="background-color: #555; border-color: #444;">Cancelar</button>
-                            <button type="submit" class="btn">Guardar Bioma</button>
+                            <button type="submit" class="btn">Guardar Raza</button>
                         </div>
                     </form>
                 </div>
             </div>
 
-            <!-- Modal de Ver Detalles de Bioma -->
-            <div id="viewBiomeModal" class="modal">
+            <!-- Modal de Ver Detalles de Raza -->
+            <div id="viewRaceModal" class="modal">
                 <div class="modal-content">
                     <span class="close-modal">×</span>
-                    <h3 id="viewBiomeTitle">Detalles del Bioma</h3>
-                    <div id="biomeDetails">
+                    <h3 id="viewRaceTitle">Detalles de la Raza</h3>
+                    <div id="raceDetails">
                         <!-- Los detalles se poblarán mediante JS -->
                     </div>
                     <div class="form-actions">
@@ -226,8 +202,9 @@
                         <li><a href="planet.html">Planetas</a></li>
                         <li><a href="continent.html">Continentes</a></li>
                         <li><a href="biome.html">Biomas</a></li>
-                        <li><a href="#">Razas</a></li>
-                        <li><a href="#">Imperios</a></li>
+                        <li><a href="race.html">Razas</a></li>
+                        <li><a href="empire.html">Imperios</a></li>
+                        <li><a href="war.html">Guerras</a></li>
                     </ul>
                 </div>
 

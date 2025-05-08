@@ -304,4 +304,321 @@ public class AplicacionSQLController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
+
+     /**
+     * Busca razas por nombre (o todas si no se proporciona nombre)
+     */
+    @GetMapping("/consulta_razas")
+    public ResponseEntity<?> buscarRazas(@RequestParam(required = false, defaultValue = "") String nombre) {
+        try {
+            return ResponseEntity.ok().body(servicio.buscarRazas(nombre));
+        } catch (SQLException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+    
+    /**
+     * Añade una nueva raza a la base de datos
+     */
+    @GetMapping("/aniadir_raza")
+    public ResponseEntity<?> aniadirRaza(
+            @RequestParam String nombre, 
+            @RequestParam(required = false) String descripcionFisica, 
+            @RequestParam(required = false) Date fechaConcepcion, 
+            @RequestParam(required = false) Float alturaPromedia, 
+            @RequestParam(required = false) Float anchoPromedio,
+            @RequestParam(defaultValue = "10") Integer atk,
+            @RequestParam(defaultValue = "10") Integer def,
+            @RequestParam(defaultValue = "10") Integer hp,
+            @RequestParam(defaultValue = "10") Integer spe,
+            @RequestParam(defaultValue = "10") Integer mat,
+            @RequestParam(defaultValue = "10") Integer mdf) {
+        try {
+            return ResponseEntity.ok().body(servicio.aniadirRaza(nombre, descripcionFisica, fechaConcepcion, alturaPromedia, anchoPromedio, atk, def, hp, spe, mat, mdf));
+        } catch (SQLException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+    
+    /**
+     * Elimina una raza por su ID
+     */
+    @GetMapping("/eliminar_raza")
+    public ResponseEntity<?> eliminarRaza(@RequestParam Integer id) {
+        try {
+            return ResponseEntity.ok().body(servicio.eliminarRaza(id));
+        } catch (SQLException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+    
+    /**
+     * Actualiza los datos de una raza existente
+     */
+    @GetMapping("/actualizar_raza")
+    public ResponseEntity<?> actualizarRaza(
+            @RequestParam Integer id, 
+            @RequestParam String nombre, 
+            @RequestParam(required = false) String descripcionFisica, 
+            @RequestParam(required = false) Date fechaConcepcion, 
+            @RequestParam(required = false) Float alturaPromedia, 
+            @RequestParam(required = false) Float anchoPromedio,
+            @RequestParam(defaultValue = "10") Integer atk,
+            @RequestParam(defaultValue = "10") Integer def,
+            @RequestParam(defaultValue = "10") Integer hp,
+            @RequestParam(defaultValue = "10") Integer spe,
+            @RequestParam(defaultValue = "10") Integer mat,
+            @RequestParam(defaultValue = "10") Integer mdf) {
+        try {
+            return ResponseEntity.ok().body(servicio.actualizarRaza(id, nombre, descripcionFisica, fechaConcepcion, alturaPromedia, anchoPromedio, atk, def, hp, spe, mat, mdf));
+        } catch (SQLException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+    
+    /**
+     * Lista todas las razas
+     */
+    @GetMapping("/listar_razas")
+    public ResponseEntity<?> listarRazas() {
+        try {
+            return ResponseEntity.ok().body(servicio.listarRazas());
+        } catch (SQLException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+    
+    /**
+     * Obtiene una raza específica por su ID
+     */
+    @GetMapping("/obtener_raza")
+    public ResponseEntity<?> obtenerRazaPorId(@RequestParam Integer id) {
+        try {
+            Raza raza = servicio.obtenerRazaPorId(id);
+            if (raza != null) {
+                return ResponseEntity.ok().body(raza);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Raza no encontrada");
+            }
+        } catch (SQLException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+    
+    /**
+     * Filtra razas según varios criterios opcionales
+     */
+    @GetMapping("/filtrar_razas")
+    public ResponseEntity<?> filtrarRazas(
+            @RequestParam(required = false) Float alturaMinima,
+            @RequestParam(required = false) Float anchoMinimo) {
+        try {
+            return ResponseEntity.ok().body(servicio.filtrarRazas(alturaMinima, anchoMinimo));
+        } catch (SQLException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    /**
+     * Busca imperios por nombre (o todos si no se proporciona nombre)
+     */
+    @GetMapping("/consulta_imperios")
+    public ResponseEntity<?> buscarImperios(@RequestParam(required = false, defaultValue = "") String nombre) {
+        try {
+            return ResponseEntity.ok().body(servicio.buscarImperios(nombre));
+        } catch (SQLException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+    
+    /**
+     * Añade un nuevo imperio a la base de datos
+     */
+    @GetMapping("/aniadir_imperio")
+    public ResponseEntity<?> aniadirImperio(
+            @RequestParam String nombre, 
+            @RequestParam(required = false) Integer poblacion, 
+            @RequestParam(required = false) String descripcion, 
+            @RequestParam(required = false) Date fechaCreacion, 
+            @RequestParam(required = false) String lider, 
+            @RequestParam(required = false) String ideologia, 
+            @RequestParam(required = false) Float gdp, 
+            @RequestParam(required = false) Float tamanio, 
+            @RequestParam(required = false, defaultValue = "false") Boolean enGuerra) {
+        try {
+            return ResponseEntity.ok().body(servicio.aniadirImperio(nombre, poblacion, descripcion, fechaCreacion, lider, ideologia, gdp, tamanio, enGuerra));
+        } catch (SQLException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+    
+    /**
+     * Elimina un imperio por su ID
+     */
+    @GetMapping("/eliminar_imperio")
+    public ResponseEntity<?> eliminarImperio(@RequestParam Integer id) {
+        try {
+            return ResponseEntity.ok().body(servicio.eliminarImperio(id));
+        } catch (SQLException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+    
+    /**
+     * Actualiza los datos de un imperio existente
+     */
+    @GetMapping("/actualizar_imperio")
+    public ResponseEntity<?> actualizarImperio(
+            @RequestParam Integer id, 
+            @RequestParam String nombre, 
+            @RequestParam(required = false) Integer poblacion, 
+            @RequestParam(required = false) String descripcion, 
+            @RequestParam(required = false) Date fechaCreacion, 
+            @RequestParam(required = false) String lider, 
+            @RequestParam(required = false) String ideologia, 
+            @RequestParam(required = false) Float gdp, 
+            @RequestParam(required = false) Float tamanio, 
+            @RequestParam(required = false, defaultValue = "false") Boolean enGuerra) {
+        try {
+            return ResponseEntity.ok().body(servicio.actualizarImperio(id, nombre, poblacion, descripcion, fechaCreacion, lider, ideologia, gdp, tamanio, enGuerra));
+        } catch (SQLException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+    
+    /**
+     * Lista todos los imperios
+     */
+    @GetMapping("/listar_imperios")
+    public ResponseEntity<?> listarImperios() {
+        try {
+            return ResponseEntity.ok().body(servicio.listarImperios());
+        } catch (SQLException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+    
+    /**
+     * Obtiene un imperio específico por su ID
+     */
+    @GetMapping("/obtener_imperio")
+    public ResponseEntity<?> obtenerImperioPorId(@RequestParam Integer id) {
+        try {
+            Imperio imperio = servicio.obtenerImperioPorId(id);
+            if (imperio != null) {
+                return ResponseEntity.ok().body(imperio);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Imperio no encontrado");
+            }
+        } catch (SQLException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+    
+    /**
+     * Filtra imperios según varios criterios opcionales
+     */
+    @GetMapping("/filtrar_imperios")
+    public ResponseEntity<?> filtrarImperios(
+            @RequestParam(required = false) Integer poblacionMinima,
+            @RequestParam(required = false) String ideologia,
+            @RequestParam(required = false) Boolean enGuerra) {
+        try {
+            return ResponseEntity.ok().body(servicio.filtrarImperios(poblacionMinima, ideologia, enGuerra));
+        } catch (SQLException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+
+    /**
+     * Busca guerras por nombre (o todas si no se proporciona nombre)
+     */
+    @GetMapping("/consulta_guerras")
+    public ResponseEntity<?> buscarGuerras(@RequestParam(required = false, defaultValue = "") String nombre) {
+        try {
+            return ResponseEntity.ok().body(servicio.buscarGuerras(nombre));
+        } catch (SQLException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+    
+    /**
+     * Añade una nueva guerra a la base de datos
+     */
+    @GetMapping("/aniadir_guerra")
+    public ResponseEntity<?> aniadirGuerra(@RequestParam Guerra guerra) {
+        try {
+            return ResponseEntity.ok().body(servicio.aniadirGuerra(guerra));
+        } catch (SQLException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+    
+    /**
+     * Elimina una guerra por su ID
+     */
+    @GetMapping("/eliminar_guerra")
+    public ResponseEntity<?> eliminarGuerra(@RequestParam Integer id) {
+        try {
+            return ResponseEntity.ok().body(servicio.eliminarGuerra(id));
+        } catch (SQLException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+    
+    /**
+     * Actualiza los datos de una guerra existente
+     */
+    @GetMapping("/actualizar_guerra")
+    public ResponseEntity<?> actualizarGuerra(@RequestParam Guerra guerra) {
+        try {
+            return ResponseEntity.ok().body(servicio.actualizarGuerra(guerra));
+        } catch (SQLException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+    
+    /**
+     * Lista todas las guerras
+     */
+    @GetMapping("/listar_guerras")
+    public ResponseEntity<?> listarGuerras() {
+        try {
+            return ResponseEntity.ok().body(servicio.listarGuerras());
+        } catch (SQLException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+    
+    /**
+     * Obtiene una guerra específica por su ID
+     */
+    @GetMapping("/obtener_guerra")
+    public ResponseEntity<?> obtenerGuerraPorId(@RequestParam Integer id) {
+        try {
+            Guerra guerra = servicio.obtenerGuerraPorId(id);
+            if (guerra != null) {
+                return ResponseEntity.ok().body(guerra);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Guerra no encontrada");
+            }
+        } catch (SQLException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+    
+    /**
+     * Filtra guerras según varios criterios opcionales
+     */
+    @GetMapping("/filtrar_guerras")
+    public ResponseEntity<?> filtrarGuerras(
+            @RequestParam(required = false) String estado,
+            @RequestParam(required = false) Integer imperioId) {
+        try {
+            return ResponseEntity.ok().body(servicio.filtrarGuerras(estado, imperioId));
+        } catch (SQLException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
 }

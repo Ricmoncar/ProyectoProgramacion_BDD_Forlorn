@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Continentes - Crónicas del Destino</title>
+    <title>Guerras - Crónicas del Destino</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
@@ -12,7 +12,7 @@
     <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
-    <script src="js/continent.js"></script>
+    <script src="js/war.js"></script>
 </head>
 <body>
     <!-- Contenedor de alertas -->
@@ -25,69 +25,44 @@
             <nav class="nav-links">
                 <a href="index.html">Inicio</a>
                 <a href="planet.html">Planetas</a>
-                <a href="continent.html" class="active">Continentes</a>
+                <a href="continent.html">Continentes</a>
                 <a href="biome.html">Biomas</a>
-                <a href="#">Razas</a>
-                <a href="#">Imperios</a>
+                <a href="race.html">Razas</a>
+                <a href="empire.html">Imperios</a>
+                <a href="war.html" class="active">Guerras</a>
             </nav>
         </div>
     </header>
 
     <!-- Sección de héroe -->
-    <section class="hero continent-hero">
+    <section class="hero war-hero">
         <div class="hero-content">
-            <h1>Continentes de Forlorn</h1>
-            <p>Explora las vastas extensiones de tierra que conforman los diversos planetas del universo de Forlorn. Cada continente alberga sus propios ecosistemas, climas y secretos por descubrir.</p>
+            <h1>Conflictos y Guerras de Forlorn</h1>
+            <p>Explora los conflictos épicos que han moldeado la historia del universo. Desde batallas legendarias hasta guerras que abarcaron galaxias enteras, cada conflicto ha dejado su huella en el destino de las civilizaciones.</p>
         </div>
     </section>
 
     <!-- Sección principal -->
     <section class="section">
         <div class="container">
-            <h2 class="section-title">Catálogo de Continentes</h2>
+            <h2 class="section-title">Registro de Conflictos</h2>
 
             <!-- Filtros personalizados -->
             <div class="custom-filters">
                 <div class="filter-group">
-                    <label for="filterPlaneta">Planeta:</label>
-                    <select id="filterPlaneta" class="filter-control">
+                    <label for="filterStatus">Estado:</label>
+                    <select id="filterStatus" class="filter-control">
+                        <option value="">Todos</option>
+                        <option value="activo">Activo</option>
+                        <option value="finalizado">Finalizado</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="filterEmpire">Imperio Participante:</label>
+                    <select id="filterEmpire" class="filter-control">
                         <option value="">Todos</option>
                         <!-- Se llenará dinámicamente desde el JS -->
-                    </select>
-                </div>
-
-                <div class="filter-group">
-                    <label for="filterHemisferio">Hemisferio:</label>
-                    <select id="filterHemisferio" class="filter-control">
-                        <option value="">Todos</option>
-                        <option value="Norte">Norte</option>
-                        <option value="Sur">Sur</option>
-                        <option value="Este">Este</option>
-                        <option value="Oeste">Oeste</option>
-                        <option value="Central">Central</option>
-                    </select>
-                </div>
-
-                <div class="filter-group">
-                    <label for="filterClima">Clima:</label>
-                    <select id="filterClima" class="filter-control">
-                        <option value="">Todos</option>
-                        <option value="Tropical">Tropical</option>
-                        <option value="Templado">Templado</option>
-                        <option value="Desértico">Desértico</option>
-                        <option value="Polar">Polar</option>
-                        <option value="Continental">Continental</option>
-                        <option value="Mediterráneo">Mediterráneo</option>
-                        <option value="Montañoso">Montañoso</option>
-                    </select>
-                </div>
-
-                <div class="filter-group">
-                    <label for="filterHabitable">Habitable:</label>
-                    <select id="filterHabitable" class="filter-control">
-                        <option value="">Todos</option>
-                        <option value="true">Sí</option>
-                        <option value="false">No</option>
                     </select>
                 </div>
 
@@ -101,23 +76,22 @@
 
             <!-- Barra de acción para el botón Añadir -->
             <div class="action-bar" style="margin-bottom: 20px; text-align: right;">
-                <button id="addContinentBtn" class="btn">
-                    <i class="fas fa-plus"></i> Añadir Continente
+                <button id="addWarBtn" class="btn">
+                    <i class="fas fa-plus"></i> Registrar Guerra
                 </button>
             </div>
 
             <!-- Contenedor de DataTables -->
             <div class="table-container">
-                <table id="continentsTable" class="display responsive nowrap" style="width:100%">
+                <table id="warsTable" class="display responsive nowrap" style="width:100%">
                     <thead>
                         <tr>
                             <th>ID</th>
                             <th>Nombre</th>
-                            <th>Planeta</th>
-                            <th>Hemisferio</th>
-                            <th>Clima</th>
-                            <th>Tamaño (km²)</th>
-                            <th>Habitable</th>
+                            <th>Inicio</th>
+                            <th>Fin</th>
+                            <th>Estado</th>
+                            <th>Imperios Participantes</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -127,83 +101,99 @@
                 </table>
             </div>
 
-            <!-- Modal de Añadir/Editar Continente -->
-            <div id="continentModal" class="modal">
-                <div class="modal-content">
+            <!-- Modal de Añadir/Editar Guerra -->
+            <div id="warModal" class="modal">
+                <div class="modal-content" style="max-width: 700px;">
                     <span class="close-modal">×</span>
-                    <h3 id="continentModalTitle">Añadir/Editar Continente</h3>
-                    <form id="continentForm">
-                        <input type="hidden" id="continentId">
+                    <h3 id="warModalTitle">Registrar Nueva Guerra</h3>
+                    <form id="warForm">
+                        <input type="hidden" id="warId">
 
                         <div class="form-group">
-                            <label for="continentName">Nombre:</label>
-                            <input type="text" id="continentName" class="form-control" required>
+                            <label for="warName">Nombre:</label>
+                            <input type="text" id="warName" class="form-control" required>
                         </div>
 
                         <div class="form-group">
-                            <label for="continentPlanet">Planeta:</label>
-                            <select id="continentPlanet" class="form-control" required>
-                                <option value="">Seleccione un planeta</option>
-                                <!-- Se llenará dinámicamente desde el JS -->
-                            </select>
+                            <label for="warStartDate">Fecha de Inicio:</label>
+                            <input type="date" id="warStartDate" class="form-control" required>
                         </div>
 
                         <div class="form-group">
-                            <label for="continentHemisphere">Hemisferio:</label>
-                            <select id="continentHemisphere" class="form-control">
-                                <option value="Norte">Norte</option>
-                                <option value="Sur">Sur</option>
-                                <option value="Este">Este</option>
-                                <option value="Oeste">Oeste</option>
-                                <option value="Central">Central</option>
-                            </select>
+                            <label for="warEndDate">Fecha de Finalización:</label>
+                            <input type="date" id="warEndDate" class="form-control">
+                            <small>Dejar vacío si el conflicto sigue activo</small>
                         </div>
 
                         <div class="form-group">
-                            <label for="continentClimate">Clima:</label>
-                            <select id="continentClimate" class="form-control">
-                                <option value="Tropical">Tropical</option>
-                                <option value="Templado">Templado</option>
-                                <option value="Desértico">Desértico</option>
-                                <option value="Polar">Polar</option>
-                                <option value="Continental">Continental</option>
-                                <option value="Mediterráneo">Mediterráneo</option>
-                                <option value="Montañoso">Montañoso</option>
-                            </select>
+                            <label for="warDescription">Descripción:</label>
+                            <textarea id="warDescription" class="form-control"></textarea>
                         </div>
 
-                        <div class="form-group">
-                            <label for="continentSize">Tamaño (km²):</label>
-                            <input type="number" id="continentSize" class="form-control" min="0" step="any">
+                        <h4>Imperios Participantes</h4>
+                        <div id="imperiosParticipantes" class="participant-list">
+                            <!-- Lista dinámica de imperios participantes -->
                         </div>
 
-                        <div class="form-group">
-                            <label for="continentHabitable">Habitable:</label>
-                            <select id="continentHabitable" class="form-control">
-                                <option value="1">Sí</option>
-                                <option value="0">No</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="continentDescription">Descripción:</label>
-                            <textarea id="continentDescription" class="form-control"></textarea>
-                        </div>
+                        <button type="button" id="addParticipantBtn" class="btn btn-small">
+                            <i class="fas fa-plus"></i> Añadir Imperio Participante
+                        </button>
 
                         <div class="form-actions">
                             <button type="button" class="btn" id="cancelBtn" style="background-color: #555; border-color: #444;">Cancelar</button>
-                            <button type="submit" class="btn">Guardar Continente</button>
+                            <button type="submit" class="btn">Guardar Guerra</button>
                         </div>
                     </form>
                 </div>
             </div>
 
-            <!-- Modal de Ver Detalles de Continente -->
-            <div id="viewContinentModal" class="modal">
+            <!-- Modal para añadir participante -->
+            <div id="participantModal" class="modal">
                 <div class="modal-content">
                     <span class="close-modal">×</span>
-                    <h3 id="viewContinentTitle">Detalles del Continente</h3>
-                    <div id="continentDetails">
+                    <h3>Añadir Imperio Participante</h3>
+                    <form id="participantForm">
+                        <div class="form-group">
+                            <label for="participantEmpire">Imperio:</label>
+                            <select id="participantEmpire" class="form-control" required>
+                                <option value="">Seleccione un imperio</option>
+                                <!-- Se llenará dinámicamente desde el JS -->
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="participantRole">Rol:</label>
+                            <select id="participantRole" class="form-control" required>
+                                <option value="Agresor">Agresor</option>
+                                <option value="Defensor">Defensor</option>
+                                <option value="Mediador">Mediador</option>
+                                <option value="Aliado">Aliado</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="participantWinner">¿Ganador?:</label>
+                            <select id="participantWinner" class="form-control">
+                                <option value="false">No</option>
+                                <option value="true">Sí</option>
+                                <option value="null">Sin determinar</option>
+                            </select>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn" id="cancelParticipantBtn" style="background-color: #555; border-color: #444;">Cancelar</button>
+                            <button type="submit" class="btn">Añadir</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Modal de Ver Detalles de Guerra -->
+            <div id="viewWarModal" class="modal">
+                <div class="modal-content" style="max-width: 700px;">
+                    <span class="close-modal">×</span>
+                    <h3 id="viewWarTitle">Detalles del Conflicto</h3>
+                    <div id="warDetails">
                         <!-- Los detalles se poblarán mediante JS -->
                     </div>
                     <div class="form-actions">
@@ -235,8 +225,9 @@
                         <li><a href="planet.html">Planetas</a></li>
                         <li><a href="continent.html">Continentes</a></li>
                         <li><a href="biome.html">Biomas</a></li>
-                        <li><a href="#">Razas</a></li>
-                        <li><a href="#">Imperios</a></li>
+                        <li><a href="race.html">Razas</a></li>
+                        <li><a href="empire.html">Imperios</a></li>
+                        <li><a href="war.html">Guerras</a></li>
                     </ul>
                 </div>
 
