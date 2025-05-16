@@ -952,7 +952,6 @@ table.dataTable thead th.sorting_desc {
     background-color: inherit !important;
 }
 
-/* Añadir estos estilos al final de tu archivo styles.css */
 
 /* Hero específico para biomas */
 .biome-hero {
@@ -1518,7 +1517,7 @@ table.dataTable thead th.sorting_desc {
     padding: 10px;
 }
 
-/* Stats display in view mode */
+
 .stats-display {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
@@ -1538,7 +1537,7 @@ table.dataTable thead th.sorting_desc {
     color: var(--accent);
 }
 
-/* Person details styling */
+/* Person details */
 .person-details {
     display: flex;
     flex-direction: column;
@@ -1582,7 +1581,7 @@ table.dataTable thead th.sorting_desc {
     line-height: 1.5;
 }
 
-/* Equipment list in view mode */
+/* Lista equipamientos */
 .equipment-list {
     list-style-type: none;
     padding: 0;
@@ -1607,7 +1606,7 @@ table.dataTable thead th.sorting_desc {
     color: var(--success);
 }
 
-/* Alert styling */
+/* Alertas */
 #alertContainer {
     position: fixed;
     top: 20px;
@@ -1649,7 +1648,7 @@ table.dataTable thead th.sorting_desc {
     margin-left: 10px;
 }
 
-/* Custom filter styling */
+/* Estilo de filtros */
 .custom-filters {
     background-color: rgba(40, 40, 40, 0.8);
     padding: 20px;
@@ -1713,15 +1712,15 @@ table.dataTable thead th.sorting_desc {
     flex-basis: 100%;
 }
 
-/* Fix for modal content scroll */
+
 .modal-content {
     max-height: 80vh;
     overflow-y: auto;
 }
 
-/* Add more specific styles for the person page */
+
 .modal {
-    display: none; /* Hidden by default */
+    display: none; 
     position: fixed;
     z-index: 1000;
     left: 0;
@@ -1732,7 +1731,7 @@ table.dataTable thead th.sorting_desc {
     background-color: rgba(0,0,0,0.7);
 }
 
-/* Hero específico para equipamiento */
+
 .equipment-hero {
     height: 50vh;
     background: linear-gradient(rgba(18, 18, 18, 0.7), rgba(18, 18, 18, 0.9)),
@@ -1967,7 +1966,7 @@ table.dataTable thead th.sorting_desc {
     color: var(--text-light);
 }
 
-/* War details */
+
 .war-details {
     margin-top: 20px;
 }
@@ -2022,7 +2021,7 @@ table.dataTable thead th.sorting_desc {
     margin-top: 10px;
 }
 
-/* Hero específico para imperios */
+/* Hero para imperios */
 .empire-hero {
     height: 50vh;
     background: linear-gradient(rgba(18, 18, 18, 0.7), rgba(18, 18, 18, 0.9)),
@@ -2080,7 +2079,7 @@ table.dataTable thead th.sorting_desc {
     color: var(--crimson);
 }
 
-/* Empire details */
+
 .empire-details {
     margin-top: 20px;
 }
