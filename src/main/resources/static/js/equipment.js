@@ -184,11 +184,11 @@ document.addEventListener('DOMContentLoaded', function() {
             btn.addEventListener('click', () => {
                 const targetTab = btn.getAttribute('data-tab');
 
-                // Remover clase activa de todas las pestañas y contenidos
+                /* Remover clase activa de todas las pestañas y contenidos */
                 tabBtns.forEach(b => b.classList.remove('active'));
                 tabContents.forEach(c => c.classList.remove('active'));
 
-                // Añadir clase activa a la pestaña y contenido seleccionados
+                /* Añadir clase activa a la pestaña y contenido seleccionados */
                 btn.classList.add('active');
                 document.getElementById(targetTab).classList.add('active');
             });
@@ -207,7 +207,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(imperios => {
                 imperiosDisponibles = imperios;
                 
-                // Llenar los selectores de imperio en todos los modales
+                /* Llenar los selectores de imperio en todos los modales */
                 ['weaponOrigin', 'armorOrigin', 'toolOrigin'].forEach(selectId => {
                     const select = document.getElementById(selectId);
                     if (select) {
@@ -248,7 +248,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 weaponsTable.clear();
                 if (Array.isArray(armas)) {
                     weaponsTable.rows.add(armas).draw();
-                    // Corrige el problema de visualización repintando las filas
+                    /* Corrige el problema de visualización repintando las filas */
                     $('#weaponsTable tbody tr').each(function(index) {
                         $(this).css('background-color', index % 2 === 0 ? 'rgba(30, 30, 30, 0.8)' : 'var(--dark-secondary)');
                     });
@@ -283,7 +283,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 armorsTable.clear();
                 if (Array.isArray(armaduras)) {
                     armorsTable.rows.add(armaduras).draw();
-                    // Corrige el problema de visualización repintando las filas
+                    /* Corrige el problema de visualización repintando las filas */
                     $('#armorsTable tbody tr').each(function(index) {
                         $(this).css('background-color', index % 2 === 0 ? 'rgba(30, 30, 30, 0.8)' : 'var(--dark-secondary)');
                     });
@@ -318,7 +318,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 toolsTable.clear();
                 if (Array.isArray(herramientas)) {
                     toolsTable.rows.add(herramientas).draw();
-                    // Corrige el problema de visualización repintando las filas
+                    /* Corrige el problema de visualización repintando las filas */
                     $('#toolsTable tbody tr').each(function(index) {
                         $(this).css('background-color', index % 2 === 0 ? 'rgba(30, 30, 30, 0.8)' : 'var(--dark-secondary)');
                     });
@@ -353,7 +353,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 arcanasTable.clear();
                 if (Array.isArray(arcanas)) {
                     arcanasTable.rows.add(arcanas).draw();
-                    // Corrige el problema de visualización repintando las filas
+                    /* Corrige el problema de visualización repintando las filas */
                     $('#arcanasTable tbody tr').each(function(index) {
                         $(this).css('background-color', index % 2 === 0 ? 'rgba(30, 30, 30, 0.8)' : 'var(--dark-secondary)');
                     });
@@ -432,14 +432,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 return res.json();
             })
             .then(arma => {
-                // Llenar el formulario con los datos del arma
+                /* Llenar el formulario con los datos del arma */
                 document.getElementById('weaponId').value = arma.id;
                 document.getElementById('weaponName').value = arma.nombre;
                 document.getElementById('weaponMaterial').value = arma.material || '';
                 document.getElementById('weaponWeight').value = arma.peso || '';
                 document.getElementById('weaponPrice').value = arma.pvp || '';
                 
-                // Buscar el ID del imperio por su nombre
+                /* Buscar el ID del imperio por su nombre */
                 const imperio = imperiosDisponibles.find(imp => imp.nombre === arma.origen);
                 document.getElementById('weaponOrigin').value = imperio ? imperio.id : '';
                 
@@ -448,7 +448,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     document.getElementById('weaponCreationDate').value = fecha.toISOString().split('T')[0];
                 }
                 
-                // Parsear los buffs desde el string
+                /* Parsear los buffs desde el string */
                 const buffs = parsearEstadisticas(arma.bufoEstadisticas);
                 document.getElementById('weaponBufAtk').value = buffs.atk || 0;
                 document.getElementById('weaponBufDef').value = buffs.def || 0;
@@ -459,10 +459,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 document.getElementById('weaponDescription').value = arma.descripcion || '';
                 
-                // Cambiar el título del modal
+                /* Cambiar el título del modal */
                 document.getElementById('weaponModalTitle').textContent = 'Editar Arma';
                 
-                // Mostrar el modal
+                /* Mostrar el modal */
                 document.getElementById('weaponModal').style.display = 'block';
             })
             .catch(error => {
@@ -555,14 +555,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 return res.json();
             })
             .then(armadura => {
-                // Llenar el formulario con los datos de la armadura
+                /* Llenar el formulario con los datos de la armadura */
                 document.getElementById('armorId').value = armadura.id;
                 document.getElementById('armorName').value = armadura.nombre;
                 document.getElementById('armorMaterial').value = armadura.material || '';
                 document.getElementById('armorWeight').value = armadura.peso || '';
                 document.getElementById('armorPrice').value = armadura.pvp || '';
                 
-                // Buscar el ID del imperio por su nombre
+                /* Buscar el ID del imperio por su nombre */
                 const imperio = imperiosDisponibles.find(imp => imp.nombre === armadura.origen);
                 document.getElementById('armorOrigin').value = imperio ? imperio.id : '';
                 
@@ -571,7 +571,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     document.getElementById('armorCreationDate').value = fecha.toISOString().split('T')[0];
                 }
                 
-                // Parsear los buffs desde el string
+                /* Parsear los buffs desde el string */
                 const buffs = parsearEstadisticas(armadura.bufoEstadisticas);
                 document.getElementById('armorBufAtk').value = buffs.atk || 0;
                 document.getElementById('armorBufDef').value = buffs.def || 0;
@@ -582,10 +582,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 document.getElementById('armorDescription').value = armadura.descripcion || '';
                 
-                // Cambiar el título del modal
+                /* Cambiar el título del modal */
                 document.getElementById('armorModalTitle').textContent = 'Editar Armadura';
                 
-                // Mostrar el modal
+                /* Mostrar el modal */
                 document.getElementById('armorModal').style.display = 'block';
             })
             .catch(error => {
@@ -682,7 +682,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 return res.json();
             })
             .then(herramienta => {
-                // Llenar el formulario con los datos de la herramienta
+                /* Llenar el formulario con los datos de la herramienta */
                 document.getElementById('toolId').value = herramienta.id;
                 document.getElementById('toolName').value = herramienta.nombre;
                 document.getElementById('toolMaterial').value = herramienta.material || '';
@@ -690,7 +690,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('toolPrice').value = herramienta.pvp || '';
                 document.getElementById('toolUse').value = herramienta.uso || '';
                 
-                // Buscar el ID del imperio por su nombre
+                /* Buscar el ID del imperio por su nombre */
                 const imperio = imperiosDisponibles.find(imp => imp.nombre === herramienta.origen);
                 document.getElementById('toolOrigin').value = imperio ? imperio.id : '';
                 
@@ -699,7 +699,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     document.getElementById('toolCreationDate').value = fecha.toISOString().split('T')[0];
                 }
                 
-                // Parsear los buffs desde el string
+                /* Parsear los buffs desde el string */
                 const buffs = parsearEstadisticas(herramienta.bufoEstadisticas);
                 document.getElementById('toolBufAtk').value = buffs.atk || 0;
                 document.getElementById('toolBufDef').value = buffs.def || 0;
@@ -710,10 +710,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 document.getElementById('toolDescription').value = herramienta.descripcion || '';
                 
-                // Cambiar el título del modal
+                /* Cambiar el título del modal */
                 document.getElementById('toolModalTitle').textContent = 'Editar Herramienta';
                 
-                // Mostrar el modal
+                /* Mostrar el modal */
                 document.getElementById('toolModal').style.display = 'block';
             })
             .catch(error => {
@@ -790,7 +790,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 return res.json();
             })
             .then(arcana => {
-                // Llenar el formulario con los datos de la arcana
+                /* Llenar el formulario con los datos de la arcana */
                 document.getElementById('arcanaId').value = arcana.id;
                 document.getElementById('arcanaType').value = arcana.tipo;
                 document.getElementById('arcanaMastery').value = arcana.maestria;
@@ -801,10 +801,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     document.getElementById('arcanaDate').value = fecha.toISOString().split('T')[0];
                 }
                 
-                // Cambiar el título del modal
+                /* Cambiar el título del modal */
                 document.getElementById('arcanaModalTitle').textContent = 'Editar Arcana';
                 
-                // Mostrar el modal
+                /* Mostrar el modal */
                 document.getElementById('arcanaModal').style.display = 'block';
             })
             .catch(error => {
@@ -850,9 +850,10 @@ document.addEventListener('DOMContentLoaded', function() {
         weaponIdInput.value = '';
         modal.style.display = 'block';
         
-        // Resetear valores de buff a 0
+        /* Resetear valores de buff a 0 */
         ['weaponBufAtk', 'weaponBufDef', 'weaponBufHp', 'weaponBufSpe', 'weaponBufMat', 'weaponBufMdf'].forEach(id => {
-            document.getElementById(id).value = 0;
+            const element = document.getElementById(id);
+            if (element) element.value = 0;
         });
     }
 
@@ -872,9 +873,10 @@ document.addEventListener('DOMContentLoaded', function() {
         armorIdInput.value = '';
         modal.style.display = 'block';
         
-        // Resetear valores de buff a 0
+        /* Resetear valores de buff a 0 */
         ['armorBufAtk', 'armorBufDef', 'armorBufHp', 'armorBufSpe', 'armorBufMat', 'armorBufMdf'].forEach(id => {
-            document.getElementById(id).value = 0;
+            const element = document.getElementById(id);
+            if (element) element.value = 0;
         });
     }
 
@@ -894,9 +896,10 @@ document.addEventListener('DOMContentLoaded', function() {
         toolIdInput.value = '';
         modal.style.display = 'block';
         
-        // Resetear valores de buff a 0
+        /* Resetear valores de buff a 0 */
         ['toolBufAtk', 'toolBufDef', 'toolBufHp', 'toolBufSpe', 'toolBufMat', 'toolBufMdf'].forEach(id => {
-            document.getElementById(id).value = 0;
+            const element = document.getElementById(id);
+            if (element) element.value = 0;
         });
     }
 
@@ -918,7 +921,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function cerrarModales() {
-        const modales = ['weaponModal', 'armorModal', 'toolModal', 'arcanaModal'];
+        const modales = ['weaponModal', 'armorModal', 'toolModal', 'arcanaModal', 'detailsModal'];
         modales.forEach(modalId => {
             const modal = document.getElementById(modalId);
             if (modal) modal.style.display = 'none';
@@ -927,7 +930,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     /* Función para mostrar modal de detalles */
     function mostrarModal(titulo, contenido) {
-        // Crear modal dinámico para mostrar detalles
+        /* Crear modal dinámico para mostrar detalles */
         let modal = document.getElementById('detailsModal');
         if (!modal) {
             modal = document.createElement('div');
@@ -935,14 +938,14 @@ document.addEventListener('DOMContentLoaded', function() {
             modal.className = 'modal';
             modal.innerHTML = `
                 <div class="modal-content">
-                    <span class="close-modal">&times;</span>
+                    <span class="close-modal">×</span>
                     <h3 id="detailsModalTitle">${titulo}</h3>
                     <div id="detailsModalContent">${contenido}</div>
                 </div>
             `;
             document.body.appendChild(modal);
             
-            // Agregar evento al botón de cerrar
+            /* Agregar evento al botón de cerrar */
             modal.querySelector('.close-modal').addEventListener('click', () => {
                 modal.style.display = 'none';
             });
@@ -959,14 +962,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const alertContainer = document.getElementById('alertContainer');
         if (!alertContainer) {
             console.error("Contenedor de alertas no encontrado");
-            alert(mensaje);
+            alert(mensaje); /* Fallback a alerta nativa */
             return;
         }
 
         const alertDiv = document.createElement('div');
         alertDiv.className = `alert alert-${tipo}`;
         
-        // Color según el tipo de alerta
+        /* Color según el tipo de alerta */
         switch (tipo) {
             case 'success':
                 alertDiv.style.backgroundColor = 'var(--success)';
@@ -984,12 +987,12 @@ document.addEventListener('DOMContentLoaded', function() {
         
         alertDiv.innerHTML = `
             <span>${mensaje}</span>
-            <button class="close-alert">&times;</button>
+            <button class="close-alert">×</button>
         `;
         
         alertContainer.appendChild(alertDiv);
         
-        // Añadir evento para cerrar la alerta
+        /* Añadir evento para cerrar la alerta */
         const closeBtn = alertDiv.querySelector('.close-alert');
         if (closeBtn) {
             closeBtn.addEventListener('click', function() {
@@ -997,9 +1000,9 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
         
-        // Auto-cerrar después de 5 segundos
+        /* Auto-cerrar después de 5 segundos */
         setTimeout(() => {
-            if (alertDiv.parentNode) {
+            if (alertDiv.parentNode) { /* Verificar si aún existe en el DOM */
                 alertDiv.remove();
             }
         }, 5000);
@@ -1020,7 +1023,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return stats;
         }
         
-        // Parsear string como "+5 ATK, +3 DEF, -2 HP"
+        /* Parsear string como "+5 ATK, +3 DEF, -2 HP" */
         const regex = /([+-]\d+)\s+(ATK|DEF|HP|SPE|MAT|MDF)/gi;
         let match;
         
@@ -1035,7 +1038,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     /* Configuración de eventos */
     function setupEventListeners() {
-        // Botones de añadir
+        /* Botones de añadir */
         const addWeaponBtn = document.getElementById('addWeaponBtn');
         const addArmorBtn = document.getElementById('addArmorBtn');
         const addToolBtn = document.getElementById('addToolBtn');
@@ -1046,22 +1049,22 @@ document.addEventListener('DOMContentLoaded', function() {
         if (addToolBtn) addToolBtn.addEventListener('click', abrirModalHerramienta);
         if (addArcanaBtn) addArcanaBtn.addEventListener('click', abrirModalArcana);
 
-        // Botones de cancelar en los modales
+        /* Botones de cancelar en los modales */
         const cancelBtns = ['cancelWeaponBtn', 'cancelArmorBtn', 'cancelToolBtn', 'cancelArcanaBtn'];
         cancelBtns.forEach(btnId => {
             const btn = document.getElementById(btnId);
             if (btn) btn.addEventListener('click', cerrarModales);
         });
 
-        // Eventos para cerrar modales con X
+        /* Eventos para cerrar modales con X */
         let closeButtons = document.querySelectorAll('.close-modal');
         closeButtons.forEach(function(btn) {
             btn.addEventListener('click', cerrarModales);
         });
 
-        // Cerrar modal al hacer clic fuera del contenido
+        /* Cerrar modal al hacer clic fuera del contenido */
         window.addEventListener('click', function(event) {
-            const modals = ['weaponModal', 'armorModal', 'toolModal', 'arcanaModal'];
+            const modals = ['weaponModal', 'armorModal', 'toolModal', 'arcanaModal', 'detailsModal'];
             modals.forEach(modalId => {
                 const modal = document.getElementById(modalId);
                 if (event.target == modal) {
@@ -1070,7 +1073,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
 
-        // Configuración de los formularios
+        /* Configuración de los formularios */
         const forms = [
             { id: 'weaponForm', handler: guardarArma },
             { id: 'armorForm', handler: guardarArmadura },
@@ -1100,7 +1103,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const fechaCreacion = document.getElementById('weaponCreationDate').value;
         const descripcion = document.getElementById('weaponDescription').value.trim();
         
-        // Obtener valores de buff
+        /* Obtener valores de buffs */
         const bufAtk = document.getElementById('weaponBufAtk').value;
         const bufDef = document.getElementById('weaponBufDef').value;
         const bufHp = document.getElementById('weaponBufHp').value;
@@ -1118,7 +1121,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        // Construir la URL
+        /* Construir la URL */
         const baseUrl = id ? 'http://localhost:8080/actualizar_arma' : 'http://localhost:8080/aniadir_arma';
         const params = new URLSearchParams();
         
@@ -1167,7 +1170,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const fechaCreacion = document.getElementById('armorCreationDate').value;
         const descripcion = document.getElementById('armorDescription').value.trim();
         
-        // Obtener valores de buff
+        /* Obtener valores de bufo */
         const bufAtk = document.getElementById('armorBufAtk').value;
         const bufDef = document.getElementById('armorBufDef').value;
         const bufHp = document.getElementById('armorBufHp').value;
@@ -1185,7 +1188,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        // Construir la URL
+        /* Construir la URL */
         const baseUrl = id ? 'http://localhost:8080/actualizar_armadura' : 'http://localhost:8080/aniadir_armadura';
         const params = new URLSearchParams();
         
@@ -1197,4 +1200,151 @@ document.addEventListener('DOMContentLoaded', function() {
         if (precio) params.append('pvp', precio);
         params.append('imperioOrigen', imperioOrigen);
         if (fechaCreacion) params.append('fechaCreacion', fechaCreacion);
-        params
+        params.append('bufAtk', bufAtk);
+        params.append('bufDef', bufDef);
+        params.append('bufHp', bufHp);
+        params.append('bufSpe', bufSpe);
+        params.append('bufMat', bufMat);
+        params.append('bufMdf', bufMdf);
+        
+        const url = `${baseUrl}?${params.toString()}`;
+        
+        fetch(url)
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error(`Error HTTP ${res.status}: ${res.statusText}`);
+                }
+                return res.text();
+            })
+            .then(resultado => {
+                mostrarAlerta('success', id ? 'Armadura actualizada correctamente' : 'Armadura añadida correctamente');
+                cerrarModales();
+                cargarArmaduras();
+            })
+            .catch(error => {
+                console.error('Error al guardar armadura:', error);
+                mostrarAlerta('error', `Error al guardar armadura: ${error.message}`);
+            });
+    }
+
+    function guardarHerramienta() {
+        const id = document.getElementById('toolId').value;
+        const nombre = document.getElementById('toolName').value.trim();
+        const material = document.getElementById('toolMaterial').value.trim();
+        const uso = document.getElementById('toolUse').value.trim();
+        const peso = document.getElementById('toolWeight').value;
+        const precio = document.getElementById('toolPrice').value;
+        const imperioOrigen = document.getElementById('toolOrigin').value;
+        const fechaCreacion = document.getElementById('toolCreationDate').value;
+        const descripcion = document.getElementById('toolDescription').value.trim();
+        
+        /* Obtener valores de buff */
+        const bufAtk = document.getElementById('toolBufAtk').value;
+        const bufDef = document.getElementById('toolBufDef').value;
+        const bufHp = document.getElementById('toolBufHp').value;
+        const bufSpe = document.getElementById('toolBufSpe').value;
+        const bufMat = document.getElementById('toolBufMat').value;
+        const bufMdf = document.getElementById('toolBufMdf').value;
+        
+        if (!nombre) {
+            mostrarAlerta('error', 'El nombre de la herramienta es obligatorio');
+            return;
+        }
+        
+        if (!imperioOrigen) {
+            mostrarAlerta('error', 'Debe seleccionar un imperio de origen');
+            return;
+        }
+        
+        /* Construir la URL */
+        const baseUrl = id ? 'http://localhost:8080/actualizar_herramienta' : 'http://localhost:8080/aniadir_herramienta';
+        const params = new URLSearchParams();
+        
+        if (id) params.append('id', id);
+        params.append('nombre', nombre);
+        if (material) params.append('material', material);
+        if (descripcion) params.append('descripcion', descripcion);
+        if (uso) params.append('uso', uso);
+        if (peso) params.append('peso', peso);
+        if (precio) params.append('pvp', precio);
+        params.append('imperioOrigen', imperioOrigen);
+        if (fechaCreacion) params.append('fechaCreacion', fechaCreacion);
+        params.append('bufAtk', bufAtk);
+        params.append('bufDef', bufDef);
+        params.append('bufHp', bufHp);
+        params.append('bufSpe', bufSpe);
+        params.append('bufMat', bufMat);
+        params.append('bufMdf', bufMdf);
+        
+        const url = `${baseUrl}?${params.toString()}`;
+        
+        fetch(url)
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error(`Error HTTP ${res.status}: ${res.statusText}`);
+                }
+                return res.text();
+            })
+            .then(resultado => {
+                mostrarAlerta('success', id ? 'Herramienta actualizada correctamente' : 'Herramienta añadida correctamente');
+                cerrarModales();
+                cargarHerramientas();
+            })
+            .catch(error => {
+                console.error('Error al guardar herramienta:', error);
+                mostrarAlerta('error', `Error al guardar herramienta: ${error.message}`);
+            });
+    }
+
+    function guardarArcana() {
+        const id = document.getElementById('arcanaId').value;
+        const tipo = document.getElementById('arcanaType').value.trim();
+        const maestria = document.getElementById('arcanaMastery').value;
+        const dificultad = document.getElementById('arcanaDifficulty').value;
+        const fecha = document.getElementById('arcanaDate').value;
+        
+        if (!tipo) {
+            mostrarAlerta('error', 'El tipo de arcana es obligatorio');
+            return;
+        }
+        
+        /* Construir la URL */
+        const baseUrl = id ? 'http://localhost:8080/actualizar_arcana' : 'http://localhost:8080/aniadir_arcana';
+        const params = new URLSearchParams();
+        
+        if (id) params.append('id', id);
+        params.append('tipo', tipo);
+        if (maestria) params.append('maestria', maestria);
+        if (dificultad) params.append('dificultad', dificultad);
+        if (fecha) params.append('fecha', fecha);
+        
+        const url = `${baseUrl}?${params.toString()}`;
+        
+        fetch(url)
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error(`Error HTTP ${res.status}: ${res.statusText}`);
+                }
+                return res.text();
+            })
+            .then(resultado => {
+                mostrarAlerta('success', id ? 'Arcana actualizada correctamente' : 'Arcana añadida correctamente');
+                cerrarModales();
+                cargarArcanas();
+            })
+            .catch(error => {
+                console.error('Error al guardar arcana:', error);
+                mostrarAlerta('error', `Error al guardar arcana: ${error.message}`);
+            });
+    }
+
+    /* Inicialización */
+    initializeTables();
+    setupTabs();
+    cargarImperios();
+    cargarArmas();
+    cargarArmaduras();
+    cargarHerramientas();
+    cargarArcanas();
+    setupEventListeners();
+});
