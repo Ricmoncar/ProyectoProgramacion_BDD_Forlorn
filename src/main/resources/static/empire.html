@@ -5,14 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Imperios - Crónicas del Destino</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.dataTables.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
-    <script src="js/empire.js"></script>
 </head>
 <body>
     <!-- Contenedor de alertas -->
@@ -131,9 +130,9 @@
                             <input type="text" id="empireLeader" class="form-control">
                         </div>
 
-                        <div class="form-group">
+<div class="form-group">
                             <label for="empirePopulation">Población:</label>
-                            <input type="number" id="empirePopulation" class="form-control" min="0" step="1000">
+                            <input type="number" id="empirePopulation" class="form-control" min="0" step="1">
                         </div>
 
                         <div class="form-group">
@@ -151,12 +150,12 @@
 
                         <div class="form-group">
                             <label for="empireGDP">GDP (millones):</label>
-                            <input type="number" id="empireGDP" class="form-control" min="0" step="0.1">
+                            <input type="number" id="empireGDP" class="form-control" min="0" step="0.01">
                         </div>
 
                         <div class="form-group">
                             <label for="empireSize">Tamaño (km²):</label>
-                            <input type="number" id="empireSize" class="form-control" min="0" step="1000">
+                            <input type="number" id="empireSize" class="form-control" min="0" step="1">
                         </div>
 
                         <div class="form-group">
@@ -164,12 +163,13 @@
                             <input type="date" id="empireFoundationDate" class="form-control">
                         </div>
 
-                        <div class="form-group">
+                       <div class="form-group">
                             <label for="empireAtWar">En Guerra:</label>
-                            <select id="empireAtWar" class="form-control">
+                            <select id="empireAtWar" class="form-control" disabled>
                                 <option value="false">No</option>
                                 <option value="true">Sí</option>
                             </select>
+                            <small>Este campo se actualiza automáticamente basado en guerras registradas</small>
                         </div>
 
                         <div class="form-group">
@@ -253,6 +253,12 @@
                 <p>© 2025 Crónicas del Destino. Todos los derechos reservados.</p>
             </div>
         </div>
-    </footer>
-</body>
+</footer>
+    </body>
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script src="js/empire.js"></script>
 </html>

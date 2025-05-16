@@ -1732,3 +1732,400 @@ table.dataTable thead th.sorting_desc {
     background-color: rgba(0,0,0,0.7);
 }
 
+/* Hero específico para equipamiento */
+.equipment-hero {
+    height: 50vh;
+    background: linear-gradient(rgba(18, 18, 18, 0.7), rgba(18, 18, 18, 0.9)),
+        url("img/equipment.jpg") no-repeat center center/cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: var(--text-light);
+    padding: 20px;
+}
+
+.equipment-hero .hero-content h1 {
+    font-family: 'Cinzel', serif;
+    font-size: 3rem;
+    margin-bottom: 15px;
+    color: var(--gold);
+}
+
+.equipment-hero .hero-content p {
+    font-size: 1.1rem;
+    max-width: 800px;
+    margin: 0 auto;
+    color: var(--text-faded);
+}
+
+/* Estilos para botones de equipamiento */
+.equipment-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+.equipment-actions button {
+    background: none;
+    border: none;
+    color: var(--text-faded);
+    cursor: pointer;
+    transition: color 0.3s ease;
+    padding: 5px;
+    font-size: 1.1rem;
+}
+
+.equipment-actions .view-btn:hover {
+    color: #4fa4ff;
+}
+
+.equipment-actions .edit-btn:hover {
+    color: var(--gold);
+}
+
+.equipment-actions .delete-btn:hover {
+    color: var(--crimson);
+}
+
+/* Hero específico para equipamiento */
+.equipment-hero {
+    height: 50vh;
+    background: linear-gradient(rgba(18, 18, 18, 0.7), rgba(18, 18, 18, 0.9)),
+        url("img/equipment.jpg") no-repeat center center/cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: var(--text-light);
+    padding: 20px;
+}
+
+.equipment-hero .hero-content h1 {
+    font-family: 'Cinzel', serif;
+    font-size: 3rem;
+    margin-bottom: 15px;
+    color: var(--gold);
+}
+
+.equipment-hero .hero-content p {
+    font-size: 1.1rem;
+    max-width: 800px;
+    margin: 0 auto;
+    color: var(--text-faded);
+}
+
+/* Estilos para botones de equipamiento */
+.equipment-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+.equipment-actions button {
+    background: none;
+    border: none;
+    color: var(--text-faded);
+    cursor: pointer;
+    transition: color 0.3s ease;
+    padding: 5px;
+    font-size: 1.1rem;
+}
+
+.equipment-actions .view-btn:hover {
+    color: #4fa4ff;
+}
+
+.equipment-actions .edit-btn:hover {
+    color: var(--gold);
+}
+
+.equipment-actions .delete-btn:hover {
+    color: var(--crimson);
+}
+
+/* Hero específico para guerras */
+.war-hero {
+    height: 50vh;
+    background: linear-gradient(rgba(18, 18, 18, 0.7), rgba(18, 18, 18, 0.9)),
+        url("img/war.jpg") no-repeat center center/cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: var(--text-light);
+    padding: 20px;
+}
+
+.war-hero .hero-content h1 {
+    font-family: 'Cinzel', serif;
+    font-size: 3rem;
+    margin-bottom: 15px;
+    color: var(--gold);
+}
+
+.war-hero .hero-content p {
+    font-size: 1.1rem;
+    max-width: 800px;
+    margin: 0 auto;
+    color: var(--text-faded);
+}
+
+/* Estilos para botones de guerra */
+.war-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+.war-actions button {
+    background: none;
+    border: none;
+    color: var(--text-faded);
+    cursor: pointer;
+    transition: color 0.3s ease;
+    padding: 5px;
+    font-size: 1.1rem;
+}
+
+.war-actions .view-btn:hover {
+    color: #4fa4ff;
+}
+
+.war-actions .edit-btn:hover {
+    color: var(--gold);
+}
+
+.war-actions .delete-btn:hover {
+    color: var(--crimson);
+}
+
+/* Estilos para la tabla de participantes */
+.participant-table {
+    width: 100%;
+    margin-top: 10px;
+    border-collapse: collapse;
+}
+
+.participant-table th,
+.participant-table td {
+    padding: 8px 12px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.participant-table th {
+    background-color: var(--dark-bg);
+    color: var(--gold);
+    font-weight: bold;
+}
+
+.participant-table td {
+    color: var(--text-light);
+}
+
+.participant-table tbody tr:hover {
+    background-color: rgba(212, 175, 55, 0.1);
+}
+
+/* Tabla de vista */
+.view-table {
+    margin-top: 15px;
+}
+
+.view-table th {
+    color: var(--gold);
+    font-family: "Cinzel", serif;
+}
+
+.view-table td {
+    color: var(--text-light);
+}
+
+/* Status badges */
+.status-active,
+.status-ended {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+.status-active {
+    background-color: var(--success);
+    color: var(--text-light);
+}
+
+.status-ended {
+    background-color: var(--crimson);
+    color: var(--text-light);
+}
+
+/* War details */
+.war-details {
+    margin-top: 20px;
+}
+
+.war-details .detail-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.war-details .detail-row:last-child {
+    border-bottom: none;
+}
+
+.war-details .detail-label {
+    color: var(--gold);
+    font-weight: bold;
+    width: 35%;
+}
+
+.war-details .detail-value {
+    color: var(--text-light);
+    width: 60%;
+    text-align: right;
+}
+
+.war-details .detail-row.full-width {
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.war-details .detail-row.full-width .detail-label {
+    width: 100%;
+    margin-bottom: 8px;
+}
+
+.war-details .detail-row.full-width .detail-description {
+    width: 100%;
+    background-color: var(--dark-bg);
+    padding: 10px;
+    border-radius: 5px;
+    color: var(--text-faded);
+    text-align: left;
+    max-height: 150px;
+    overflow-y: auto;
+    line-height: 1.6;
+}
+
+.war-details .detail-participants {
+    width: 100%;
+    margin-top: 10px;
+}
+
+/* Hero específico para imperios */
+.empire-hero {
+    height: 50vh;
+    background: linear-gradient(rgba(18, 18, 18, 0.7), rgba(18, 18, 18, 0.9)),
+        url("img/empire.jpg") no-repeat center center/cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: var(--text-light);
+    padding: 20px;
+}
+
+.empire-hero .hero-content h1 {
+    font-family: 'Cinzel', serif;
+    font-size: 3rem;
+    margin-bottom: 15px;
+    color: var(--gold);
+}
+
+.empire-hero .hero-content p {
+    font-size: 1.1rem;
+    max-width: 800px;
+    margin: 0 auto;
+    color: var(--text-faded);
+}
+
+/* Estilos para botones de imperio */
+.empire-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+.empire-actions button {
+    background: none;
+    border: none;
+    color: var(--text-faded);
+    cursor: pointer;
+    transition: color 0.3s ease;
+    padding: 5px;
+    font-size: 1.1rem;
+}
+
+.empire-actions .view-btn:hover {
+    color: #4fa4ff;
+}
+
+.empire-actions .edit-btn:hover {
+    color: var(--gold);
+}
+
+.empire-actions .delete-btn:hover {
+    color: var(--crimson);
+}
+
+/* Empire details */
+.empire-details {
+    margin-top: 20px;
+}
+
+.empire-details .detail-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.empire-details .detail-row:last-child {
+    border-bottom: none;
+}
+
+.empire-details .detail-label {
+    color: var(--gold);
+    font-weight: bold;
+    width: 35%;
+}
+
+.empire-details .detail-value {
+    color: var(--text-light);
+    width: 60%;
+    text-align: right;
+}
+
+.empire-details .detail-row.full-width {
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.empire-details .detail-row.full-width .detail-label {
+    width: 100%;
+    margin-bottom: 8px;
+}
+
+.empire-details .detail-row.full-width .detail-description {
+    width: 100%;
+    background-color: var(--dark-bg);
+    padding: 10px;
+    border-radius: 5px;
+    color: var(--text-faded);
+    text-align: left;
+    max-height: 150px;
+    overflow-y: auto;
+    line-height: 1.6;
+}

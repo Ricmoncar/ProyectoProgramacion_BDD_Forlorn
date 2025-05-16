@@ -710,6 +710,9 @@ function cerrarModalDetalles() {
 /**
  * Guarda una nueva guerra o actualiza una existente
  */
+/**
+ * Guarda una nueva guerra o actualiza una existente
+ */
 function guardarGuerra() {
     const id = document.getElementById('warId').value;
     const nombre = document.getElementById('warName').value.trim();
@@ -743,16 +746,19 @@ function guardarGuerra() {
         imperiosParticipantes: participantesGuerra
     };
 
-    // Enviar la petición
-    const url = id ? `http://localhost:8080/actualizar_guerra` : `http://localhost:8080/aniadir_guerra`;
+    // Enviar la petición 
+    const url = id ? 'http://localhost:8080/actualizar_guerra?' : 'http://localhost:8080/aniadir_guerra?';
     
-    fetch(url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(guerra),
-    })
+    const params = new URLSearchParams();
+    if (id) params.append('id', id);
+    params.append('nombre', nombre);
+    params.append('fechaInicio', fechaInicio);
+    if (fechaFin) params.append('fechaFin', fechaFin);
+    if (descripcion) params.append('descripcion', descripcion);
+    
+    const finalUrl = url + params.toString();
+    
+    fetch(finalUrl)
         .then(res => {
             if (!res.ok) {
                 return res.text().then(text => {
@@ -762,6 +768,7 @@ function guardarGuerra() {
             return res.text();
         })
         .then(resultado => {
+            mostrarAlerta('warning', 'Nota: Los participantes no se han guardado aún. Esta funcionalidad se implementará próximamente.');
             mostrarAlerta('success', id ? 'Conflicto actualizado correctamente.' : 'Conflicto registrado correctamente.');
             cerrarModal();
             cargarGuerras();
@@ -771,7 +778,6 @@ function guardarGuerra() {
             mostrarAlerta('error', `Error al guardar conflicto: ${error.message}`);
         });
 }
-
 /**
  * Aplica filtros seleccionados para filtrar guerras
  */

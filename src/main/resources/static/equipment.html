@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equipamiento - Crónicas del Destino</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.dataTables.min.css">
+</head>
+<body>
+    <!-- Contenedor de alertas -->
+    <div id="alertContainer"></div>
+
+    <!-- Cabecera -->
+    <header>
+        <div class="container nav-container">
+            <a href="index.html" class="logo">Crónicas del <span>Destino</span></a>
+            <nav class="nav-links">
+                <a href="index.html">Inicio</a>
+                <a href="planet.html">Planetas</a>
+                <a href="continent.html">Continentes</a>
+                <a href="biome.html">Biomas</a>
+                <a href="race.html">Razas</a>
+                <a href="empire.html">Imperios</a>
+                <a href="war.html">Guerras</a>
+                <a href="person.html">Personas</a>
+                <a href="equipment.html" class="active">Equipamiento</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Sección de héroe -->
+    <section class="hero equipment-hero">
+        <div class="hero-content">
+            <h1>Arsenal de Forlorn</h1>
+            <p>Gestiona las armas, armaduras y arcanas que forjarán el destino de los héroes.</p>
+        </div>
+    </section>
+
+    <!-- Sección principal -->
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">Gestión de Equipamiento</h2>
+
+            <!-- Pestañas para diferentes tipos de equipamiento -->
+            <div class="tabs-container">
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="armas">Armas</button>
+                    <button class="tab-btn" data-tab="armaduras">Armaduras</button>
+                    <button class="tab-btn" data-tab="herramientas">Herramientas</button>
+                    <button class="tab-btn" data-tab="arcanas">Arcanas</button>
+                </div>
+
+                <!-- Tab content for Armas -->
+                <div class="tab-content active" id="armas">
+                    <div class="action-bar" style="margin-bottom: 20px; text-align: right;">
+                        <button id="addWeaponBtn" class="btn">
+                            <i class="fas fa-plus"></i> Añadir Arma
+                        </button>
+                    </div>
+                    <div class="table-container">
+                        <table id="weaponsTable" class="display responsive nowrap" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nombre</th>
+                                    <th>Material</th>
+                                    <th>Peso</th>
+                                    <th>Precio</th>
+                                    <th>Origen</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Los datos se poblarán mediante DataTables -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Tab content for Armaduras -->
+                <div class="tab-content" id="armaduras">
+                    <div class="action-bar" style="margin-bottom: 20px; text-align: right;">
+                        <button id="addArmorBtn" class="btn">
+                            <i class="fas fa-plus"></i> Añadir Armadura
+                        </button>
+                    </div>
+                    <div class="table-container">
+                        <table id="armorsTable" class="display responsive nowrap" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nombre</th>
+                                    <th>Material</th>
+                                    <th>Peso</th>
+                                    <th>Precio</th>
+                                    <th>Origen</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Los datos se poblarán mediante DataTables -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Tab content for Herramientas -->
+                <div class="tab-content" id="herramientas">
+                    <div class="action-bar" style="margin-bottom: 20px; text-align: right;">
+                        <button id="addToolBtn" class="btn">
+                            <i class="fas fa-plus"></i> Añadir Herramienta
+                        </button>
+                    </div>
+                    <div class="table-container">
+                        <table id="toolsTable" class="display responsive nowrap" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nombre</th>
+                                    <th>Material</th>
+                                    <th>Peso</th>
+                                    <th>Precio</th>
+                                    <th>Uso</th>
+                                    <th>Origen</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Los datos se poblarán mediante DataTables -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Tab content for Arcanas -->
+                <div class="tab-content" id="arcanas">
+                    <div class="action-bar" style="margin-bottom: 20px; text-align: right;">
+                        <button id="addArcanaBtn" class="btn">
+                            <i class="fas fa-plus"></i> Añadir Arcana
+                        </button>
+                    </div>
+                    <div class="table-container">
+                        <table id="arcanasTable" class="display responsive nowrap" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Tipo</th>
+                                    <th>Maestría</th>
+                                    <th>Dificultad</th>
+                                    <th>Fecha</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Los datos se poblarán mediante DataTables -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal de Añadir/Editar Arma -->
+            <div id="weaponModal" class="modal">
+                <div class="modal-content">
+                    <span class="close-modal">×</span>
+                    <h3 id="weaponModalTitle">Añadir/Editar Arma</h3>
+                    <form id="weaponForm">
+                        <input type="hidden" id="weaponId">
+
+                        <div class="form-group">
+                            <label for="weaponName">Nombre:</label>
+                            <input type="text" id="weaponName" class="form-control" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="weaponMaterial">Material:</label>
+                            <input type="text" id="weaponMaterial" class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="weaponWeight">Peso (kg):</label>
+                            <input type="number" id="weaponWeight" class="form-control" step="0.1" min="0">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="weaponPrice">Precio (oro):</label>
+                            <input type="number" id="weaponPrice" class="form-control" step="0.01" min="0">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="weaponOrigin">Origen:</label>
+                            <input type="text" id="weaponOrigin" class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="weaponCreationDate">Fecha de Creación:</label>
+                            <input type="date" id="weaponCreationDate" class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="weaponBuffs">Estadísticas (buff):</label>
+                            <textarea id="weaponBuffs" class="form-control" placeholder="Ej: +5 ATK, +2 DEF"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="weaponDescription">Descripción:</label>
+                            <textarea id="weaponDescription" class="form-control"></textarea>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn" id="cancelWeaponBtn" style="background-color: #555; border-color: #444;">Cancelar</button>
+                            <button type="submit" class="btn">Guardar Arma</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Modal de Añadir/Editar Armadura -->
+            <div id="armorModal" class="modal">
+                <div class="modal-content">
+                    <span class="close-modal">×</span>
+                    <h3 id="armorModalTitle">Añadir/Editar Armadura</h3>
+                    <form id="armorForm">
+                        <input type="hidden" id="armorId">
+
+                        <div class="form-group">
+                            <label for="armorName">Nombre:</label>
+                            <input type="text" id="armorName" class="form-control" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="armorMaterial">Material:</label>
+                            <input type="text" id="armorMaterial" class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="armorWeight">Peso (kg):</label>
+                            <input type="number" id="armorWeight" class="form-control" step="0.1" min="0">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="armorPrice">Precio (oro):</label>
+                            <input type="number" id="armorPrice" class="form-control" step="0.01" min="0">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="armorOrigin">Origen:</label>
+                            <input type="text" id="armorOrigin" class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="armorCreationDate">Fecha de Creación:</label>
+                            <input type="date" id="armorCreationDate" class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="armorBuffs">Estadísticas (buff):</label>
+                            <textarea id="armorBuffs" class="form-control" placeholder="Ej: +3 DEF, +1 HP"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="armorDescription">Descripción:</label>
+                            <textarea id="armorDescription" class="form-control"></textarea>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn" id="cancelArmorBtn" style="background-color: #555; border-color: #444;">Cancelar</button>
+                            <button type="submit" class="btn">Guardar Armadura</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Modal de Añadir/Editar Herramienta -->
+            <div id="toolModal" class="modal">
+                <div class="modal-content">
+                    <span class="close-modal">×</span>
+                    <h3 id="toolModalTitle">Añadir/Editar Herramienta</h3>
+                    <form id="toolForm">
+                        <input type="hidden" id="toolId">
+
+                        <div class="form-group">
+                            <label for="toolName">Nombre:</label>
+                            <input type="text" id="toolName" class="form-control" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="toolMaterial">Material:</label>
+                            <input type="text" id="toolMaterial" class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="toolWeight">Peso (kg):</label>
+                            <input type="number" id="toolWeight" class="form-control" step="0.1" min="0">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="toolPrice">Precio (oro):</label>
+                            <input type="number" id="toolPrice" class="form-control" step="0.01" min="0">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="toolUse">Uso:</label>
+                            <input type="text" id="toolUse" class="form-control" placeholder="Para qué se usa esta herramienta">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="toolOrigin">Origen:</label>
+                            <input type="text" id="toolOrigin" class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="toolCreationDate">Fecha de Creación:</label>
+                            <input type="date" id="toolCreationDate" class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="toolBuffs">Estadísticas (buff):</label>
+                            <textarea id="toolBuffs" class="form-control" placeholder="Ej: +1 SPE cuando se usa"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="toolDescription">Descripción:</label>
+                            <textarea id="toolDescription" class="form-control"></textarea>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn" id="cancelToolBtn" style="background-color: #555; border-color: #444;">Cancelar</button>
+                            <button type="submit" class="btn">Guardar Herramienta</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Modal de Añadir/Editar Arcana -->
+            <div id="arcanaModal" class="modal">
+                <div class="modal-content">
+                    <span class="close-modal">×</span>
+                    <h3 id="arcanaModalTitle">Añadir/Editar Arcana</h3>
+                    <form id="arcanaForm">
+                        <input type="hidden" id="arcanaId">
+
+                        <div class="form-group">
+                            <label for="arcanaType">Tipo:</label>
+                            <input type="text" id="arcanaType" class="form-control" required placeholder="Ej: Fuego, Agua, Tierra, Aire">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="arcanaMastery">Maestría:</label>
+                            <select id="arcanaMastery" class="form-control">
+                                <option value="Novato">Novato</option>
+                                <option value="Aprendiz">Aprendiz</option>
+                                <option value="Competente">Competente</option>
+                                <option value="Experto">Experto</option>
+                                <option value="Maestro">Maestro</option>
+                                <option value="Gran Maestro">Gran Maestro</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="arcanaDifficulty">Dificultad:</label>
+                            <select id="arcanaDifficulty" class="form-control">
+                                <option value="Fácil">Fácil</option>
+                                <option value="Intermedio">Intermedio</option>
+                                <option value="Difícil">Difícil</option>
+                                <option value="Muy Difícil">Muy Difícil</option>
+                                <option value="Legendario">Legendario</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="arcanaDate">Fecha:</label>
+                            <input type="date" id="arcanaDate" class="form-control">
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn" id="cancelArcanaBtn" style="background-color: #555; border-color: #444;">Cancelar</button>
+                            <button type="submit" class="btn">Guardar Arcana</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pie de página -->
+    <footer>
+        <div class="container">
+            <div class="footer-container">
+                <div class="footer-section">
+                    <h3>Crónicas del Destino</h3>
+                    <p>Un mundo de fantasía meticulosamente creado.</p>
+                    <div class="social-links">
+                        <a href="#" aria-label="Facebook" class="social-link">F</a>
+                        <a href="#" aria-label="Twitter" class="social-link">T</a>
+                        <a href="#" aria-label="Instagram" class="social-link">I</a>
+                        <a href="#" aria-label="Discord" class="social-link">D</a>
+                    </div>
+                </div>
+
+                <div class="footer-section">
+                    <h3>Explorar</h3>
+                    <ul class="footer-links">
+                        <li><a href="planet.html">Planetas</a></li>
+                        <li><a href="continent.html">Continentes</a></li>
+                        <li><a href="biome.html">Biomas</a></li>
+                        <li><a href="race.html">Razas</a></li>
+                        <li><a href="empire.html">Imperios</a></li>
+                        <li><a href="war.html">Guerras</a></li>
+                        <li><a href="person.html">Personas</a></li>
+                        <li><a href="equipment.html">Equipamiento</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h3>Operaciones</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Crear Nueva Entidad</a></li>
+                        <li><a href="#">Editar Existentes</a></li>
+                        <li><a href="#">Explorar Base de Datos</a></li>
+                        <li><a href="#">Generar Informes</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h3>Contacto</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Sobre el Creador</a></li>
+                        <li><a href="#">Contribuir</a></li>
+                        <li><a href="#">Reportar Errores</a></li>
+                        <li><a href="#">Sugerir Mejoras</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="copyright">
+                <p>© 2025 Crónicas del Destino. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script src="js/equipment.js"></script>
+</body>
+</html>
