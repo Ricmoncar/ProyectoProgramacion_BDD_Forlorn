@@ -1458,3 +1458,277 @@ table.dataTable thead th.sorting_desc {
     color: var(--crimson);
 }
 
+ .btn-sm {
+    padding: 5px 10px;
+    font-size: 0.8em;
+    background-color: var(--accent);
+    color: var(--light);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-sm:hover {
+    background-color: var(--accent-dark);
+}
+
+.equipment-item-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.equipment-item-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 10px;
+    background-color: rgba(60, 60, 60, 0.6);
+    margin-bottom: 5px;
+    border-radius: 4px;
+}
+
+.equipment-name {
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.equipment-property {
+    color: #ccc;
+    font-size: 0.9em;
+}
+
+.btn-icon {
+    background: none;
+    border: none;
+    color: var(--error);
+    cursor: pointer;
+    font-size: 1.1em;
+    padding: 5px;
+}
+
+.btn-icon:hover {
+    color: var(--error-dark);
+}
+
+.no-items {
+    color: #999;
+    font-style: italic;
+    text-align: center;
+    padding: 10px;
+}
+
+/* Stats display in view mode */
+.stats-display {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.stat-item {
+    background-color: rgba(50, 50, 50, 0.8);
+    padding: 8px;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.stat-item span {
+    font-weight: bold;
+    color: var(--accent);
+}
+
+/* Person details styling */
+.person-details {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.person-section {
+    background-color: rgba(40, 40, 40, 0.6);
+    padding: 15px;
+    border-radius: 5px;
+}
+
+.detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.detail-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.detail-label {
+    font-weight: bold;
+    color: #ccc;
+    margin-bottom: 5px;
+}
+
+.detail-value {
+    color: var(--light);
+}
+
+.detail-description {
+    margin-top: 15px;
+}
+
+.detail-description p {
+    margin-top: 5px;
+    line-height: 1.5;
+}
+
+/* Equipment list in view mode */
+.equipment-list {
+    list-style-type: none;
+    padding: 0;
+    margin-top: 10px;
+}
+
+.equipment-list li {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 10px;
+    background-color: rgba(60, 60, 60, 0.6);
+    margin-bottom: 5px;
+    border-radius: 4px;
+}
+
+.equipment-status {
+    color: #888;
+    font-size: 0.9em;
+}
+
+.equipment-status.equipped {
+    color: var(--success);
+}
+
+/* Alert styling */
+#alertContainer {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    width: 300px;
+}
+
+.alert {
+    margin-bottom: 10px;
+    padding: 15px;
+    border-radius: 5px;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.close-alert {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5em;
+    cursor: pointer;
+    padding: 0;
+    margin-left: 10px;
+}
+
+/* Custom filter styling */
+.custom-filters {
+    background-color: rgba(40, 40, 40, 0.8);
+    padding: 20px;
+    border-radius: 5px;
+    margin-bottom: 25px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.filter-group {
+    flex: 1;
+    min-width: 200px;
+}
+
+.filter-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #ccc;
+}
+
+.filter-control {
+    width: 100%;
+    padding: 8px 10px;
+    background-color: rgba(60, 60, 60, 0.8);
+    border: 1px solid #555;
+    border-radius: 4px;
+    color: var(--light);
+}
+
+.range-slider {
+    height: 5px;
+    -webkit-appearance: none;
+    background: #555;
+    outline: none;
+    border-radius: 5px;
+    margin: 10px 0;
+}
+
+.range-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+}
+
+.filter-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    flex-basis: 100%;
+}
+
+#filterResults {
+    margin-top: 10px;
+    color: #ccc;
+    font-style: italic;
+    flex-basis: 100%;
+}
+
+/* Fix for modal content scroll */
+.modal-content {
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+/* Add more specific styles for the person page */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.7);
+}
+

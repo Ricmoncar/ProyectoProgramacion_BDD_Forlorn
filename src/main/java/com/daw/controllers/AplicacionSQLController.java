@@ -621,30 +621,133 @@ public class AplicacionSQLController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
- /**
-     * Añade una nueva persona a la base de datos
-     */
-    @GetMapping("/aniadir_persona")
-    public ResponseEntity<?> aniadirPersona(@RequestParam Persona persona) {
-        try {
-            return ResponseEntity.ok().body(servicio.aniadirPersona(persona));
-        } catch (SQLException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
+/**
+ * Añade una nueva persona a la base de datos
+ */
+@GetMapping("/aniadir_persona")
+public ResponseEntity<?> aniadirPersona(
+        @RequestParam String nombre,
+        @RequestParam(required = false) String apellido,
+        @RequestParam(required = false) Float ancho,
+        @RequestParam(required = false) Float alto,
+        @RequestParam(required = false) String descripcionFisica,
+        @RequestParam(required = false) Float porcentajeGrasaCorporal,
+        @RequestParam(required = false) String personalidad,
+        @RequestParam(required = false, defaultValue = "0") Integer oro,
+        @RequestParam(required = false) Date fechaNacimiento,
+        @RequestParam(required = false) String profesion,
+        @RequestParam(required = false) String direccion,
+        @RequestParam Integer razaId,
+        @RequestParam(required = false) Integer imperioId,
+        @RequestParam(required = false, defaultValue = "Personal") String estadisticasTipo,
+        @RequestParam(required = false, defaultValue = "10") Integer atk,
+        @RequestParam(required = false, defaultValue = "10") Integer def,
+        @RequestParam(required = false, defaultValue = "10") Integer hp,
+        @RequestParam(required = false, defaultValue = "10") Integer spe,
+        @RequestParam(required = false, defaultValue = "10") Integer mat,
+        @RequestParam(required = false, defaultValue = "10") Integer mdf,
+        @RequestParam(required = false, defaultValue = "0") Integer xp,
+        @RequestParam(required = false, defaultValue = "1") Integer lvl) {
+    try {
+        // Create a Persona object from the parameters
+        Persona persona = new Persona();
+        persona.setNombre(nombre);
+        persona.setApellido(apellido);
+        persona.setAncho(ancho);
+        persona.setAlto(alto);
+        persona.setDescripcionFisica(descripcionFisica);
+        persona.setPorcentajeGrasaCorporal(porcentajeGrasaCorporal);
+        persona.setPersonalidad(personalidad);
+        persona.setOro(oro);
+        persona.setFechaNacimiento(fechaNacimiento);
+        persona.setProfesion(profesion);
+        persona.setDireccion(direccion);
+        persona.setRazaId(razaId);
+        persona.setImperioId(imperioId);
+        
+        // Create and set estadisticas
+        Estadisticas stats = new Estadisticas();
+        stats.setTipo(estadisticasTipo);
+        stats.setAtk(atk);
+        stats.setDef(def);
+        stats.setHp(hp);
+        stats.setSpe(spe);
+        stats.setMat(mat);
+        stats.setMdf(mdf);
+        stats.setXp(xp);
+        stats.setLvl(lvl);
+        persona.setEstadisticas(stats);
+        
+        return ResponseEntity.ok().body(servicio.aniadirPersona(persona));
+    } catch (SQLException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
     }
-    
-    /**
-     * Actualiza una persona existente
-     */
-    @GetMapping("/actualizar_persona")
-    public ResponseEntity<?> actualizarPersona(@RequestParam Persona persona) {
-        try {
-            return ResponseEntity.ok().body(servicio.actualizarPersona(persona));
-        } catch (SQLException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
+}
+
+/**
+ * Actualiza una persona existente
+ */
+@GetMapping("/actualizar_persona")
+public ResponseEntity<?> actualizarPersona(
+        @RequestParam Integer id,
+        @RequestParam String nombre,
+        @RequestParam(required = false) String apellido,
+        @RequestParam(required = false) Float ancho,
+        @RequestParam(required = false) Float alto,
+        @RequestParam(required = false) String descripcionFisica,
+        @RequestParam(required = false) Float porcentajeGrasaCorporal,
+        @RequestParam(required = false) String personalidad,
+        @RequestParam(required = false, defaultValue = "0") Integer oro,
+        @RequestParam(required = false) Date fechaNacimiento,
+        @RequestParam(required = false) String profesion,
+        @RequestParam(required = false) String direccion,
+        @RequestParam Integer razaId,
+        @RequestParam(required = false) Integer imperioId,
+        @RequestParam(required = false, defaultValue = "Personal") String estadisticasTipo,
+        @RequestParam(required = false, defaultValue = "10") Integer atk,
+        @RequestParam(required = false, defaultValue = "10") Integer def,
+        @RequestParam(required = false, defaultValue = "10") Integer hp,
+        @RequestParam(required = false, defaultValue = "10") Integer spe,
+        @RequestParam(required = false, defaultValue = "10") Integer mat,
+        @RequestParam(required = false, defaultValue = "10") Integer mdf,
+        @RequestParam(required = false, defaultValue = "0") Integer xp,
+        @RequestParam(required = false, defaultValue = "1") Integer lvl) {
+    try {
+
+        Persona persona = new Persona();
+        persona.setId(id);
+        persona.setNombre(nombre);
+        persona.setApellido(apellido);
+        persona.setAncho(ancho);
+        persona.setAlto(alto);
+        persona.setDescripcionFisica(descripcionFisica);
+        persona.setPorcentajeGrasaCorporal(porcentajeGrasaCorporal);
+        persona.setPersonalidad(personalidad);
+        persona.setOro(oro);
+        persona.setFechaNacimiento(fechaNacimiento);
+        persona.setProfesion(profesion);
+        persona.setDireccion(direccion);
+        persona.setRazaId(razaId);
+        persona.setImperioId(imperioId);
+        
+
+        Estadisticas stats = new Estadisticas();
+        stats.setTipo(estadisticasTipo);
+        stats.setAtk(atk);
+        stats.setDef(def);
+        stats.setHp(hp);
+        stats.setSpe(spe);
+        stats.setMat(mat);
+        stats.setMdf(mdf);
+        stats.setXp(xp);
+        stats.setLvl(lvl);
+        persona.setEstadisticas(stats);
+        
+        return ResponseEntity.ok().body(servicio.actualizarPersona(persona));
+    } catch (SQLException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
     }
-    
+}
     /**
      * Elimina una persona por su ID
      */

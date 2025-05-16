@@ -22,6 +22,11 @@ import com.daw.controllers.Imperio;
 import com.daw.controllers.Guerra;
 import com.daw.controllers.ParticipanteGuerra;
 import com.daw.controllers.Estadisticas;
+import com.daw.controllers.Arma;
+import com.daw.controllers.Armadura;
+import com.daw.controllers.Herramienta;
+import com.daw.controllers.Arcana;
+import com.daw.controllers.Persona;
 
 
 @Service
@@ -2337,6 +2342,7 @@ public List<Guerra> filtrarGuerras(String estado, Integer imperioId) throws SQLE
     private List<Arcana> obtenerArcanasDePersona(Connection con, Integer personaId) throws SQLException {
         List<Arcana> arcanas = new ArrayList<>();
         
+        // This query should be using "Maestria", not "NivelMaestria"
         String sql = "SELECT a.*, pa.Maestria FROM arcana a " +
                      "JOIN persona_arcana pa ON a.ID = pa.ArcanaID " +
                      "WHERE pa.PersonaID = ?";
@@ -2350,7 +2356,7 @@ public List<Guerra> filtrarGuerras(String estado, Integer imperioId) throws SQLE
                     arcana.setTipo(rs.getString("Tipo"));
                     arcana.setDificultad(rs.getString("Dificultad"));
                     arcana.setFecha(rs.getDate("Fecha"));
-                    // Tomamos la maestría de la tabla intermedia
+                    // This should be getting "Maestria"
                     arcana.setMaestria(rs.getString("Maestria"));
                     arcanas.add(arcana);
                 }
@@ -2648,22 +2654,207 @@ public List<Guerra> filtrarGuerras(String estado, Integer imperioId) throws SQLE
         }
     }
     
-    /**
-     * Inserta relaciones entre una persona y sus arcanas
-     */
-    private void insertarArcanasPersona(Connection con, Integer personaId, List<Arcana> arcanas) throws SQLException {
-        String sql = "INSERT INTO persona_arcana (PersonaID, ArcanaID) VALUES (?, ?)";
+// This is the completion of the insertarArcanasPersona method
+private void insertarArcanasPersona(Connection con, Integer personaId, List<Arcana> arcanas) throws SQLException {
+    String sql = "INSERT INTO persona_arcana (PersonaID, ArcanaID, Maestria) VALUES (?, ?, ?)";
+    
+    try (PreparedStatement ps = con.prepareStatement(sql)) {
+        for (Arcana arcana : arcanas) {
+            ps.setInt(1, personaId);
+            ps.setInt(2, arcana.getId());
+            ps.setString(3, arcana.getMaestria());
+            ps.addBatch();
+        }
+        ps.executeBatch();
+    }
+}
+
+/**
+ * Equipa o desequipa un arma para una persona
+ */
+public String equiparArma(Integer personaId, Integer armaId, Boolean equipada) throws SQLException {
+    try (Connection con = DriverManager.getConnection(url);
+         PreparedStatement ps = con.prepareStatement(
+             "UPDATE persona_arma SET Equipada = ? WHERE PersonaID = ? AND ArmaID = ?")) {
+        ps.setBoolean(1, equipada);
+        ps.setInt(2, personaId);
+        ps.setInt(3, armaId);
+        int rowsAffected = ps.executeUpdate();
         
-        try (PreparedStatement ps = con.prepareStatement(sql)) {
-            for (Arcana arcana : arcanas) {
-                ps.setInt(1, personaId);
-                ps.setInt(2, arcana.getId());
-                ps.addBatch();
+        if (rowsAffected == 0) {
+            return "No se encontró la relación entre la persona y el arma.";
+        }
+        return "Arma " + (equipada ? "equipada" : "desequipada") + " correctamente.";
+    }
+}
+
+/**
+ * Equipa o desequipa una armadura para una persona
+ */
+public String equiparArmadura(Integer personaId, Integer armaduraId, Boolean equipada) throws SQLException {
+    try (Connection con = DriverManager.getConnection(url);
+         PreparedStatement ps = con.prepareStatement(
+             "UPDATE persona_armadura SET Equipada = ? WHERE PersonaID = ? AND ArmaduraID = ?")) {
+        ps.setBoolean(1, equipada);
+        ps.setInt(2, personaId);
+        ps.setInt(3, armaduraId);
+        int rowsAffected = ps.executeUpdate();
+        
+        if (rowsAffected == 0) {
+            return "No se encontró la relación entre la persona y la armadura.";
+        }
+        return "Armadura " + (equipada ? "equipada" : "desequipada") + " correctamente.";
+    }
+}
+
+/**
+ * Equipa o desequipa una herramienta para una persona
+ */
+public String equiparHerramienta(Integer personaId, Integer herramientaId, Boolean equipada) throws SQLException {
+    try (Connection con = DriverManager.getConnection(url);
+         PreparedStatement ps = con.prepareStatement(
+             "UPDATE persona_herramienta SET Equipada = ? WHERE PersonaID = ? AND HerramientaID = ?")) {
+        ps.setBoolean(1, equipada);
+        ps.setInt(2, personaId);
+        ps.setInt(3, herramientaId);
+        int rowsAffected = ps.executeUpdate();
+        
+        if (rowsAffected == 0) {
+            return "No se encontró la relación entre la persona y la herramienta.";
+        }
+        return "Herramienta " + (equipada ? "equipada" : "desequipada") + " correctamente.";
+    }
+}
+
+/**
+ * Actualiza el nivel de maestría de una arcana para una persona
+ */
+public String actualizarMaestriaArcana(Integer personaId, Integer arcanaId, String maestria) throws SQLException {
+    try (Connection con = DriverManager.getConnection(url);
+         PreparedStatement ps = con.prepareStatement(
+             "UPDATE persona_arcana SET Maestria = ? WHERE PersonaID = ? AND ArcanaID = ?")) {
+        ps.setString(1, maestria);
+        ps.setInt(2, personaId);
+        ps.setInt(3, arcanaId);
+        int rowsAffected = ps.executeUpdate();
+        
+        if (rowsAffected == 0) {
+            return "No se encontró la relación entre la persona y la arcana.";
+        }
+        return "Nivel de maestría actualizado correctamente.";
+    }
+}
+
+/**
+ * Obtiene personas con habilidades arcanas específicas
+ */
+public List<Persona> buscarPersonasPorArcana(String tipoArcana) throws SQLException {
+    List<Persona> lista = new ArrayList<>();
+    
+    String sql = "SELECT p.* FROM persona p " +
+                 "JOIN persona_arcana pa ON p.ID = pa.PersonaID " +
+                 "JOIN arcana a ON pa.ArcanaID = a.ID " +
+                 "WHERE a.Tipo LIKE ?";
+    
+    try (Connection con = DriverManager.getConnection(url);
+         PreparedStatement ps = con.prepareStatement(sql)) {
+        ps.setString(1, "%" + tipoArcana + "%");
+        try (ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                Persona persona = mapRowToPersonaBasica(rs);
+                cargarRelacionesPersona(con, persona);
+                lista.add(persona);
             }
-            ps.executeBatch();
         }
     }
-}Id(rs.getInt("ID"));
-                arma.setNombre(rs.getString("Nombre"));
-                arma.setBufoEstadisticas(rs.getString("BufoEstadisticas"));
-                arma.set
+    
+    return lista;
+}
+
+/**
+ * Actualiza las estadísticas de una persona (al ganar experiencia, subir de nivel, etc.)
+ */
+public String actualizarEstadisticasPersona(Integer personaId, Estadisticas estadisticas) throws SQLException {
+    try (Connection con = DriverManager.getConnection(url)) {
+        // Obtener el ID de estadísticas de la persona
+        Integer estadisticasId = null;
+        try (PreparedStatement ps = con.prepareStatement("SELECT EstadisticasID FROM persona WHERE ID = ?")) {
+            ps.setInt(1, personaId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    estadisticasId = rs.getInt("EstadisticasID");
+                } else {
+                    return "Persona no encontrada";
+                }
+            }
+        }
+        
+        // Actualizar estadísticas
+        try (PreparedStatement ps = con.prepareStatement(
+                "UPDATE estadisticas SET ATK = ?, DEF = ?, HP = ?, SPE = ?, MAT = ?, MDF = ?, XP = ?, LVL = ? WHERE ID = ?")) {
+            ps.setInt(1, estadisticas.getAtk());
+            ps.setInt(2, estadisticas.getDef());
+            ps.setInt(3, estadisticas.getHp());
+            ps.setInt(4, estadisticas.getSpe());
+            ps.setInt(5, estadisticas.getMat());
+            ps.setInt(6, estadisticas.getMdf());
+            ps.setInt(7, estadisticas.getXp());
+            ps.setInt(8, estadisticas.getLvl());
+            ps.setInt(9, estadisticasId);
+            
+            int rowsAffected = ps.executeUpdate();
+            if (rowsAffected == 0) {
+                return "No se pudieron actualizar las estadísticas";
+            }
+        }
+        
+        return "Estadísticas actualizadas correctamente";
+    }
+}
+
+/**
+ * Obtiene todas las personas de un imperio específico
+ */
+public List<Persona> obtenerPersonasPorImperio(Integer imperioId) throws SQLException {
+    List<Persona> lista = new ArrayList<>();
+    
+    String sql = "SELECT p.* FROM persona p WHERE p.ImperioID = ?";
+    
+    try (Connection con = DriverManager.getConnection(url);
+         PreparedStatement ps = con.prepareStatement(sql)) {
+        ps.setInt(1, imperioId);
+        try (ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                Persona persona = mapRowToPersonaBasica(rs);
+                cargarRelacionesPersona(con, persona);
+                lista.add(persona);
+            }
+        }
+    }
+    
+    return lista;
+}
+
+/**
+ * Obtiene todas las personas de una raza específica
+ */
+public List<Persona> obtenerPersonasPorRaza(Integer razaId) throws SQLException {
+    List<Persona> lista = new ArrayList<>();
+    
+    String sql = "SELECT p.* FROM persona p WHERE p.RazaID = ?";
+    
+    try (Connection con = DriverManager.getConnection(url);
+         PreparedStatement ps = con.prepareStatement(sql)) {
+        ps.setInt(1, razaId);
+        try (ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                Persona persona = mapRowToPersonaBasica(rs);
+                cargarRelacionesPersona(con, persona);
+                lista.add(persona);
+            }
+        }
+    }
+    
+    return lista;
+}
+}
