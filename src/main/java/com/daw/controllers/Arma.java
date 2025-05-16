@@ -1,5 +1,5 @@
 /**
- * Clase modelo para Arma
+ * Clase modelo para Arma - Actualizada
  */
 package com.daw.controllers;
 
@@ -16,11 +16,13 @@ public class Arma {
     private String origen;
     private Date fechaCreacion;
     private Boolean equipada; // Campo adicional para UI
+    private Integer origenImperioId;
+    private Estadisticas estadisticasBuff; // Nueva propiedad
     
     public Arma() {
     }
     
-    // Getters y Setters
+    // Getters y Setters existentes
     public Integer getId() {
         return id;
     }
@@ -99,5 +101,22 @@ public class Arma {
     
     public void setEquipada(Boolean equipada) {
         this.equipada = equipada;
+    }
+    
+    // Nuevos getters y setters
+    public Integer getOrigenImperioId() {
+        return origenImperioId;
+    }
+    
+    public void setOrigenImperioId(Integer origenImperioId) {
+        this.origenImperioId = origenImperioId;
+    }
+    
+    public Estadisticas getEstadisticasBuff() {
+        return estadisticasBuff;
+    }
+    
+    public void setEstadisticasBuff(Estadisticas estadisticasBuff) {
+        this.estadisticasBuff = estadisticasBuff;
     }
 }

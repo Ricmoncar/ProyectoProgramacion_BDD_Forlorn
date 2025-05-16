@@ -852,4 +852,378 @@ public ResponseEntity<?> actualizarPersona(
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
+
+// Agregar estos métodos al final de AplicacionSQLController.java
+
+/* ----- Endpoints para gestión de Armas ----- */
+
+/**
+ * Busca armas por nombre (o todas si no se proporciona nombre)
+ */
+@GetMapping("/consulta_armas")
+public ResponseEntity<?> buscarArmas(@RequestParam(required = false, defaultValue = "") String nombre) {
+    try {
+        return ResponseEntity.ok().body(servicio.buscarArmas(nombre));
+    } catch (SQLException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+    }
+}
+
+/**
+ * Añade una nueva arma a la base de datos
+ */
+@GetMapping("/aniadir_arma")
+public ResponseEntity<?> aniadirArma(
+        @RequestParam String nombre,
+        @RequestParam(required = false) String material,
+        @RequestParam(required = false) String descripcion,
+        @RequestParam(required = false) Float peso,
+        @RequestParam(required = false) Float pvp,
+        @RequestParam Integer imperioOrigen,
+        @RequestParam(required = false) Date fechaCreacion,
+        @RequestParam(required = false, defaultValue = "0") Integer bufAtk,
+        @RequestParam(required = false, defaultValue = "0") Integer bufDef,
+        @RequestParam(required = false, defaultValue = "0") Integer bufHp,
+        @RequestParam(required = false, defaultValue = "0") Integer bufSpe,
+        @RequestParam(required = false, defaultValue = "0") Integer bufMat,
+        @RequestParam(required = false, defaultValue = "0") Integer bufMdf) {
+    try {
+        return ResponseEntity.ok().body(servicio.aniadirArma(nombre, material, descripcion, peso, pvp, 
+                                                           imperioOrigen, fechaCreacion, bufAtk, bufDef, 
+                                                           bufHp, bufSpe, bufMat, bufMdf));
+    } catch (SQLException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+    }
+}
+
+/**
+ * Obtiene un arma específica por su ID
+ */
+@GetMapping("/obtener_arma")
+public ResponseEntity<?> obtenerArmaPorId(@RequestParam Integer id) {
+    try {
+        Arma arma = servicio.obtenerArmaPorId(id);
+        if (arma != null) {
+            return ResponseEntity.ok().body(arma);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Arma no encontrada");
+        }
+    } catch (SQLException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+    }
+}
+
+/**
+ * Actualiza un arma existente
+ */
+@GetMapping("/actualizar_arma")
+public ResponseEntity<?> actualizarArma(
+        @RequestParam Integer id,
+        @RequestParam String nombre,
+        @RequestParam(required = false) String material,
+        @RequestParam(required = false) String descripcion,
+        @RequestParam(required = false) Float peso,
+        @RequestParam(required = false) Float pvp,
+        @RequestParam Integer imperioOrigen,
+        @RequestParam(required = false) Date fechaCreacion,
+        @RequestParam(required = false, defaultValue = "0") Integer bufAtk,
+        @RequestParam(required = false, defaultValue = "0") Integer bufDef,
+        @RequestParam(required = false, defaultValue = "0") Integer bufHp,
+        @RequestParam(required = false, defaultValue = "0") Integer bufSpe,
+        @RequestParam(required = false, defaultValue = "0") Integer bufMat,
+        @RequestParam(required = false, defaultValue = "0") Integer bufMdf) {
+    try {
+        return ResponseEntity.ok().body(servicio.actualizarArma(id, nombre, material, descripcion, peso, pvp, 
+                                                              imperioOrigen, fechaCreacion, bufAtk, bufDef, 
+                                                              bufHp, bufSpe, bufMat, bufMdf));
+    } catch (SQLException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+    }
+}
+
+/**
+ * Elimina un arma por su ID
+ */
+@GetMapping("/eliminar_arma")
+public ResponseEntity<?> eliminarArma(@RequestParam Integer id) {
+    try {
+        return ResponseEntity.ok().body(servicio.eliminarArma(id));
+    } catch (SQLException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+    }
+}
+
+/* ----- Endpoints para gestión de Armaduras ----- */
+
+/**
+ * Busca armaduras por nombre (o todas si no se proporciona nombre)
+ */
+@GetMapping("/consulta_armaduras")
+public ResponseEntity<?> buscarArmaduras(@RequestParam(required = false, defaultValue = "") String nombre) {
+    try {
+        return ResponseEntity.ok().body(servicio.buscarArmaduras(nombre));
+    } catch (SQLException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+    }
+}
+
+/**
+ * Añade una nueva armadura a la base de datos
+ */
+@GetMapping("/aniadir_armadura")
+public ResponseEntity<?> aniadirArmadura(
+        @RequestParam String nombre,
+        @RequestParam(required = false) String material,
+        @RequestParam(required = false) String descripcion,
+        @RequestParam(required = false) Float peso,
+        @RequestParam(required = false) Float pvp,
+        @RequestParam Integer imperioOrigen,
+        @RequestParam(required = false) Date fechaCreacion,
+        @RequestParam(required = false, defaultValue = "0") Integer bufAtk,
+        @RequestParam(required = false, defaultValue = "0") Integer bufDef,
+        @RequestParam(required = false, defaultValue = "0") Integer bufHp,
+        @RequestParam(required = false, defaultValue = "0") Integer bufSpe,
+        @RequestParam(required = false, defaultValue = "0") Integer bufMat,
+        @RequestParam(required = false, defaultValue = "0") Integer bufMdf) {
+    try {
+        return ResponseEntity.ok().body(servicio.aniadirArmadura(nombre, material, descripcion, peso, pvp, 
+                                                               imperioOrigen, fechaCreacion, bufAtk, bufDef, 
+                                                               bufHp, bufSpe, bufMat, bufMdf));
+    } catch (SQLException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+    }
+}
+
+/**
+ * Obtiene una armadura específica por su ID
+ */
+@GetMapping("/obtener_armadura")
+public ResponseEntity<?> obtenerArmaduraPorId(@RequestParam Integer id) {
+    try {
+        Armadura armadura = servicio.obtenerArmaduraPorId(id);
+        if (armadura != null) {
+            return ResponseEntity.ok().body(armadura);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Armadura no encontrada");
+        }
+    } catch (SQLException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+    }
+}
+
+/**
+ * Actualiza una armadura existente
+ */
+@GetMapping("/actualizar_armadura")
+public ResponseEntity<?> actualizarArmadura(
+        @RequestParam Integer id,
+        @RequestParam String nombre,
+        @RequestParam(required = false) String material,
+        @RequestParam(required = false) String descripcion,
+        @RequestParam(required = false) Float peso,
+        @RequestParam(required = false) Float pvp,
+        @RequestParam Integer imperioOrigen,
+        @RequestParam(required = false) Date fechaCreacion,
+        @RequestParam(required = false, defaultValue = "0") Integer bufAtk,
+        @RequestParam(required = false, defaultValue = "0") Integer bufDef,
+        @RequestParam(required = false, defaultValue = "0") Integer bufHp,
+        @RequestParam(required = false, defaultValue = "0") Integer bufSpe,
+        @RequestParam(required = false, defaultValue = "0") Integer bufMat,
+        @RequestParam(required = false, defaultValue = "0") Integer bufMdf) {
+    try {
+        return ResponseEntity.ok().body(servicio.actualizarArmadura(id, nombre, material, descripcion, peso, pvp, 
+                                                                  imperioOrigen, fechaCreacion, bufAtk, bufDef, 
+                                                                  bufHp, bufSpe, bufMat, bufMdf));
+    } catch (SQLException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+    }
+}
+
+/**
+ * Elimina una armadura por su ID
+ */
+@GetMapping("/eliminar_armadura")
+public ResponseEntity<?> eliminarArmadura(@RequestParam Integer id) {
+    try {
+        return ResponseEntity.ok().body(servicio.eliminarArmadura(id));
+    } catch (SQLException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+    }
+}
+
+/* ----- Endpoints para gestión de Herramientas ----- */
+
+/**
+ * Busca herramientas por nombre (o todas si no se proporciona nombre)
+ */
+@GetMapping("/consulta_herramientas")
+public ResponseEntity<?> buscarHerramientas(@RequestParam(required = false, defaultValue = "") String nombre) {
+    try {
+        return ResponseEntity.ok().body(servicio.buscarHerramientas(nombre));
+    } catch (SQLException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+    }
+}
+
+/**
+ * Añade una nueva herramienta a la base de datos
+ */
+@GetMapping("/aniadir_herramienta")
+public ResponseEntity<?> aniadirHerramienta(
+        @RequestParam String nombre,
+        @RequestParam(required = false) String material,
+        @RequestParam(required = false) String descripcion,
+        @RequestParam(required = false) String uso,
+        @RequestParam(required = false) Float peso,
+        @RequestParam(required = false) Float pvp,
+        @RequestParam Integer imperioOrigen,
+        @RequestParam(required = false) Date fechaCreacion,
+        @RequestParam(required = false, defaultValue = "0") Integer bufAtk,
+        @RequestParam(required = false, defaultValue = "0") Integer bufDef,
+        @RequestParam(required = false, defaultValue = "0") Integer bufHp,
+        @RequestParam(required = false, defaultValue = "0") Integer bufSpe,
+        @RequestParam(required = false, defaultValue = "0") Integer bufMat,
+        @RequestParam(required = false, defaultValue = "0") Integer bufMdf) {
+    try {
+        return ResponseEntity.ok().body(servicio.aniadirHerramienta(nombre, material, descripcion, uso, peso, pvp, 
+                                                                  imperioOrigen, fechaCreacion, bufAtk, bufDef, 
+                                                                  bufHp, bufSpe, bufMat, bufMdf));
+    } catch (SQLException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+    }
+}
+
+/**
+ * Obtiene una herramienta específica por su ID
+ */
+@GetMapping("/obtener_herramienta")
+public ResponseEntity<?> obtenerHerramientaPorId(@RequestParam Integer id) {
+    try {
+        Herramienta herramienta = servicio.obtenerHerramientaPorId(id);
+        if (herramienta != null) {
+            return ResponseEntity.ok().body(herramienta);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Herramienta no encontrada");
+        }
+    } catch (SQLException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+    }
+}
+
+/**
+ * Actualiza una herramienta existente
+ */
+@GetMapping("/actualizar_herramienta")
+public ResponseEntity<?> actualizarHerramienta(
+        @RequestParam Integer id,
+        @RequestParam String nombre,
+        @RequestParam(required = false) String material,
+        @RequestParam(required = false) String descripcion,
+        @RequestParam(required = false) String uso,
+        @RequestParam(required = false) Float peso,
+        @RequestParam(required = false) Float pvp,
+        @RequestParam Integer imperioOrigen,
+        @RequestParam(required = false) Date fechaCreacion,
+        @RequestParam(required = false, defaultValue = "0") Integer bufAtk,
+        @RequestParam(required = false, defaultValue = "0") Integer bufDef,
+        @RequestParam(required = false, defaultValue = "0") Integer bufHp,
+        @RequestParam(required = false, defaultValue = "0") Integer bufSpe,
+        @RequestParam(required = false, defaultValue = "0") Integer bufMat,
+        @RequestParam(required = false, defaultValue = "0") Integer bufMdf) {
+    try {
+        return ResponseEntity.ok().body(servicio.actualizarHerramienta(id, nombre, material, descripcion, uso, peso, pvp, 
+                                                                     imperioOrigen, fechaCreacion, bufAtk, bufDef, 
+                                                                     bufHp, bufSpe, bufMat, bufMdf));
+    } catch (SQLException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+    }
+}
+
+/**
+ * Elimina una herramienta por su ID
+ */
+@GetMapping("/eliminar_herramienta")
+public ResponseEntity<?> eliminarHerramienta(@RequestParam Integer id) {
+    try {
+        return ResponseEntity.ok().body(servicio.eliminarHerramienta(id));
+    } catch (SQLException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+    }
+}
+
+/* ----- Endpoints para gestión de Arcanas ----- */
+
+/**
+ * Busca arcanas por tipo (o todas si no se proporciona tipo)
+ */
+@GetMapping("/consulta_arcanas")
+public ResponseEntity<?> buscarArcanas(@RequestParam(required = false, defaultValue = "") String tipo) {
+    try {
+        return ResponseEntity.ok().body(servicio.buscarArcanas(tipo));
+    } catch (SQLException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+    }
+}
+
+/**
+ * Añade una nueva arcana a la base de datos
+ */
+@GetMapping("/aniadir_arcana")
+public ResponseEntity<?> aniadirArcana(
+        @RequestParam String tipo,
+        @RequestParam(required = false, defaultValue = "Novato") String maestria,
+        @RequestParam(required = false, defaultValue = "Fácil") String dificultad,
+        @RequestParam(required = false) Date fecha) {
+    try {
+        return ResponseEntity.ok().body(servicio.aniadirArcana(tipo, maestria, dificultad, fecha));
+    } catch (SQLException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+    }
+}
+
+/**
+ * Obtiene una arcana específica por su ID
+ */
+@GetMapping("/obtener_arcana")
+public ResponseEntity<?> obtenerArcanaPorId(@RequestParam Integer id) {
+    try {
+        Arcana arcana = servicio.obtenerArcanaPorId(id);
+        if (arcana != null) {
+            return ResponseEntity.ok().body(arcana);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Arcana no encontrada");
+        }
+    } catch (SQLException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+    }
+}
+
+/**
+ * Actualiza una arcana existente
+ */
+@GetMapping("/actualizar_arcana")
+public ResponseEntity<?> actualizarArcana(
+        @RequestParam Integer id,
+        @RequestParam String tipo,
+        @RequestParam(required = false, defaultValue = "Novato") String maestria,
+        @RequestParam(required = false, defaultValue = "Fácil") String dificultad,
+        @RequestParam(required = false) Date fecha) {
+    try {
+        return ResponseEntity.ok().body(servicio.actualizarArcana(id, tipo, maestria, dificultad, fecha));
+    } catch (SQLException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+    }
+}
+
+/**
+ * Elimina una arcana por su ID
+ */
+@GetMapping("/eliminar_arcana")
+public ResponseEntity<?> eliminarArcana(@RequestParam Integer id) {
+    try {
+        return ResponseEntity.ok().body(servicio.eliminarArcana(id));
+    } catch (SQLException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+    }
+}
 }

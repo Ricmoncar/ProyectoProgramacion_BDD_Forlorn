@@ -1,5 +1,5 @@
 /**
- * Clase modelo para Herramienta
+ * Clase modelo para Herramienta - Actualizada
  */
 package com.daw.controllers;
 
@@ -17,11 +17,13 @@ public class Herramienta {
     private String origen;
     private Date fechaCreacion;
     private Boolean equipada; // Campo adicional para UI
+    private Integer origenImperioId;
+    private Estadisticas estadisticasBuff; // Nueva propiedad
     
     public Herramienta() {
     }
     
-    // Getters y Setters
+    // Getters y Setters existentes
     public Integer getId() {
         return id;
     }
@@ -108,5 +110,22 @@ public class Herramienta {
     
     public void setEquipada(Boolean equipada) {
         this.equipada = equipada;
+    }
+    
+    // Nuevos getters y setters
+    public Integer getOrigenImperioId() {
+        return origenImperioId;
+    }
+    
+    public void setOrigenImperioId(Integer origenImperioId) {
+        this.origenImperioId = origenImperioId;
+    }
+    
+    public Estadisticas getEstadisticasBuff() {
+        return estadisticasBuff;
+    }
+    
+    public void setEstadisticasBuff(Estadisticas estadisticasBuff) {
+        this.estadisticasBuff = estadisticasBuff;
     }
 }

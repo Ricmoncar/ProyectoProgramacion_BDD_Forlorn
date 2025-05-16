@@ -191,8 +191,10 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="weaponOrigin">Origen:</label>
-                            <input type="text" id="weaponOrigin" class="form-control">
+                            <label for="weaponOrigin">Imperio de Origen:</label>
+                            <select id="weaponOrigin" class="form-control" required>
+                                <option value="">Seleccione un imperio</option>
+                            </select>
                         </div>
 
                         <div class="form-group">
@@ -201,8 +203,33 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="weaponBuffs">Estadísticas (buff):</label>
-                            <textarea id="weaponBuffs" class="form-control" placeholder="Ej: +5 ATK, +2 DEF"></textarea>
+                            <label>Estadísticas de Buff:</label>
+                            <div class="stats-grid">
+                                <div class="form-group">
+                                    <label for="weaponBufAtk">ATK:</label>
+                                    <input type="number" id="weaponBufAtk" class="form-control" value="0" min="-99" max="99">
+                                </div>
+                                <div class="form-group">
+                                    <label for="weaponBufDef">DEF:</label>
+                                    <input type="number" id="weaponBufDef" class="form-control" value="0" min="-99" max="99">
+                                </div>
+                                <div class="form-group">
+                                    <label for="weaponBufHp">HP:</label>
+                                    <input type="number" id="weaponBufHp" class="form-control" value="0" min="-99" max="99">
+                                </div>
+                                <div class="form-group">
+                                    <label for="weaponBufSpe">SPE:</label>
+                                    <input type="number" id="weaponBufSpe" class="form-control" value="0" min="-99" max="99">
+                                </div>
+                                <div class="form-group">
+                                    <label for="weaponBufMat">MAT:</label>
+                                    <input type="number" id="weaponBufMat" class="form-control" value="0" min="-99" max="99">
+                                </div>
+                                <div class="form-group">
+                                    <label for="weaponBufMdf">MDF:</label>
+                                    <input type="number" id="weaponBufMdf" class="form-control" value="0" min="-99" max="99">
+                                </div>
+                            </div>
                         </div>
 
                         <div class="form-group">
@@ -247,8 +274,10 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="armorOrigin">Origen:</label>
-                            <input type="text" id="armorOrigin" class="form-control">
+                            <label for="armorOrigin">Imperio de Origen:</label>
+                            <select id="armorOrigin" class="form-control" required>
+                                <option value="">Seleccione un imperio</option>
+                            </select>
                         </div>
 
                         <div class="form-group">
@@ -257,8 +286,33 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="armorBuffs">Estadísticas (buff):</label>
-                            <textarea id="armorBuffs" class="form-control" placeholder="Ej: +3 DEF, +1 HP"></textarea>
+                            <label>Estadísticas de Buff:</label>
+                            <div class="stats-grid">
+                                <div class="form-group">
+                                    <label for="armorBufAtk">ATK:</label>
+                                    <input type="number" id="armorBufAtk" class="form-control" value="0" min="-99" max="99">
+                                </div>
+                                <div class="form-group">
+                                    <label for="armorBufDef">DEF:</label>
+                                    <input type="number" id="armorBufDef" class="form-control" value="0" min="-99" max="99">
+                                </div>
+                                <div class="form-group">
+                                    <label for="armorBufHp">HP:</label>
+                                    <input type="number" id="armorBufHp" class="form-control" value="0" min="-99" max="99">
+                                </div>
+                                <div class="form-group">
+                                    <label for="armorBufSpe">SPE:</label>
+                                    <input type="number" id="armorBufSpe" class="form-control" value="0" min="-99" max="99">
+                                </div>
+                                <div class="form-group">
+                                    <label for="armorBufMat">MAT:</label>
+                                    <input type="number" id="armorBufMat" class="form-control" value="0" min="-99" max="99">
+                                </div>
+                                <div class="form-group">
+                                    <label for="armorBufMdf">MDF:</label>
+                                    <input type="number" id="armorBufMdf" class="form-control" value="0" min="-99" max="99">
+                                </div>
+                            </div>
                         </div>
 
                         <div class="form-group">
@@ -308,8 +362,10 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="toolOrigin">Origen:</label>
-                            <input type="text" id="toolOrigin" class="form-control">
+                            <label for="toolOrigin">Imperio de Origen:</label>
+                            <select id="toolOrigin" class="form-control" required>
+                                <option value="">Seleccione un imperio</option>
+                            </select>
                         </div>
 
                         <div class="form-group">
@@ -318,8 +374,33 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="toolBuffs">Estadísticas (buff):</label>
-                            <textarea id="toolBuffs" class="form-control" placeholder="Ej: +1 SPE cuando se usa"></textarea>
+                            <label>Estadísticas de Buff:</label>
+                            <div class="stats-grid">
+                                <div class="form-group">
+                                    <label for="toolBufAtk">ATK:</label>
+                                    <input type="number" id="toolBufAtk" class="form-control" value="0" min="-99" max="99">
+                                </div>
+                                <div class="form-group">
+                                    <label for="toolBufDef">DEF:</label>
+                                    <input type="number" id="toolBufDef" class="form-control" value="0" min="-99" max="99">
+                                </div>
+                                <div class="form-group">
+                                    <label for="toolBufHp">HP:</label>
+                                    <input type="number" id="toolBufHp" class="form-control" value="0" min="-99" max="99">
+                                </div>
+                                <div class="form-group">
+                                    <label for="toolBufSpe">SPE:</label>
+                                    <input type="number" id="toolBufSpe" class="form-control" value="0" min="-99" max="99">
+                                </div>
+                                <div class="form-group">
+                                    <label for="toolBufMat">MAT:</label>
+                                    <input type="number" id="toolBufMat" class="form-control" value="0" min="-99" max="99">
+                                </div>
+                                <div class="form-group">
+                                    <label for="toolBufMdf">MDF:</label>
+                                    <input type="number" id="toolBufMdf" class="form-control" value="0" min="-99" max="99">
+                                </div>
+                            </div>
                         </div>
 
                         <div class="form-group">

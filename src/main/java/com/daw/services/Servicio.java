@@ -2857,4 +2857,871 @@ public List<Persona> obtenerPersonasPorRaza(Integer razaId) throws SQLException 
     
     return lista;
 }
+/* ----- Métodos para gestión de Armas ----- */
+
+/**
+ * Busca armas que coincidan con el nombre proporcionado
+ */
+public List<Arma> buscarArmas(String nombre) throws SQLException {
+    List<Arma> lista = new ArrayList<>();
+    
+    String sql = "SELECT a.*, i.nombre as imperio_nombre FROM arma a " +
+                 "LEFT JOIN imperio i ON a.OrigenImperioID = i.ID " +
+                 "WHERE a.Nombre LIKE ?";
+    
+    try (Connection con = DriverManager.getConnection(url);
+         PreparedStatement ps = con.prepareStatement(sql)) {
+        ps.setString(1, "%" + nombre + "%");
+        try (ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                Arma arma = mapRowToArma(rs);
+                lista.add(arma);
+            }
+        }
+    }
+    
+    return lista;
+}
+
+/**
+ * Obtiene un arma específica por su ID
+ */
+public Arma obtenerArmaPorId(Integer id) throws SQLException {
+    Arma arma = null;
+    
+    String sql = "SELECT a.*, i.nombre as imperio_nombre FROM arma a " +
+                 "LEFT JOIN imperio i ON a.OrigenImperioID = i.ID " +
+                 "WHERE a.ID = ?";
+    
+    try (Connection con = DriverManager.getConnection(url);
+         PreparedStatement ps = con.prepareStatement(sql)) {
+        ps.setInt(1, id);
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                arma = mapRowToArma(rs);
+            }
+        }
+    }
+    
+    return arma;
+}
+
+/**
+ * Añade una nueva arma a la base de datos
+ */
+public String aniadirArma(String nombre, String material, String descripcion, Float peso, Float pvp, 
+                         Integer imperioOrigenId, Date fechaCreacion, Integer bufAtk, Integer bufDef,
+                         Integer bufHp, Integer bufSpe, Integer bufMat, Integer bufMdf) throws SQLException {
+    try (Connection con = DriverManager.getConnection(url)) {
+        con.setAutoCommit(false);
+        
+        try {
+            // Validar que el imperio existe
+            if (imperioOrigenId != null && !imperioExiste(con, imperioOrigenId)) {
+                throw new SQLException("El imperio especificado como origen no existe");
+            }
+            
+            // Crear las estadísticas de buff
+            Estadisticas estadisticasBuf = new Estadisticas();
+            estadisticasBuf.setTipo("BuffArma");
+            estadisticasBuf.setAtk(bufAtk);
+            estadisticasBuf.setDef(bufDef);
+            estadisticasBuf.setHp(bufHp);
+            estadisticasBuf.setSpe(bufSpe);
+            estadisticasBuf.setMat(bufMat);
+            estadisticasBuf.setMdf(bufMdf);
+            estadisticasBuf.setXp(0);
+            estadisticasBuf.setLvl(1);
+            
+            Integer estadisticasId = insertarEstadisticas(con, estadisticasBuf);
+            
+            // Convertir estadísticas a string
+            String bufoString = formatearEstadisticas(bufAtk, bufDef, bufHp, bufSpe, bufMat, bufMdf);
+            
+            String sql = "INSERT INTO arma (Nombre, BufoEstadisticas, Material, Descripcion, Peso, PVP, OrigenImperioID, FechaCreacion) " +
+                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            
+            try (PreparedStatement ps = con.prepareStatement(sql)) {
+                ps.setString(1, nombre);
+                ps.setString(2, bufoString);
+                ps.setString(3, material);
+                ps.setString(4, descripcion);
+                
+                if (peso != null) {
+                    ps.setFloat(5, peso);
+                } else {
+                    ps.setNull(5, java.sql.Types.FLOAT);
+                }
+                
+                if (pvp != null) {
+                    ps.setFloat(6, pvp);
+                } else {
+                    ps.setNull(6, java.sql.Types.FLOAT);
+                }
+                
+                if (imperioOrigenId != null) {
+                    ps.setInt(7, imperioOrigenId);
+                } else {
+                    ps.setNull(7, java.sql.Types.INTEGER);
+                }
+                
+                ps.setDate(8, fechaCreacion);
+                
+                ps.executeUpdate();
+            }
+            
+            con.commit();
+            return "Arma añadida correctamente";
+        } catch (SQLException e) {
+            con.rollback();
+            throw e;
+        } finally {
+            con.setAutoCommit(true);
+        }
+    }
+}
+
+/**
+ * Actualiza un arma existente
+ */
+public String actualizarArma(Integer id, String nombre, String material, String descripcion, Float peso, Float pvp, 
+                           Integer imperioOrigenId, Date fechaCreacion, Integer bufAtk, Integer bufDef,
+                           Integer bufHp, Integer bufSpe, Integer bufMat, Integer bufMdf) throws SQLException {
+    try (Connection con = DriverManager.getConnection(url)) {
+        con.setAutoCommit(false);
+        
+        try {
+            // Validar que el imperio existe
+            if (imperioOrigenId != null && !imperioExiste(con, imperioOrigenId)) {
+                throw new SQLException("El imperio especificado como origen no existe");
+            }
+            
+            // Convertir estadísticas a string
+            String bufoString = formatearEstadisticas(bufAtk, bufDef, bufHp, bufSpe, bufMat, bufMdf);
+            
+            String sql = "UPDATE arma SET Nombre = ?, BufoEstadisticas = ?, Material = ?, Descripcion = ?, " +
+                        "Peso = ?, PVP = ?, OrigenImperioID = ?, FechaCreacion = ? WHERE ID = ?";
+            
+            try (PreparedStatement ps = con.prepareStatement(sql)) {
+                ps.setString(1, nombre);
+                ps.setString(2, bufoString);
+                ps.setString(3, material);
+                ps.setString(4, descripcion);
+                
+                if (peso != null) {
+                    ps.setFloat(5, peso);
+                } else {
+                    ps.setNull(5, java.sql.Types.FLOAT);
+                }
+                
+                if (pvp != null) {
+                    ps.setFloat(6, pvp);
+                } else {
+                    ps.setNull(6, java.sql.Types.FLOAT);
+                }
+                
+                if (imperioOrigenId != null) {
+                    ps.setInt(7, imperioOrigenId);
+                } else {
+                    ps.setNull(7, java.sql.Types.INTEGER);
+                }
+                
+                ps.setDate(8, fechaCreacion);
+                ps.setInt(9, id);
+                
+                int rowsAffected = ps.executeUpdate();
+                if (rowsAffected == 0) {
+                    throw new SQLException("Arma no encontrada con ID: " + id);
+                }
+            }
+            
+            con.commit();
+            return "Arma actualizada correctamente";
+        } catch (SQLException e) {
+            con.rollback();
+            throw e;
+        } finally {
+            con.setAutoCommit(true);
+        }
+    }
+}
+
+/**
+ * Elimina un arma por su ID
+ */
+public String eliminarArma(Integer id) throws SQLException {
+    try (Connection con = DriverManager.getConnection(url);
+         PreparedStatement ps = con.prepareStatement("DELETE FROM arma WHERE ID = ?")) {
+        ps.setInt(1, id);
+        int rowsAffected = ps.executeUpdate();
+        
+        if (rowsAffected == 0) {
+            throw new SQLException("Arma no encontrada con ID: " + id);
+        }
+        
+        return rowsAffected + " arma eliminada";
+    }
+}
+
+/**
+ * Mapea una fila de ResultSet a un objeto Arma
+ */
+private Arma mapRowToArma(ResultSet rs) throws SQLException {
+    Arma arma = new Arma();
+    arma.setId(rs.getInt("ID"));
+    arma.setNombre(rs.getString("Nombre"));
+    arma.setBufoEstadisticas(rs.getString("BufoEstadisticas"));
+    arma.setMaterial(rs.getString("Material"));
+    arma.setDescripcion(rs.getString("Descripcion"));
+    
+    float peso = rs.getFloat("Peso");
+    if (!rs.wasNull()) {
+        arma.setPeso(peso);
+    }
+    
+    float pvp = rs.getFloat("PVP");
+    if (!rs.wasNull()) {
+        arma.setPvp(pvp);
+    }
+    
+    String origen = rs.getString("imperio_nombre");
+    if (origen != null) {
+        arma.setOrigen(origen);
+    }
+    
+    arma.setFechaCreacion(rs.getDate("FechaCreacion"));
+    return arma;
+}
+
+/* ----- Métodos para gestión de Armaduras ----- */
+
+/**
+ * Busca armaduras que coincidan con el nombre proporcionado
+ */
+public List<Armadura> buscarArmaduras(String nombre) throws SQLException {
+    List<Armadura> lista = new ArrayList<>();
+    
+    String sql = "SELECT a.*, i.nombre as imperio_nombre FROM armadura a " +
+                 "LEFT JOIN imperio i ON a.OrigenImperioID = i.ID " +
+                 "WHERE a.Nombre LIKE ?";
+    
+    try (Connection con = DriverManager.getConnection(url);
+         PreparedStatement ps = con.prepareStatement(sql)) {
+        ps.setString(1, "%" + nombre + "%");
+        try (ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                Armadura armadura = mapRowToArmadura(rs);
+                lista.add(armadura);
+            }
+        }
+    }
+    
+    return lista;
+}
+
+/**
+ * Obtiene una armadura específica por su ID
+ */
+public Armadura obtenerArmaduraPorId(Integer id) throws SQLException {
+    Armadura armadura = null;
+    
+    String sql = "SELECT a.*, i.nombre as imperio_nombre FROM armadura a " +
+                 "LEFT JOIN imperio i ON a.OrigenImperioID = i.ID " +
+                 "WHERE a.ID = ?";
+    
+    try (Connection con = DriverManager.getConnection(url);
+         PreparedStatement ps = con.prepareStatement(sql)) {
+        ps.setInt(1, id);
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                armadura = mapRowToArmadura(rs);
+            }
+        }
+    }
+    
+    return armadura;
+}
+
+/**
+ * Añade una nueva armadura a la base de datos
+ */
+public String aniadirArmadura(String nombre, String material, String descripcion, Float peso, Float pvp, 
+                            Integer imperioOrigenId, Date fechaCreacion, Integer bufAtk, Integer bufDef,
+                            Integer bufHp, Integer bufSpe, Integer bufMat, Integer bufMdf) throws SQLException {
+    try (Connection con = DriverManager.getConnection(url)) {
+        con.setAutoCommit(false);
+        
+        try {
+            // Validar que el imperio existe
+            if (imperioOrigenId != null && !imperioExiste(con, imperioOrigenId)) {
+                throw new SQLException("El imperio especificado como origen no existe");
+            }
+            
+            // Crear las estadísticas de buff
+            Estadisticas estadisticasBuf = new Estadisticas();
+            estadisticasBuf.setTipo("BuffArmadura");
+            estadisticasBuf.setAtk(bufAtk);
+            estadisticasBuf.setDef(bufDef);
+            estadisticasBuf.setHp(bufHp);
+            estadisticasBuf.setSpe(bufSpe);
+            estadisticasBuf.setMat(bufMat);
+            estadisticasBuf.setMdf(bufMdf);
+            estadisticasBuf.setXp(0);
+            estadisticasBuf.setLvl(1);
+            
+            Integer estadisticasId = insertarEstadisticas(con, estadisticasBuf);
+            
+            // Convertir estadísticas a string
+            String bufoString = formatearEstadisticas(bufAtk, bufDef, bufHp, bufSpe, bufMat, bufMdf);
+            
+            String sql = "INSERT INTO armadura (Nombre, BufoEstadisticas, Material, Descripcion, Peso, PVP, OrigenImperioID, FechaCreacion) " +
+                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            
+            try (PreparedStatement ps = con.prepareStatement(sql)) {
+                ps.setString(1, nombre);
+                ps.setString(2, bufoString);
+                ps.setString(3, material);
+                ps.setString(4, descripcion);
+                
+                if (peso != null) {
+                    ps.setFloat(5, peso);
+                } else {
+                    ps.setNull(5, java.sql.Types.FLOAT);
+                }
+                
+                if (pvp != null) {
+                    ps.setFloat(6, pvp);
+                } else {
+                    ps.setNull(6, java.sql.Types.FLOAT);
+                }
+                
+                if (imperioOrigenId != null) {
+                    ps.setInt(7, imperioOrigenId);
+                } else {
+                    ps.setNull(7, java.sql.Types.INTEGER);
+                }
+                
+                ps.setDate(8, fechaCreacion);
+                
+                ps.executeUpdate();
+            }
+            
+            con.commit();
+            return "Armadura añadida correctamente";
+        } catch (SQLException e) {
+            con.rollback();
+            throw e;
+        } finally {
+            con.setAutoCommit(true);
+        }
+    }
+}
+
+/**
+ * Actualiza una armadura existente
+ */
+public String actualizarArmadura(Integer id, String nombre, String material, String descripcion, Float peso, Float pvp, 
+                               Integer imperioOrigenId, Date fechaCreacion, Integer bufAtk, Integer bufDef,
+                               Integer bufHp, Integer bufSpe, Integer bufMat, Integer bufMdf) throws SQLException {
+    try (Connection con = DriverManager.getConnection(url)) {
+        con.setAutoCommit(false);
+        
+        try {
+            // Validar que el imperio existe
+            if (imperioOrigenId != null && !imperioExiste(con, imperioOrigenId)) {
+                throw new SQLException("El imperio especificado como origen no existe");
+            }
+            
+            // Convertir estadísticas a string
+            String bufoString = formatearEstadisticas(bufAtk, bufDef, bufHp, bufSpe, bufMat, bufMdf);
+            
+            String sql = "UPDATE armadura SET Nombre = ?, BufoEstadisticas = ?, Material = ?, Descripcion = ?, " +
+                        "Peso = ?, PVP = ?, OrigenImperioID = ?, FechaCreacion = ? WHERE ID = ?";
+            
+            try (PreparedStatement ps = con.prepareStatement(sql)) {
+                ps.setString(1, nombre);
+                ps.setString(2, bufoString);
+                ps.setString(3, material);
+                ps.setString(4, descripcion);
+                
+                if (peso != null) {
+                    ps.setFloat(5, peso);
+                } else {
+                    ps.setNull(5, java.sql.Types.FLOAT);
+                }
+                
+                if (pvp != null) {
+                    ps.setFloat(6, pvp);
+                } else {
+                    ps.setNull(6, java.sql.Types.FLOAT);
+                }
+                
+                if (imperioOrigenId != null) {
+                    ps.setInt(7, imperioOrigenId);
+                } else {  
+                    ps.setNull(7, java.sql.Types.INTEGER);
+                }
+                
+                ps.setDate(8, fechaCreacion);
+                ps.setInt(9, id);
+                
+                int rowsAffected = ps.executeUpdate();
+                if (rowsAffected == 0) {
+                    throw new SQLException("Armadura no encontrada con ID: " + id);
+                }
+            }
+            
+            con.commit();
+            return "Armadura actualizada correctamente";
+        } catch (SQLException e) {
+            con.rollback();
+            throw e;
+        } finally {
+            con.setAutoCommit(true);
+        }
+    }
+}
+
+/**
+ * Elimina una armadura por su ID
+ */
+public String eliminarArmadura(Integer id) throws SQLException {
+    try (Connection con = DriverManager.getConnection(url);
+         PreparedStatement ps = con.prepareStatement("DELETE FROM armadura WHERE ID = ?")) {
+        ps.setInt(1, id);
+        int rowsAffected = ps.executeUpdate();
+        
+        if (rowsAffected == 0) {
+            throw new SQLException("Armadura no encontrada con ID: " + id);
+        }
+        
+        return rowsAffected + " armadura eliminada";
+    }
+}
+
+/**
+ * Mapea una fila de ResultSet a un objeto Armadura
+ */
+private Armadura mapRowToArmadura(ResultSet rs) throws SQLException {
+    Armadura armadura = new Armadura();
+    armadura.setId(rs.getInt("ID"));
+    armadura.setNombre(rs.getString("Nombre"));
+    armadura.setBufoEstadisticas(rs.getString("BufoEstadisticas"));
+    armadura.setMaterial(rs.getString("Material"));
+    armadura.setDescripcion(rs.getString("Descripcion"));
+    
+    float peso = rs.getFloat("Peso");
+    if (!rs.wasNull()) {
+        armadura.setPeso(peso);
+    }
+    
+    float pvp = rs.getFloat("PVP");
+    if (!rs.wasNull()) {
+        armadura.setPvp(pvp);
+    }
+    
+    String origen = rs.getString("imperio_nombre");
+    if (origen != null) {
+        armadura.setOrigen(origen);
+    }
+    
+    armadura.setFechaCreacion(rs.getDate("FechaCreacion"));
+    return armadura;
+}
+
+/* ----- Métodos para gestión de Herramientas ----- */
+
+/**
+ * Busca herramientas que coincidan con el nombre proporcionado
+ */
+public List<Herramienta> buscarHerramientas(String nombre) throws SQLException {
+    List<Herramienta> lista = new ArrayList<>();
+    
+    String sql = "SELECT h.*, i.nombre as imperio_nombre FROM herramienta h " +
+                 "LEFT JOIN imperio i ON h.OrigenImperioID = i.ID " +
+                 "WHERE h.Nombre LIKE ?";
+    
+    try (Connection con = DriverManager.getConnection(url);
+         PreparedStatement ps = con.prepareStatement(sql)) {
+        ps.setString(1, "%" + nombre + "%");
+        try (ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                Herramienta herramienta = mapRowToHerramienta(rs);
+                lista.add(herramienta);
+            }
+        }
+    }
+    
+    return lista;
+}
+
+/**
+ * Obtiene una herramienta específica por su ID
+ */
+public Herramienta obtenerHerramientaPorId(Integer id) throws SQLException {
+    Herramienta herramienta = null;
+    
+    String sql = "SELECT h.*, i.nombre as imperio_nombre FROM herramienta h " +
+                 "LEFT JOIN imperio i ON h.OrigenImperioID = i.ID " +
+                 "WHERE h.ID = ?";
+    
+    try (Connection con = DriverManager.getConnection(url);
+         PreparedStatement ps = con.prepareStatement(sql)) {
+        ps.setInt(1, id);
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                herramienta = mapRowToHerramienta(rs);
+            }
+        }
+    }
+    
+    return herramienta;
+}
+
+/**
+ * Añade una nueva herramienta a la base de datos
+ */
+public String aniadirHerramienta(String nombre, String material, String descripcion, String uso, Float peso, Float pvp, 
+                               Integer imperioOrigenId, Date fechaCreacion, Integer bufAtk, Integer bufDef,
+                               Integer bufHp, Integer bufSpe, Integer bufMat, Integer bufMdf) throws SQLException {
+    try (Connection con = DriverManager.getConnection(url)) {
+        con.setAutoCommit(false);
+        
+        try {
+            // Validar que el imperio existe
+            if (imperioOrigenId != null && !imperioExiste(con, imperioOrigenId)) {
+                throw new SQLException("El imperio especificado como origen no existe");
+            }
+            
+            // Crear las estadísticas de buff
+            Estadisticas estadisticasBuf = new Estadisticas();
+            estadisticasBuf.setTipo("BuffHerramienta");
+            estadisticasBuf.setAtk(bufAtk);
+            estadisticasBuf.setDef(bufDef);
+            estadisticasBuf.setHp(bufHp);
+            estadisticasBuf.setSpe(bufSpe);
+            estadisticasBuf.setMat(bufMat);
+            estadisticasBuf.setMdf(bufMdf);
+            estadisticasBuf.setXp(0);
+            estadisticasBuf.setLvl(1);
+            
+            Integer estadisticasId = insertarEstadisticas(con, estadisticasBuf);
+            
+            // Convertir estadísticas a string
+            String bufoString = formatearEstadisticas(bufAtk, bufDef, bufHp, bufSpe, bufMat, bufMdf);
+            
+            String sql = "INSERT INTO herramienta (Nombre, BufoEstadisticas, Material, Descripcion, Peso, PVP, Uso, OrigenImperioID, FechaCreacion) " +
+                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            
+            try (PreparedStatement ps = con.prepareStatement(sql)) {
+                ps.setString(1, nombre);
+                ps.setString(2, bufoString);
+                ps.setString(3, material);
+                ps.setString(4, descripcion);
+                
+                if (peso != null) {
+                    ps.setFloat(5, peso);
+                } else {
+                    ps.setNull(5, java.sql.Types.FLOAT);
+                }
+                
+                if (pvp != null) {
+                    ps.setFloat(6, pvp);
+                } else {
+                    ps.setNull(6, java.sql.Types.FLOAT);
+                }
+                
+                ps.setString(7, uso);
+                
+                if (imperioOrigenId != null) {
+                    ps.setInt(8, imperioOrigenId);
+                } else {
+                    ps.setNull(8, java.sql.Types.INTEGER);
+                }
+                
+                ps.setDate(9, fechaCreacion);
+                
+                ps.executeUpdate();
+            }
+            
+            con.commit();
+            return "Herramienta añadida correctamente";
+        } catch (SQLException e) {
+            con.rollback();
+            throw e;
+        } finally {
+            con.setAutoCommit(true);
+        }
+    }
+}
+
+/**
+ * Actualiza una herramienta existente
+ */
+public String actualizarHerramienta(Integer id, String nombre, String material, String descripcion, String uso, Float peso, Float pvp, 
+                                  Integer imperioOrigenId, Date fechaCreacion, Integer bufAtk, Integer bufDef,
+                                  Integer bufHp, Integer bufSpe, Integer bufMat, Integer bufMdf) throws SQLException {
+    try (Connection con = DriverManager.getConnection(url)) {
+        con.setAutoCommit(false);
+        
+        try {
+            // Validar que el imperio existe
+            if (imperioOrigenId != null && !imperioExiste(con, imperioOrigenId)) {
+                throw new SQLException("El imperio especificado como origen no existe");
+            }
+            
+            // Convertir estadísticas a string
+            String bufoString = formatearEstadisticas(bufAtk, bufDef, bufHp, bufSpe, bufMat, bufMdf);
+            
+            String sql = "UPDATE herramienta SET Nombre = ?, BufoEstadisticas = ?, Material = ?, Descripcion = ?, " +
+                        "Peso = ?, PVP = ?, Uso = ?, OrigenImperioID = ?, FechaCreacion = ? WHERE ID = ?";
+            
+            try (PreparedStatement ps = con.prepareStatement(sql)) {
+                ps.setString(1, nombre);
+                ps.setString(2, bufoString);
+                ps.setString(3, material);
+                ps.setString(4, descripcion);
+                
+                if (peso != null) {
+                    ps.setFloat(5, peso);
+                } else {
+                    ps.setNull(5, java.sql.Types.FLOAT);
+                }
+                
+                if (pvp != null) {
+                    ps.setFloat(6, pvp);
+                } else {
+                    ps.setNull(6, java.sql.Types.FLOAT);
+                }
+                
+                ps.setString(7, uso);
+                
+                if (imperioOrigenId != null) {
+                    ps.setInt(8, imperioOrigenId);
+                } else {
+                    ps.setNull(8, java.sql.Types.INTEGER);
+                }
+                
+                ps.setDate(9, fechaCreacion);
+                ps.setInt(10, id);
+                
+                int rowsAffected = ps.executeUpdate();
+                if (rowsAffected == 0) {
+                    throw new SQLException("Herramienta no encontrada con ID: " + id);
+                }
+            }
+            
+            con.commit();
+            return "Herramienta actualizada correctamente";
+        } catch (SQLException e) {
+            con.rollback();
+            throw e;
+        } finally {
+            con.setAutoCommit(true);
+        }
+    }
+}
+
+/**
+ * Elimina una herramienta por su ID
+ */
+public String eliminarHerramienta(Integer id) throws SQLException {
+    try (Connection con = DriverManager.getConnection(url);
+         PreparedStatement ps = con.prepareStatement("DELETE FROM herramienta WHERE ID = ?")) {
+        ps.setInt(1, id);
+        int rowsAffected = ps.executeUpdate();
+        
+        if (rowsAffected == 0) {
+            throw new SQLException("Herramienta no encontrada con ID: " + id);
+        }
+        
+        return rowsAffected + " herramienta eliminada";
+    }
+}
+
+/**
+ * Mapea una fila de ResultSet a un objeto Herramienta
+ */
+private Herramienta mapRowToHerramienta(ResultSet rs) throws SQLException {
+    Herramienta herramienta = new Herramienta();
+    herramienta.setId(rs.getInt("ID"));
+    herramienta.setNombre(rs.getString("Nombre"));
+    herramienta.setBufoEstadisticas(rs.getString("BufoEstadisticas"));
+    herramienta.setMaterial(rs.getString("Material"));
+    herramienta.setDescripcion(rs.getString("Descripcion"));
+    
+    float peso = rs.getFloat("Peso");
+    if (!rs.wasNull()) {
+        herramienta.setPeso(peso);
+    }
+    
+    float pvp = rs.getFloat("PVP");
+    if (!rs.wasNull()) {
+        herramienta.setPvp(pvp);
+    }
+    
+    herramienta.setUso(rs.getString("Uso"));
+    
+    String origen = rs.getString("imperio_nombre");
+    if (origen != null) {
+        herramienta.setOrigen(origen);
+    }
+    
+    herramienta.setFechaCreacion(rs.getDate("FechaCreacion"));
+    return herramienta;
+}
+
+/* ----- Métodos para gestión de Arcanas ----- */
+
+/**
+ * Busca arcanas que coincidan con el tipo proporcionado
+ */
+public List<Arcana> buscarArcanas(String tipo) throws SQLException {
+    List<Arcana> lista = new ArrayList<>();
+    
+    String sql = "SELECT * FROM arcana WHERE Tipo LIKE ?";
+    
+    try (Connection con = DriverManager.getConnection(url);
+         PreparedStatement ps = con.prepareStatement(sql)) {
+        ps.setString(1, "%" + tipo + "%");
+        try (ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                Arcana arcana = mapRowToArcana(rs);
+                lista.add(arcana);
+            }
+        }
+    }
+    
+    return lista;
+}
+
+/**
+ * Obtiene una arcana específica por su ID
+ */
+public Arcana obtenerArcanaPorId(Integer id) throws SQLException {
+    Arcana arcana = null;
+    
+    String sql = "SELECT * FROM arcana WHERE ID = ?";
+    
+    try (Connection con = DriverManager.getConnection(url);
+         PreparedStatement ps = con.prepareStatement(sql)) {
+        ps.setInt(1, id);
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                arcana = mapRowToArcana(rs);
+            }
+        }
+    }
+    
+    return arcana;
+}
+
+/**
+ * Añade una nueva arcana a la base de datos
+ */
+public String aniadirArcana(String tipo, String maestria, String dificultad, Date fecha) throws SQLException {
+    String sql = "INSERT INTO arcana (Tipo, Maestria, Dificultad, Fecha) VALUES (?, ?, ?, ?)";
+    
+    try (Connection con = DriverManager.getConnection(url);
+         PreparedStatement ps = con.prepareStatement(sql)) {
+        ps.setString(1, tipo);
+        ps.setString(2, maestria);
+        ps.setString(3, dificultad);
+        ps.setDate(4, fecha);
+        
+        ps.executeUpdate();
+        return "Arcana añadida correctamente";
+    }
+}
+
+/**
+ * Actualiza una arcana existente
+ */
+public String actualizarArcana(Integer id, String tipo, String maestria, String dificultad, Date fecha) throws SQLException {
+    String sql = "UPDATE arcana SET Tipo = ?, Maestria = ?, Dificultad = ?, Fecha = ? WHERE ID = ?";
+    
+    try (Connection con = DriverManager.getConnection(url);
+         PreparedStatement ps = con.prepareStatement(sql)) {
+        ps.setString(1, tipo);
+        ps.setString(2, maestria);
+        ps.setString(3, dificultad);
+        ps.setDate(4, fecha);
+        ps.setInt(5, id);
+        
+        int rowsAffected = ps.executeUpdate();
+        if (rowsAffected == 0) {
+            throw new SQLException("Arcana no encontrada con ID: " + id);
+        }
+        
+        return "Arcana actualizada correctamente";
+    }
+}
+
+/**
+ * Elimina una arcana por su ID
+ */
+public String eliminarArcana(Integer id) throws SQLException {
+    try (Connection con = DriverManager.getConnection(url);
+         PreparedStatement ps = con.prepareStatement("DELETE FROM arcana WHERE ID = ?")) {
+        ps.setInt(1, id);
+        int rowsAffected = ps.executeUpdate();
+        
+        if (rowsAffected == 0) {
+            throw new SQLException("Arcana no encontrada con ID: " + id);
+        }
+        
+        return rowsAffected + " arcana eliminada";
+    }
+}
+
+/**
+ * Mapea una fila de ResultSet a un objeto Arcana
+ */
+private Arcana mapRowToArcana(ResultSet rs) throws SQLException {
+    Arcana arcana = new Arcana();
+    arcana.setId(rs.getInt("ID"));
+    arcana.setTipo(rs.getString("Tipo"));
+    arcana.setMaestria(rs.getString("Maestria"));
+    arcana.setDificultad(rs.getString("Dificultad"));
+    arcana.setFecha(rs.getDate("Fecha"));
+    return arcana;
+}
+
+/* ----- Métodos auxiliares ----- */
+
+/**
+ * Verifica si un imperio existe
+ */
+private boolean imperioExiste(Connection con, Integer imperioId) throws SQLException {
+    String sql = "SELECT COUNT(*) FROM imperio WHERE ID = ?";
+    try (PreparedStatement ps = con.prepareStatement(sql)) {
+        ps.setInt(1, imperioId);
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        }
+    }
+    return false;
+}
+
+/**
+ * Formatea las estadísticas como un string legible
+ */
+private String formatearEstadisticas(Integer atk, Integer def, Integer hp, Integer spe, Integer mat, Integer mdf) {
+    StringBuilder sb = new StringBuilder();
+    if (atk != null && atk != 0) sb.append(atk > 0 ? "+" : "").append(atk).append(" ATK, ");
+    if (def != null && def != 0) sb.append(def > 0 ? "+" : "").append(def).append(" DEF, ");
+    if (hp != null && hp != 0) sb.append(hp > 0 ? "+" : "").append(hp).append(" HP, ");
+    if (spe != null && spe != 0) sb.append(spe > 0 ? "+" : "").append(spe).append(" SPE, ");
+    if (mat != null && mat != 0) sb.append(mat > 0 ? "+" : "").append(mat).append(" MAT, ");
+    if (mdf != null && mdf != 0) sb.append(mdf > 0 ? "+" : "").append(mdf).append(" MDF, ");
+    
+    if (sb.length() > 0) {
+        // Eliminar la última coma y espacio
+        return sb.substring(0, sb.length() - 2);
+    }
+    return "Sin modificadores";
+}
+
 }
