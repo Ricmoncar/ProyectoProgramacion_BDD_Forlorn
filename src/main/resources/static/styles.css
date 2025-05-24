@@ -1155,7 +1155,7 @@ table.dataTable thead th.sorting_desc {
 .person-hero {
     height: 50vh;
     background: linear-gradient(rgba(18, 18, 18, 0.7), rgba(18, 18, 18, 0.9)),
-        url("img/people.jpg") no-repeat center center/cover;
+        url("img/person.jpg") no-repeat center center/cover;
     display: flex;
     align-items: center;
     justify-content: center;

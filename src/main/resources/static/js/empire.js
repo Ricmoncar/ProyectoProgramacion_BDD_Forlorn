@@ -1,67 +1,5 @@
-document.addEventListener('DOMContentLoaded', function() {
-    /* Inicialización de DataTables */
-    let empiresTable = $('#empiresTable').DataTable({
-        language: {
-            url: 'https://cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json'
-        },
-        responsive: true,
-        columns: [
-            { data: 'id' },
-            { data: 'nombre' },
-            { data: 'lider' },
-            { 
-                data: 'poblacion',
-                render: function(data) {
-                    if (data === null || data === undefined) return 'N/A';
-                    return data.toLocaleString('es-ES') + ' habitantes';
-                }
-            },
-            { data: 'ideologia' },
-            { 
-                data: 'gdp',
-                render: function(data) {
-                    if (data === null || data === undefined) return 'N/A';
-                    return data.toLocaleString('es-ES') + ' M';
-                }
-            },
-            {
-                data: 'enGuerra',
-                render: function(data) {
-                    return data == 1 || data === true ? 'Sí' : 'No';
-                }
-            },
-            {
-                data: null,
-                orderable: false,
-                searchable: false,
-                render: function(data, type, row) {
-                    const imperioId = row.id;
-                    if (imperioId === undefined || imperioId === null) {
-                        console.error("ID de imperio no encontrado en los datos de la fila:", row);
-                        return 'Error ID';
-                    }
-                    return `<div class="empire-actions">
-                        <button class="view-btn" title="Ver detalles" onclick="verImperio(${imperioId})"><i class="fas fa-eye"></i></button>
-                        <button class="edit-btn" title="Editar" onclick="editarImperio(${imperioId})"><i class="fas fa-edit"></i></button>
-                        <button class="delete-btn" title="Eliminar" onclick="eliminarImperio(${imperioId})"><i class="fas fa-trash-alt"></i></button>
-                    </div>`;
-                },
-                className: 'dt-center'
-            }
-        ],
-        responsive: {
-            details: {
-                type: 'column',
-                target: 'tr'
-            }
-        },
-        order: [[1, 'asc']], // Ordenar por nombre en lugar de ID
-        // Configuración para solucionar problemas de visualización
-        createdRow: function(row, data, dataIndex) {
-            // Garantiza que todas las filas tengan el fondo correcto
-            $(row).css('background-color', dataIndex % 2 === 0 ? 'rgba(30, 30, 30, 0.8)' : 'var(--dark-secondary)');
-        }
-    });
+// Variables globales
+let empiresTable;
 
 /**
  * Corrige problemas de visualización en las tablas con tema oscuro
@@ -558,6 +496,72 @@ function mostrarAlerta(tipo, mensaje) {
         }
     }, 5000);
 }
+
+// Inicialización cuando el DOM esté cargado
+document.addEventListener('DOMContentLoaded', function() {
+    /* Inicialización de DataTables */
+    empiresTable = $('#empiresTable').DataTable({
+        language: {
+            url: 'https://cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json'
+        },
+        responsive: true,
+        columns: [
+            { data: 'id' },
+            { data: 'nombre' },
+            { data: 'lider' },
+            { 
+                data: 'poblacion',
+                render: function(data) {
+                    if (data === null || data === undefined) return 'N/A';
+                    return data.toLocaleString('es-ES') + ' habitantes';
+                }
+            },
+            { data: 'ideologia' },
+            { 
+                data: 'gdp',
+                render: function(data) {
+                    if (data === null || data === undefined) return 'N/A';
+                    return data.toLocaleString('es-ES') + ' M';
+                }
+            },
+            {
+                data: 'enGuerra',
+                render: function(data) {
+                    return data == 1 || data === true ? 'Sí' : 'No';
+                }
+            },
+            {
+                data: null,
+                orderable: false,
+                searchable: false,
+                render: function(data, type, row) {
+                    const imperioId = row.id;
+                    if (imperioId === undefined || imperioId === null) {
+                        console.error("ID de imperio no encontrado en los datos de la fila:", row);
+                        return 'Error ID';
+                    }
+                    return `<div class="empire-actions">
+                        <button class="view-btn" title="Ver detalles" onclick="verImperio(${imperioId})"><i class="fas fa-eye"></i></button>
+                        <button class="edit-btn" title="Editar" onclick="editarImperio(${imperioId})"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" title="Eliminar" onclick="eliminarImperio(${imperioId})"><i class="fas fa-trash-alt"></i></button>
+                    </div>`;
+                },
+                className: 'dt-center'
+            }
+        ],
+        responsive: {
+            details: {
+                type: 'column',
+                target: 'tr'
+            }
+        },
+        order: [[1, 'asc']], // Ordenar por nombre en lugar de ID
+        // Configuración para solucionar problemas de visualización
+        createdRow: function(row, data, dataIndex) {
+            // Garantiza que todas las filas tengan el fondo correcto
+            $(row).css('background-color', dataIndex % 2 === 0 ? 'rgba(30, 30, 30, 0.8)' : 'var(--dark-secondary)');
+        }
+    });
 
     /* Carga inicial de datos */
     cargarImperios();

@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         },
         order: [[1, 'asc']], // Ordenar por nombre en lugar de ID
-        // Solución al problema de visualización con colores de fondo
+
         createdRow: function(row, data, dataIndex) {
             // Garantiza que todas las filas tengan el fondo correcto
             $(row).css('background-color', dataIndex % 2 === 0 ? 'rgba(30, 30, 30, 0.8)' : 'var(--dark-secondary)');
