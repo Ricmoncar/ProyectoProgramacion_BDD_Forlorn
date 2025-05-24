@@ -75,28 +75,29 @@
         </div>
     </section>
 
-    <!-- Sección de estadísticas -->
+   <!-- Sección de estadísticas -->
     <section class="section stats">
         <div class="container">
             <h2 class="section-title">Estadísticas del Mundo</h2>
             <div class="stats-container">
                 <div class="stat">
-                    <div class="stat-number">???</div>
+                     <!-- IDs añadidos aquí --> 
+                    <div class="stat-number" id="statPlanetas">Cargando...</div>
                     <div class="stat-label">Planetas</div>
                 </div>
                 
                 <div class="stat">
-                    <div class="stat-number">???</div>
+                    <div class="stat-number" id="statContinentes">Cargando...</div>
                     <div class="stat-label">Continentes</div>
                 </div>
                 
                 <div class="stat">
-                    <div class="stat-number">???</div>
+                    <div class="stat-number" id="statImperios">Cargando...</div>
                     <div class="stat-label">Imperios</div>
                 </div>
                 
                 <div class="stat">
-                    <div class="stat-number">???</div>
+                    <div class="stat-number" id="statRazas">Cargando...</div>
                     <div class="stat-label">Razas</div>
                 </div>
             </div>
@@ -174,5 +175,30 @@
             </div>
         </div>
     </footer>
+      <!-- Script para actualizar las estadísticas --> 
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('/universo/estadisticas_globales')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Error al cargar estadísticas del universo');
+                    }
+                    return response.json();
+                })
+                .then(stats => {
+                    document.getElementById('statPlanetas').textContent = stats.totalPlanetas !== undefined ? stats.totalPlanetas.toLocaleString('es-ES') : 'N/A';
+                    document.getElementById('statContinentes').textContent = stats.totalContinentes !== undefined ? stats.totalContinentes.toLocaleString('es-ES') : 'N/A';
+                    document.getElementById('statImperios').textContent = stats.totalImperios !== undefined ? stats.totalImperios.toLocaleString('es-ES') : 'N/A';
+                    document.getElementById('statRazas').textContent = stats.totalRazas !== undefined ? stats.totalRazas.toLocaleString('es-ES') : 'N/A';
+                })
+                .catch(error => {
+                    console.error('Error fetching stats:', error);
+                    document.getElementById('statPlanetas').textContent = 'Error';
+                    document.getElementById('statContinentes').textContent = 'Error';
+                    document.getElementById('statImperios').textContent = 'Error';
+                    document.getElementById('statRazas').textContent = 'Error';
+                });
+        });
+    </script>
 </body>
 </html>
