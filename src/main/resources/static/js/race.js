@@ -162,7 +162,7 @@ function fixTableDisplay() {
  * Carga la lista de razas desde el servidor
  */
 function cargarRazas() {
-    fetch("http://localhost:8080/listar_razas")
+    fetch("/listar_razas")
         .then(res => {
             if (!res.ok) {
                 return res.text().then(text => {
@@ -207,7 +207,7 @@ function verRaza(id) {
         mostrarAlerta('error', 'No se puede mostrar la raza: ID inválido.');
         return;
     }
-    fetch(`http://localhost:8080/obtener_raza?id=${id}`)
+    fetch(`/obtener_raza?id=${id}`)
         .then(res => {
             if (!res.ok) {
                 return res.text().then(text => { 
@@ -324,7 +324,7 @@ function editarRaza(id) {
     modalTitle.textContent = 'Editar Raza';
     raceIdInput.value = id;
 
-    fetch(`http://localhost:8080/obtener_raza?id=${id}`)
+    fetch(`/obtener_raza?id=${id}`)
         .then(res => {
             if (!res.ok) {
                 return res.text().then(text => { 
@@ -389,7 +389,7 @@ function eliminarRaza(id) {
     }
     
     if (confirm(`¿Está seguro que desea eliminar la raza con ID ${id}? Esta acción no se puede deshacer.`)) {
-        fetch(`http://localhost:8080/eliminar_raza?id=${id}`)
+        fetch(`/eliminar_raza?id=${id}`)
             .then(res => {
                 if (!res.ok) {
                     return res.text().then(text => {
@@ -493,7 +493,7 @@ function guardarRaza() {
     }
 
     // Construir la URL con los parámetros
-    let url = id ? 'http://localhost:8080/actualizar_raza?' : 'http://localhost:8080/aniadir_raza?';
+    let url = id ? '/actualizar_raza?' : '/aniadir_raza?';
     
     const params = new URLSearchParams();
     if (id) params.append('id', id);
@@ -542,7 +542,7 @@ function aplicarFiltros() {
     const anchoMinimo = document.getElementById('filterAncho').value;
     
     // Construir la URL con los parámetros
-    let url = 'http://localhost:8080/filtrar_razas?';
+    let url = '/filtrar_razas?';
     const params = new URLSearchParams();
     
     if (alturaMinima && parseFloat(alturaMinima) > 0) params.append('alturaMinima', alturaMinima);

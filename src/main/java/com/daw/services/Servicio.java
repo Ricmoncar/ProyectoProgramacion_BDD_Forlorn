@@ -8,25 +8,26 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
-import com.daw.controllers.Bioma;
-import com.daw.controllers.Continente;
-import com.daw.controllers.Planeta;
-import com.daw.controllers.Raza;
-import com.daw.controllers.Imperio;
-import com.daw.controllers.Guerra;
-import com.daw.controllers.ParticipanteGuerra;
-import com.daw.controllers.Estadisticas;
+import com.daw.controllers.Arcana;
 import com.daw.controllers.Arma;
 import com.daw.controllers.Armadura;
+import com.daw.controllers.Bioma;
+import com.daw.controllers.Continente;
+import com.daw.controllers.Estadisticas;
+import com.daw.controllers.Guerra;
 import com.daw.controllers.Herramienta;
-import com.daw.controllers.Arcana;
+import com.daw.controllers.Imperio;
+import com.daw.controllers.ParticipanteGuerra;
 import com.daw.controllers.Persona;
+import com.daw.controllers.Planeta;
+import com.daw.controllers.Raza;
 
 
 @Service
@@ -2010,27 +2011,47 @@ public List<Guerra> filtrarGuerras(String estado, Integer imperioId) throws SQLE
     /**
      * Lista todas las armas disponibles
      */
+
+    
     public List<Arma> listarArmas() throws SQLException {
         List<Arma> lista = new ArrayList<>();
+        String sql = "SELECT a.*, i.nombre as imperio_nombre FROM arma a " +
+                     "LEFT JOIN imperio i ON a.OrigenImperioID = i.ID";
         
         try (Connection con = DriverManager.getConnection(url);
              Statement st = con.createStatement();
-             ResultSet rs = st.executeQuery("SELECT * FROM arma")) {
+             ResultSet rs = st.executeQuery(sql)) { 
             while (rs.next()) {
-                Arma arma = new Arma();
-                arma.setMaterial(rs.getString("Material"));
-                arma.setDescripcion(rs.getString("Descripcion"));
-                arma.setPeso(rs.getFloat("Peso"));
-                arma.setPvp(rs.getFloat("PVP"));
-                arma.setOrigen(rs.getString("Origen"));
-                arma.setFechaCreacion(rs.getDate("FechaCreacion"));
+                Arma arma = mapRowToArma(rs); 
                 lista.add(arma);
             }
         }
-        
         return lista;
     }
-    
+
+    public List<Arma> listarArmasPersona(Integer personaId) throws SQLException {
+        List<Arma> armas = new ArrayList<>();
+        String sql = "SELECT a.*, i.nombre as imperio_nombre, pa.Equipada " +
+                     "FROM arma a " +
+                     "JOIN persona_arma pa ON a.ID = pa.ArmaID " +
+                     "LEFT JOIN imperio i ON a.OrigenImperioID = i.ID " +
+                     "WHERE pa.PersonaID = ?";
+        
+        try (Connection con = DriverManager.getConnection(url);
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, personaId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Arma arma = mapRowToArma(rs); // 
+                    arma.setEquipada(rs.getBoolean("Equipada")); 
+                    armas.add(arma);
+                }
+            }
+        }
+        return armas;
+    }
+
+
     /**
      * Lista todas las armaduras disponibles
      */
@@ -2058,6 +2079,32 @@ public List<Guerra> filtrarGuerras(String estado, Integer imperioId) throws SQLE
         return lista;
     }
     
+    /**
+     * Lista las armaduras de una persona específica.
+     * Este método es público y maneja su propia conexión.
+     */
+    public List<Armadura> listarArmadurasPersona(Integer personaId) throws SQLException {
+        List<Armadura> armaduras = new ArrayList<>();
+        String sql = "SELECT adm.*, i.nombre as imperio_nombre, pa.Equipada " + 
+                     "FROM armadura adm " + 
+                     "JOIN persona_armadura pa ON adm.ID = pa.ArmaduraID " + 
+                     "LEFT JOIN imperio i ON adm.OrigenImperioID = i.ID " +
+                     "WHERE pa.PersonaID = ?";
+        
+        try (Connection con = DriverManager.getConnection(url);
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, personaId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Armadura armadura = mapRowToArmadura(rs); 
+                    armadura.setEquipada(rs.getBoolean("Equipada")); 
+                    armaduras.add(armadura);
+                }
+            }
+        }
+        return armaduras;
+    }
+
     /**
      * Lista todas las herramientas disponibles
      */
@@ -2087,6 +2134,33 @@ public List<Guerra> filtrarGuerras(String estado, Integer imperioId) throws SQLE
     }
     
     /**
+     * Lista las herramientas de una persona específica.
+     * Este método es público y maneja su propia conexión.
+     */
+    public List<Herramienta> listarHerramientasPersona(Integer personaId) throws SQLException {
+        List<Herramienta> herramientas = new ArrayList<>();
+        String sql = "SELECT h.*, i.nombre as imperio_nombre, ph.Equipada " + 
+                     "FROM herramienta h " + 
+                     "JOIN persona_herramienta ph ON h.ID = ph.HerramientaID " + 
+                     "LEFT JOIN imperio i ON h.OrigenImperioID = i.ID " +
+                     "WHERE ph.PersonaID = ?";
+        
+        try (Connection con = DriverManager.getConnection(url);
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, personaId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+
+                    Herramienta herramienta = mapRowToHerramienta(rs); 
+                    herramienta.setEquipada(rs.getBoolean("Equipada")); 
+                    herramientas.add(herramienta);
+                }
+            }
+        }
+        return herramientas;
+    }
+
+    /**
      * Lista todas las arcanas disponibles
      */
     public List<Arcana> listarArcanas() throws SQLException {
@@ -2107,6 +2181,40 @@ public List<Guerra> filtrarGuerras(String estado, Integer imperioId) throws SQLE
         }
         
         return lista;
+    }
+
+        /**
+     * Lista las arcanas de una persona específica, incluyendo su maestría personal.
+     */
+    public List<Arcana> listarArcanasPersona(Integer personaId) throws SQLException {
+        List<Arcana> arcanas = new ArrayList<>();
+        
+        String sql = "SELECT a.ID AS ArcanaID, a.Tipo AS ArcanaTipo, " +
+                     "a.Dificultad AS ArcanaDificultad, a.Fecha AS ArcanaFecha, " +
+                     "pa.Maestria AS PersonaMaestria " + 
+                     "FROM arcana a " +
+                     "JOIN persona_arcana pa ON a.ID = pa.ArcanaID " + 
+                     "WHERE pa.PersonaID = ?"; 
+        
+        try (Connection con = DriverManager.getConnection(url);
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            
+            ps.setInt(1, personaId); 
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Arcana arcana = new Arcana();
+                    arcana.setId(rs.getInt("ArcanaID"));
+                    arcana.setTipo(rs.getString("ArcanaTipo"));
+                    arcana.setDificultad(rs.getString("ArcanaDificultad"));
+                    arcana.setFecha(rs.getDate("ArcanaFecha"));
+                    arcana.setMaestria(rs.getString("PersonaMaestria")); 
+                                        
+                    arcanas.add(arcana);
+                }
+            }
+        }
+        return arcanas;
     }
     
     /* ----- Métodos auxiliares para personas ----- */
@@ -3724,4 +3832,562 @@ private String formatearEstadisticas(Integer atk, Integer def, Integer hp, Integ
     return "Sin modificadores";
 }
 
+// TABLA MAESTRA... (wow)
+
+public Map<String, Object> obtenerEstadisticasGlobales() throws SQLException {
+    Map<String, Object> estadisticas = new HashMap<>();
+    String sqlPlanetas = "SELECT COUNT(*) FROM planeta";
+    String sqlContinentes = "SELECT COUNT(*) FROM continente";
+    String sqlImperios = "SELECT COUNT(*) FROM imperio";
+    String sqlRazas = "SELECT COUNT(*) FROM raza";
+    String sqlGuerrasActivas = "SELECT COUNT(*) FROM guerra WHERE FechaFin IS NULL";
+    String sqlPoblacionTotal = "SELECT SUM(Poblacion) FROM imperio WHERE Poblacion IS NOT NULL"; 
+
+    try (Connection con = DriverManager.getConnection(url); Statement st = con.createStatement()) {
+        
+        try (ResultSet rs = st.executeQuery(sqlPlanetas)) {
+            if (rs.next()) estadisticas.put("totalPlanetas", rs.getInt(1));
+        }
+        try (ResultSet rs = st.executeQuery(sqlContinentes)) {
+            if (rs.next()) estadisticas.put("totalContinentes", rs.getInt(1));
+        }
+        try (ResultSet rs = st.executeQuery(sqlImperios)) {
+            if (rs.next()) estadisticas.put("totalImperios", rs.getInt(1));
+        }
+        try (ResultSet rs = st.executeQuery(sqlRazas)) {
+            if (rs.next()) estadisticas.put("totalRazas", rs.getInt(1));
+        }
+        try (ResultSet rs = st.executeQuery(sqlGuerrasActivas)) {
+            if (rs.next()) estadisticas.put("guerrasActivas", rs.getInt(1));
+        }
+        try (ResultSet rs = st.executeQuery(sqlPoblacionTotal)) {
+            if (rs.next()) estadisticas.put("poblacionTotalImperios", rs.getLong(1)); 
+        }
+    }
+    return estadisticas;
+}
+
+
+/**
+ * Obtiene los N planetas más recientes.
+ */
+public List<Planeta> getPlanetasRecientes(int limite) throws SQLException {
+    List<Planeta> lista = new ArrayList<>();
+    
+    String sql = "SELECT * FROM planeta ORDER BY FechaCreacion DESC, ID DESC LIMIT ?"; 
+    
+    try (Connection con = DriverManager.getConnection(url);
+         PreparedStatement ps = con.prepareStatement(sql)) {
+        
+        ps.setInt(1, limite); // Establece el parámetro LIMITE
+        
+        try (ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                Planeta planeta = new Planeta(); 
+                
+                // Mapea cada columna del ResultSet a las propiedades del objeto Planeta
+               
+                planeta.setId(rs.getInt("ID")); 
+                planeta.setNombre(rs.getString("Nombre"));
+                planeta.setUbicacion(rs.getString("Ubicacion"));
+                planeta.setHabitable(rs.getBoolean("Habitable"));
+                // Para campos Float/Double/Integer que pueden ser NULL en la BD:
+                float nivelAgua = rs.getFloat("NivelAgua");
+                if (!rs.wasNull()) {
+                    planeta.setNivelAgua(nivelAgua);
+                } else {
+                    planeta.setNivelAgua(null); 
+                }
+                
+                planeta.setFechaCreacion(rs.getDate("FechaCreacion")); 
+                
+                float tamanio = rs.getFloat("Tamanio");
+                if (!rs.wasNull()) {
+                    planeta.setTamanio(tamanio);
+                } else {
+                    planeta.setTamanio(null);
+                }
+                
+                float densidad = rs.getFloat("Densidad");
+                if (!rs.wasNull()) {
+                    planeta.setDensidad(densidad);
+                } else {
+                    planeta.setDensidad(null);
+                }
+                
+                planeta.setDescripcion(rs.getString("Descripcion"));
+                
+                lista.add(planeta);
+            }
+        }
+    }
+    return lista;
+}
+
+
+/**
+ * Obtiene los N imperios más recientes.
+ * Ordena por FechaCreacion descendente, y luego por ID descendente.
+
+ *
+ * @param limite El número máximo de imperios recientes a devolver.
+ * @return Una lista de objetos Imperio.
+ */
+public List<Imperio> getImperiosRecientes(int limite) throws SQLException {
+    List<Imperio> lista = new ArrayList<>();
+    String sql = "SELECT * FROM imperio ORDER BY FechaCreacion DESC, ID DESC LIMIT ?"; 
+    
+    try (Connection con = DriverManager.getConnection(url);
+         PreparedStatement ps = con.prepareStatement(sql)) {
+        
+        ps.setInt(1, limite);
+        
+        try (ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                // mapRowToImperio debería
+                // manejar la lectura de todas las columnas de "SELECT *".
+                Imperio imperio = mapRowToImperio(rs); 
+                lista.add(imperio);
+            }
+        }
+    }
+    return lista;
+}
+/**
+ * Para este ejemplo, obtendremos las más recientes por ID descendente.
+ * Incluye el nombre de la raza y el nivel de las estadísticas.
+ *
+ * @param limite El número máximo de personas recientes a devolver.
+ * @return Una lista de objetos Persona.
+ */
+public List<Persona> getPersonasRecientes(int limite) throws SQLException {
+    List<Persona> lista = new ArrayList<>();
+    
+
+    String sql = "SELECT p.ID, p.Nombre, p.Apellido, p.Profesion, " +
+                 "r.Nombre as razaNombre, " + 
+                 "s.LVL as nivelEstadisticas " + 
+                 "FROM persona p " +
+                 "LEFT JOIN raza r ON p.RazaID = r.ID " +
+                 "LEFT JOIN estadisticas s ON p.EstadisticasID = s.ID " +
+                 "ORDER BY p.ID DESC LIMIT ?"; 
+
+    try (Connection con = DriverManager.getConnection(url);
+         PreparedStatement ps = con.prepareStatement(sql)) {
+        
+        ps.setInt(1, limite);
+        
+        try (ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                Persona persona = new Persona();
+                persona.setId(rs.getInt("ID"));
+                persona.setNombre(rs.getString("Nombre"));
+                
+                // Apellido puede ser null
+                String apellido = rs.getString("Apellido");
+                if (!rs.wasNull()) {
+                    persona.setApellido(apellido);
+                }
+                
+                persona.setProfesion(rs.getString("Profesion"));
+
+                // Crear y setear el objeto Raza
+                Raza raza = new Raza();
+                String nombreRaza = rs.getString("razaNombre");
+                if (nombreRaza != null) { 
+                    raza.setNombre(nombreRaza);
+                } else {
+                    raza.setNombre("Desconocida"); 
+                }
+                persona.setRaza(raza);
+
+                // Crear y setear el objeto Estadisticas 
+                Estadisticas estadisticas = new Estadisticas();
+                int nivel = rs.getInt("nivelEstadisticas");
+                if (!rs.wasNull()) { // El LEFT JOIN puede resultar en NULL si no hay estadísticas
+                    estadisticas.setLvl(nivel);
+                } else {
+                    estadisticas.setLvl(1); // Valor por defecto si no hay estadísticas o nivel
+                }
+                persona.setEstadisticas(estadisticas); 
+                
+                lista.add(persona);
+            }
+        }
+    }
+    return lista;
+}
+/**
+ * Obtiene las N guerras iniciadas más recientemente, incluyendo sus imperios participantes.
+ *
+ * @param limite El número máximo de guerras recientes a devolver.
+ * @return Una lista de objetos Guerra, cada uno con su lista de imperiosParticipantes poblada.
+
+ */
+public List<Guerra> getGuerrasRecientes(int limite) throws SQLException {
+    List<Guerra> guerrasRecientes = new ArrayList<>();
+    
+    // Obtiene las N guerras más recientes (solo los datos de la tabla 'guerra')
+    String sqlGuerras = "SELECT * FROM guerra ORDER BY FechaInicio DESC, ID DESC LIMIT ?";
+    
+    try (Connection con = DriverManager.getConnection(url)) { // Una sola conexión para todas las operaciones
+        try (PreparedStatement psGuerras = con.prepareStatement(sqlGuerras)) {
+            psGuerras.setInt(1, limite);
+            
+            try (ResultSet rsGuerras = psGuerras.executeQuery()) {
+                while (rsGuerras.next()) {
+                    Guerra guerra = new Guerra(); // El constructor inicializa imperiosParticipantes a new ArrayList<>()
+                    
+                    guerra.setId(rsGuerras.getInt("ID"));
+                    guerra.setNombre(rsGuerras.getString("Nombre"));
+                    
+                    Date fechaInicio = rsGuerras.getDate("FechaInicio");
+                    if (!rsGuerras.wasNull()) {
+                        guerra.setFechaInicio(fechaInicio);
+                    }
+                    
+                    Date fechaFin = rsGuerras.getDate("FechaFin");
+                    if (!rsGuerras.wasNull()) {
+                        guerra.setFechaFin(fechaFin);
+                    } else {
+                        guerra.setFechaFin(null);
+                    }
+                    
+                    guerra.setDescripcion(rsGuerras.getString("Descripcion"));
+                    
+                    // para esta guerra, obtener sus imperios participantes
+                    List<ParticipanteGuerra> participantes = obtenerParticipantesDeGuerra(con, guerra.getId());
+                    guerra.setImperiosParticipantes(participantes);
+                    
+                    guerrasRecientes.add(guerra);
+                }
+            }
+        }
+    } // La conexión se cierra aquí
+    return guerrasRecientes;
+}
+
+/**
+ * Método auxiliar para obtener los participantes de una guerra específica.
+ * Este método reutiliza la conexión pasada como argumento.
+ *
+ * @param con La conexión de base de datos activa.
+ * @param guerraId El ID de la guerra para la cual obtener los participantes.
+ * @return Una lista de objetos ParticipanteGuerra.
+ */
+private List<ParticipanteGuerra> obtenerParticipantesDeGuerra(Connection con, Integer guerraId) throws SQLException {
+    List<ParticipanteGuerra> participantes = new ArrayList<>();
+    String sqlParticipantes = "SELECT ig.Rol, ig.Ganador, i.ID as ImperioID, i.Nombre as ImperioNombre " +
+                              "FROM imperio_guerra ig " +
+                              "JOIN imperio i ON ig.ImperioID = i.ID " +
+                              "WHERE ig.GuerraID = ?";
+                              
+    try (PreparedStatement psParticipantes = con.prepareStatement(sqlParticipantes)) {
+        psParticipantes.setInt(1, guerraId);
+        try (ResultSet rsParticipantes = psParticipantes.executeQuery()) {
+            while (rsParticipantes.next()) {
+                ParticipanteGuerra participante = new ParticipanteGuerra();
+                participante.setImperioId(rsParticipantes.getInt("ImperioID"));
+                participante.setImperioNombre(rsParticipantes.getString("ImperioNombre"));
+                participante.setRol(rsParticipantes.getString("Rol"));
+                
+                // Manejar el booleano 'Ganador' que puede ser NULL
+                boolean ganador = rsParticipantes.getBoolean("Ganador");
+                if (!rsParticipantes.wasNull()) {
+                    participante.setGanador(ganador);
+                } else {
+                    participante.setGanador(null); // Explícitamente null si la columna es NULL
+                }
+                participantes.add(participante);
+            }
+        }
+    }
+    return participantes;
+}
+
+
+ // Clase auxiliar interna estática para representar una fila de la Tabla Maestra
+
+    public static class FilaTablaMaestra {
+        private Integer id; 
+        private String tipoEntidad;
+        private String nombrePrincipal;
+        private Date fechaRelevante; 
+        private String infoClave1;
+        private String infoClave2;
+        private String urlDetalle;   // URL para ver detalles (ej. "planet.html#1")
+        public FilaTablaMaestra() {}
+
+        public FilaTablaMaestra(Integer id, String tipoEntidad, String nombrePrincipal, Date fechaRelevante, String infoClave1, String infoClave2, String urlDetalle) {
+            this.id = id;
+            this.tipoEntidad = tipoEntidad;
+            this.nombrePrincipal = nombrePrincipal;
+            this.fechaRelevante = fechaRelevante;
+            this.infoClave1 = infoClave1;
+            this.infoClave2 = infoClave2;
+            this.urlDetalle = urlDetalle;
+        }
+
+        // Getters
+        public Integer getId() { return id; }
+        public String getTipoEntidad() { return tipoEntidad; }
+        public String getNombrePrincipal() { return nombrePrincipal; }
+        public Date getFechaRelevante() { return fechaRelevante; }
+        public String getInfoClave1() { return infoClave1; }
+        public String getInfoClave2() { return infoClave2; }
+        public String getUrlDetalle() { return urlDetalle; }
+
+        // Setters
+        public void setId(Integer id) { this.id = id; }
+        public void setTipoEntidad(String tipoEntidad) { this.tipoEntidad = tipoEntidad; }
+        public void setNombrePrincipal(String nombrePrincipal) { this.nombrePrincipal = nombrePrincipal; }
+        public void setFechaRelevante(Date fechaRelevante) { this.fechaRelevante = fechaRelevante; }
+        public void setInfoClave1(String infoClave1) { this.infoClave1 = infoClave1; }
+        public void setInfoClave2(String infoClave2) { this.infoClave2 = infoClave2; }
+        public void setUrlDetalle(String urlDetalle) { this.urlDetalle = urlDetalle; }
+    }
+
+ /**
+     * Obtiene datos consolidados de varias entidades para una tabla maestra.
+     * Inicialmente, solo carga planetas.
+     *
+     * @param limitePorEntidad El número máximo de ítems a cargar por cada tipo de entidad.
+     * @return Una lista de objetos FilaTablaMaestra.
+     */
+    public List<FilaTablaMaestra> getDatosTablaMaestra(int limitePorEntidad) throws SQLException {
+        List<FilaTablaMaestra> datosCompletos = new ArrayList<>();
+
+        try (Connection con = DriverManager.getConnection(url)) {
+            
+            // ---- Sección para PLANETAS ----
+            // Seleccionamos las columnas que necesitamos para FilaTablaMaestra
+            String sqlPlanetas = "SELECT ID, Nombre, FechaCreacion, Habitable, Ubicacion " +
+                                 "FROM planeta " +
+                                 "ORDER BY FechaCreacion DESC, ID DESC LIMIT ?"; // Ordenar para obtener los más recientes
+            
+            try (PreparedStatement psPlanetas = con.prepareStatement(sqlPlanetas)) {
+                psPlanetas.setInt(1, limitePorEntidad);
+                try (ResultSet rsPlanetas = psPlanetas.executeQuery()) {
+                    while (rsPlanetas.next()) {
+                        Integer planetaId = rsPlanetas.getInt("ID");
+                        String nombrePlaneta = rsPlanetas.getString("Nombre");
+                        Date fechaCreacionPlaneta = rsPlanetas.getDate("FechaCreacion");
+                        boolean esHabitable = rsPlanetas.getBoolean("Habitable");
+                        String ubicacionPlaneta = rsPlanetas.getString("Ubicacion");
+
+                        datosCompletos.add(new FilaTablaMaestra(
+                            planetaId,
+                            "Planeta", // tipoEntidad
+                            nombrePlaneta, // nombrePrincipal
+                            fechaCreacionPlaneta, // fechaRelevante
+                            esHabitable ? "Habitable" : "No Habitable", // infoClave1
+                            ubicacionPlaneta != null ? "Ubicación: " + ubicacionPlaneta : "Ubicación: N/A", // infoClave2
+                            "planet.html#" + planetaId // urlDetalle (el frontend construirá el enlace completo)
+                        ));
+                    }
+                }
+            }
+ // ---- Sección para IMPERIOS ----
+            String sqlImperios = "SELECT ID, Nombre, FechaCreacion, Lider, Poblacion " +
+                                 "FROM imperio " +
+                                 "ORDER BY FechaCreacion DESC, ID DESC LIMIT ?";
+            try (PreparedStatement psImperios = con.prepareStatement(sqlImperios)) {
+                psImperios.setInt(1, limitePorEntidad);
+                try (ResultSet rsImperios = psImperios.executeQuery()) {
+                    while (rsImperios.next()) {
+                        Integer imperioId = rsImperios.getInt("ID");
+                        int poblacion = rsImperios.getInt("Poblacion"); // getInt devuelve 0 si es NULL, wasNull para chequear
+                        String poblacionStr = rsImperios.wasNull() ? "Población: N/A" : "Población: " + poblacion;
+
+                        datosCompletos.add(new FilaTablaMaestra(
+                            imperioId,
+                            "Imperio",
+                            rsImperios.getString("Nombre"),
+                            rsImperios.getDate("FechaCreacion"),
+                            "Líder: " + (rsImperios.getString("Lider") != null ? rsImperios.getString("Lider") : "N/A"),
+                            poblacionStr,
+                            "empire.html#" + imperioId
+                        ));
+                    }
+                }
+            }
+            
+            // ---- Sección para GUERRAS ----
+            String sqlGuerras = "SELECT ID, Nombre, FechaInicio, FechaFin " +
+                                "FROM guerra " +
+                                "ORDER BY FechaInicio DESC, ID DESC LIMIT ?";
+            try (PreparedStatement psGuerras = con.prepareStatement(sqlGuerras)) {
+                psGuerras.setInt(1, limitePorEntidad);
+                try (ResultSet rsGuerras = psGuerras.executeQuery()) {
+                    while (rsGuerras.next()) {
+                        Integer guerraId = rsGuerras.getInt("ID");
+                        Date fechaFin = rsGuerras.getDate("FechaFin");
+                        boolean activa = rsGuerras.wasNull() || fechaFin == null; // Considera NULL como activa
+
+                        datosCompletos.add(new FilaTablaMaestra(
+                            guerraId,
+                            "Guerra",
+                            rsGuerras.getString("Nombre"),
+                            rsGuerras.getDate("FechaInicio"),
+                            activa ? "Activa" : "Finalizada",
+                            "", 
+                            "war.html#" + guerraId
+                        ));
+                    }
+                }
+            }
+            
+            // ---- Sección para PERSONAS ----
+            String sqlPersonas = "SELECT p.ID, p.Nombre, p.Apellido, p.FechaNacimiento, r.Nombre as razaNombre, s.LVL as nivel " +
+                                 "FROM persona p " +
+                                 "LEFT JOIN raza r ON p.RazaID = r.ID " +
+                                 "LEFT JOIN estadisticas s ON p.EstadisticasID = s.ID " +
+                                 "ORDER BY p.ID DESC LIMIT ?"; 
+            try (PreparedStatement psPersonas = con.prepareStatement(sqlPersonas)) {
+                psPersonas.setInt(1, limitePorEntidad);
+                try (ResultSet rsPersonas = psPersonas.executeQuery()) {
+                    while (rsPersonas.next()) {
+                        Integer personaId = rsPersonas.getInt("ID");
+                        String nombreCompleto = rsPersonas.getString("Nombre") + 
+                                                (rsPersonas.getString("Apellido") != null ? " " + rsPersonas.getString("Apellido") : "");
+                        String razaNombre = rsPersonas.getString("razaNombre");
+                        int nivel = rsPersonas.getInt("nivel");
+                        boolean nivelWasNull = rsPersonas.wasNull();
+
+                        datosCompletos.add(new FilaTablaMaestra(
+                            personaId,
+                            "Persona",
+                            nombreCompleto,
+                            rsPersonas.getDate("FechaNacimiento"), 
+                            "Raza: " + (razaNombre != null ? razaNombre : "N/A"),
+                            "Nivel: " + (nivelWasNull ? "N/A" : nivel),
+                            "person.html#" + personaId
+                        ));
+                    }
+                }
+            }
+                        // ---- NUEVA Sección para CONTINENTES ----
+            // Asumimos que Continente no tiene una fecha de creación propia, usaremos ID.
+            // Hacemos JOIN con Planeta para mostrar a qué planeta pertenece.
+            String sqlContinentes = "SELECT c.ID, c.Nombre, c.Clima, p.Nombre as PlanetaNombre " +
+                                    "FROM continente c " +
+                                    "LEFT JOIN planeta p ON c.PlanetaID = p.ID " +
+                                    "ORDER BY c.ID DESC LIMIT ?";
+            try (PreparedStatement psContinentes = con.prepareStatement(sqlContinentes)) {
+                psContinentes.setInt(1, limitePorEntidad);
+                try (ResultSet rsContinentes = psContinentes.executeQuery()) {
+                    while (rsContinentes.next()) {
+                        Integer continenteId = rsContinentes.getInt("ID");
+                        datosCompletos.add(new FilaTablaMaestra(
+                            continenteId,
+                            "Continente",
+                            rsContinentes.getString("Nombre"),
+                            null, // Sin fecha relevante específica para continente en este resumen
+                            "Clima: " + (rsContinentes.getString("Clima") != null ? rsContinentes.getString("Clima") : "N/A"),
+                            "Planeta: " + (rsContinentes.getString("PlanetaNombre") != null ? rsContinentes.getString("PlanetaNombre") : "N/A"),
+                            "continent.html#" + continenteId
+                        ));
+                    }
+                }
+            }
+
+            // ---- Sección para BIOMAS ----
+
+            String sqlBiomas = "SELECT b.ID, b.Nombre, b.Clima, c.Nombre as ContinenteNombre " +
+                               "FROM bioma b " +
+                               "LEFT JOIN continente c ON b.ContinenteID = c.ID " +
+                               "ORDER BY b.ID DESC LIMIT ?";
+            try (PreparedStatement psBiomas = con.prepareStatement(sqlBiomas)) {
+                psBiomas.setInt(1, limitePorEntidad);
+                try (ResultSet rsBiomas = psBiomas.executeQuery()) {
+                    while (rsBiomas.next()) {
+                        Integer biomaId = rsBiomas.getInt("ID");
+                        datosCompletos.add(new FilaTablaMaestra(
+                            biomaId,
+                            "Bioma",
+                            rsBiomas.getString("Nombre"),
+                            null, // Sin fecha relevante específica
+                            "Clima: " + (rsBiomas.getString("Clima") != null ? rsBiomas.getString("Clima") : "N/A"),
+                            "Continente: " + (rsBiomas.getString("ContinenteNombre") != null ? rsBiomas.getString("ContinenteNombre") : "N/A"),
+                            "biome.html#" + biomaId
+                        ));
+                    }
+                }
+            }
+
+            // ---- Sección para ARMAS ----
+
+            String sqlArmas = "SELECT ID, Nombre, FechaCreacion, Material, PVP FROM arma ORDER BY FechaCreacion DESC, ID DESC LIMIT ?";
+            try (PreparedStatement psArmas = con.prepareStatement(sqlArmas)) {
+                psArmas.setInt(1, limitePorEntidad);
+                try (ResultSet rsArmas = psArmas.executeQuery()) {
+                    while (rsArmas.next()) {
+                        Integer armaId = rsArmas.getInt("ID");
+                        float pvp = rsArmas.getFloat("PVP");
+                        String pvpStr = rsArmas.wasNull() ? "PVP: N/A" : "PVP: " + pvp + " oro";
+                        datosCompletos.add(new FilaTablaMaestra(
+                            armaId, "Arma", rsArmas.getString("Nombre"), rsArmas.getDate("FechaCreacion"),
+                            "Material: " + (rsArmas.getString("Material") != null ? rsArmas.getString("Material") : "N/A"),
+                            pvpStr, "equipment.html#armas" 
+                        ));
+                    }
+                }
+            }
+            
+            // ---- Sección para ARMADURAS ----
+            String sqlArmaduras = "SELECT ID, Nombre, FechaCreacion, Material, PVP FROM armadura ORDER BY FechaCreacion DESC, ID DESC LIMIT ?";
+            try (PreparedStatement psArmaduras = con.prepareStatement(sqlArmaduras)) {
+                psArmaduras.setInt(1, limitePorEntidad);
+                try (ResultSet rsArmaduras = psArmaduras.executeQuery()) {
+                    while (rsArmaduras.next()) {
+                        Integer armaduraId = rsArmaduras.getInt("ID");
+                         float pvp = rsArmaduras.getFloat("PVP");
+                        String pvpStr = rsArmaduras.wasNull() ? "PVP: N/A" : "PVP: " + pvp + " oro";
+                        datosCompletos.add(new FilaTablaMaestra(
+                            armaduraId, "Armadura", rsArmaduras.getString("Nombre"), rsArmaduras.getDate("FechaCreacion"),
+                            "Material: " + (rsArmaduras.getString("Material") != null ? rsArmaduras.getString("Material") : "N/A"),
+                             pvpStr, "equipment.html#armaduras"
+                        ));
+                    }
+                }
+            }
+
+            // ---- Sección para HERRAMIENTAS ----
+            String sqlHerramientas = "SELECT ID, Nombre, FechaCreacion, Uso, Material FROM herramienta ORDER BY FechaCreacion DESC, ID DESC LIMIT ?";
+            try (PreparedStatement psHerramientas = con.prepareStatement(sqlHerramientas)) {
+                psHerramientas.setInt(1, limitePorEntidad);
+                try (ResultSet rsHerramientas = psHerramientas.executeQuery()) {
+                    while (rsHerramientas.next()) {
+                        Integer herramientaId = rsHerramientas.getInt("ID");
+                        datosCompletos.add(new FilaTablaMaestra(
+                            herramientaId, "Herramienta", rsHerramientas.getString("Nombre"), rsHerramientas.getDate("FechaCreacion"),
+                            "Uso: " + (rsHerramientas.getString("Uso") != null ? rsHerramientas.getString("Uso") : "N/A"),
+                            "Material: " + (rsHerramientas.getString("Material") != null ? rsHerramientas.getString("Material") : "N/A"),
+                            "equipment.html#herramientas"
+                        ));
+                    }
+                }
+            }
+
+            // ---- Sección para ARCANAS ----
+
+            String sqlArcanas = "SELECT ID, Tipo, Fecha, Maestria, Dificultad FROM arcana ORDER BY Fecha DESC, ID DESC LIMIT ?";
+            try (PreparedStatement psArcanas = con.prepareStatement(sqlArcanas)) {
+                psArcanas.setInt(1, limitePorEntidad);
+                try (ResultSet rsArcanas = psArcanas.executeQuery()) {
+                    while (rsArcanas.next()) {
+                        Integer arcanaId = rsArcanas.getInt("ID");
+                        datosCompletos.add(new FilaTablaMaestra(
+                            arcanaId, "Arcana", rsArcanas.getString("Tipo"), rsArcanas.getDate("Fecha"),
+                            "Maestría: " + (rsArcanas.getString("Maestria") != null ? rsArcanas.getString("Maestria") : "N/A"),
+                            "Dificultad: " + (rsArcanas.getString("Dificultad") != null ? rsArcanas.getString("Dificultad") : "N/A"),
+                            "equipment.html#arcanas"
+                        ));
+                    }
+                }
+            }
+
+        } // La conexión se cierra aquí
+        return datosCompletos;
+    }
 }

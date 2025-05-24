@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-    /* Inicialización de DataTables */
+    // Configuración inicial de DataTables para la tabla de guerras
     let warsTable = $('#warsTable').DataTable({
         language: {
             url: 'https://cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json'
@@ -69,23 +69,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 target: 'tr'
             }
         },
-        order: [[1, 'asc']], // Ordenar por nombre en lugar de ID
-        // Configuración para solucionar problemas de visualización
+        order: [[1, 'asc']], // Ordenar por nombre del conflicto
         createdRow: function(row, data, dataIndex) {
-            // Garantiza que todas las filas tengan el fondo correcto
+            // Aplicar colores alternos para las filas
             $(row).css('background-color', dataIndex % 2 === 0 ? 'rgba(30, 30, 30, 0.8)' : 'var(--dark-secondary)');
         }
     });
 
-    /* Variables para manejar los participantes en una guerra */
+    // Variables para manejar los participantes en una guerra
     let imperiosDisponibles = [];
     let participantesGuerra = [];
 
-    /* Carga inicial de datos */
+    // Cargar datos iniciales al abrir la página
     cargarImperios();
     cargarGuerras();
 
-    /* Configuración de eventos para modales */
+    // Configurar eventos de los botones principales
     const addBtn = document.getElementById('addWarBtn');
     const cancelBtn = document.getElementById('cancelBtn');
     const closeViewBtn = document.getElementById('closeViewBtn');
@@ -98,14 +97,14 @@ document.addEventListener('DOMContentLoaded', function() {
     if (addParticipantBtn) addParticipantBtn.addEventListener('click', abrirModalParticipante);
     if (cancelParticipantBtn) cancelParticipantBtn.addEventListener('click', cerrarModalParticipante);
 
-    /* Configuración de eventos para filtros */
+    // Configurar eventos de los filtros
     const applyFiltersBtn = document.getElementById('applyFiltersBtn');
     const resetFiltersBtn = document.getElementById('resetFiltersBtn');
 
     if (applyFiltersBtn) applyFiltersBtn.addEventListener('click', aplicarFiltros);
     if (resetFiltersBtn) resetFiltersBtn.addEventListener('click', resetearFiltros);
 
-    /* Configuración de eventos para cerrar modales */
+    // Configurar eventos para cerrar modales con la X
     let closeButtons = document.querySelectorAll('.close-modal');
     closeButtons.forEach(function(btn) {
         btn.addEventListener('click', function() {
@@ -118,7 +117,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    /* Configuración de los formularios */
+    // Configurar envío de formularios
     const warForm = document.getElementById('warForm');
     if (warForm) {
         warForm.addEventListener('submit', function(e) {
@@ -135,7 +134,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    /* Cerrar modal al hacer clic fuera del contenido */
+    // Cerrar modales al hacer clic fuera del contenido
     window.addEventListener('click', function(event) {
         const warModal = document.getElementById('warModal');
         const viewWarModal = document.getElementById('viewWarModal');
@@ -151,14 +150,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Corregir visualización de la tabla
-    fixTableDisplay();
+    // Arreglar visualización de la tabla
+    arreglarVisualizacionTabla();
 });
 
-/**
- * Corrige problemas de visualización en las tablas con tema oscuro
- */
-function fixTableDisplay() {
+// Arregla problemas de visualización en las tablas con tema oscuro
+function arreglarVisualizacionTabla() {
     setTimeout(function() {
         $('table.dataTable tbody td').css('background-color', 'inherit');
         
@@ -177,7 +174,7 @@ function fixTableDisplay() {
  * Carga la lista de imperios desde el servidor
  */
 function cargarImperios() {
-    fetch("http://localhost:8080/listar_imperios")
+    fetch("/listar_imperios")
         .then(res => {
             if (!res.ok) {
                 return res.text().then(text => {
@@ -229,7 +226,7 @@ function cargarImperios() {
  * Carga la lista de guerras desde el servidor
  */
 function cargarGuerras() {
-    fetch("http://localhost:8080/listar_guerras")
+    fetch("/listar_guerras")
         .then(res => {
             if (!res.ok) {
                 return res.text().then(text => {
@@ -430,7 +427,7 @@ function verGuerra(id) {
         mostrarAlerta('error', 'No se puede mostrar la guerra: ID inválido.');
         return;
     }
-    fetch(`http://localhost:8080/obtener_guerra?id=${id}`)
+    fetch(`/obtener_guerra?id=${id}`)
         .then(res => {
             if (!res.ok) {
                 return res.text().then(text => { 
@@ -574,7 +571,7 @@ function editarGuerra(id) {
     // Resetear la lista de participantes
     participantesGuerra = [];
 
-    fetch(`http://localhost:8080/obtener_guerra?id=${id}`)
+    fetch(`/obtener_guerra?id=${id}`)
         .then(res => {
             if (!res.ok) {
                 return res.text().then(text => { 
@@ -640,7 +637,7 @@ function eliminarGuerra(id) {
     }
     
     if (confirm(`¿Está seguro que desea eliminar la guerra con ID ${id}? Esta acción no se puede deshacer.`)) {
-        fetch(`http://localhost:8080/eliminar_guerra?id=${id}`)
+        fetch(`/eliminar_guerra?id=${id}`)
             .then(res => {
                 if (!res.ok) {
                     return res.text().then(text => {
@@ -707,77 +704,83 @@ function cerrarModalDetalles() {
     }
 }
 
-/**
- * Guarda una nueva guerra o actualiza una existente
- */
-/**
- * Guarda una nueva guerra o actualiza una existente
- */
+// Función para guardar una nueva guerra o actualizar una existente
 function guardarGuerra() {
-    const id = document.getElementById('warId').value;
-    const nombre = document.getElementById('warName').value.trim();
-    const fechaInicio = document.getElementById('warStartDate').value;
-    const fechaFin = document.getElementById('warEndDate').value;
-    const descripcion = document.getElementById('warDescription').value.trim();
+    const idValue = document.getElementById('warId').value;
+    const id = idValue ? parseInt(idValue) : null; // El ID será null si es una nueva guerra
+
+    // 1. Construir el objeto JavaScript 'guerraData'
+    const guerraData = {
+        id: id,
+        nombre: document.getElementById('warName').value.trim(),
+        fechaInicio: document.getElementById('warStartDate').value, // Enviar como string YYYY-MM-DD
+        fechaFin: document.getElementById('warEndDate').value || null, // Enviar como string YYYY-MM-DD o null
+        descripcion: document.getElementById('warDescription').value.trim() || null,
+        
+        // Aquí usamos la variable global 'participantesGuerra'
+        //que contiene objetos { imperioId: "1", imperioNombre: "NombreImperio", rol: "Atacante", ganador: true/false/null }
+        // Solo necesitamos enviar imperioId, rol y ganador al backend.
+        // El backend espera List<ParticipanteGuerra>, donde cada ParticipanteGuerra tiene imperioId, rol, ganador.
+        imperiosParticipantes: participantesGuerra.map(p => {
+            return {
+                imperioId: parseInt(p.imperioId), // Debe ser un num
+                rol: p.rol,
+                ganador: p.ganador // Esto ya debería ser true, false, o null desde agregarParticipante
+            };
+        })
+    };
 
     // Validación básica
-    if (!nombre) {
+    if (!guerraData.nombre) {
         mostrarAlerta('error', 'El nombre del conflicto es obligatorio.');
         return;
     }
-    
-    if (!fechaInicio) {
+    if (!guerraData.fechaInicio) {
         mostrarAlerta('error', 'La fecha de inicio es obligatoria.');
         return;
     }
-    
-    if (fechaFin && new Date(fechaFin) < new Date(fechaInicio)) {
+    if (guerraData.fechaFin && new Date(guerraData.fechaFin) < new Date(guerraData.fechaInicio)) {
         mostrarAlerta('error', 'La fecha de finalización no puede ser anterior a la fecha de inicio.');
         return;
     }
 
-    // Construir el objeto guerra
-    const guerra = {
-        id: id || null,
-        nombre: nombre,
-        fechaInicio: fechaInicio,
-        fechaFin: fechaFin || null,
-        descripcion: descripcion,
-        imperiosParticipantes: participantesGuerra
-    };
+    const url = id ? '/actualizar_guerra' : '/aniadir_guerra';
 
-    // Enviar la petición 
-    const url = id ? 'http://localhost:8080/actualizar_guerra?' : 'http://localhost:8080/aniadir_guerra?';
-    
-    const params = new URLSearchParams();
-    if (id) params.append('id', id);
-    params.append('nombre', nombre);
-    params.append('fechaInicio', fechaInicio);
-    if (fechaFin) params.append('fechaFin', fechaFin);
-    if (descripcion) params.append('descripcion', descripcion);
-    
-    const finalUrl = url + params.toString();
-    
-    fetch(finalUrl)
-        .then(res => {
-            if (!res.ok) {
-                return res.text().then(text => {
-                    throw new Error(`Error HTTP ${res.status}: ${res.statusText}. Detalle: ${text}`);
-                });
-            }
-            return res.text();
-        })
-        .then(resultado => {
-            mostrarAlerta('warning', 'Nota: Los participantes no se han guardado aún. Esta funcionalidad se implementará próximamente.');
-            mostrarAlerta('success', id ? 'Conflicto actualizado correctamente.' : 'Conflicto registrado correctamente.');
-            cerrarModal();
-            cargarGuerras();
-        })
-        .catch(error => {
-            console.error('Error al guardar la guerra:', error);
-            mostrarAlerta('error', `Error al guardar conflicto: ${error.message}`);
-        });
+    console.log("Enviando JSON para guardar guerra a URL:", url);
+    console.log("Datos Guerra:", JSON.stringify(guerraData, null, 2));
+
+    // Enviar la petición fetch con método POST y cuerpo JSON
+    fetch(url, {
+        method: 'POST', // Usar POST
+        headers: {
+            'Content-Type': 'application/json' // Indicar que el cuerpo es JSON
+        },
+        body: JSON.stringify(guerraData) // Convertir el objeto JavaScript a un string JSON
+    })
+    .then(res => {
+        if (!res.ok) {
+            return res.text().then(text => {
+                let errorDetail = text;
+                try {
+                    const jsonError = JSON.parse(text);
+                    errorDetail = jsonError.message || jsonError.error || text;
+                } catch (e) { /* No era JSON */ }
+                throw new Error(`Error HTTP ${res.status}: ${res.statusText}. Detalle: ${errorDetail}`);
+            });
+        }
+        return res.text(); 
+    })
+    .then(resultado => {
+        mostrarAlerta('success', id ? 'Conflicto actualizado correctamente.' : 'Conflicto registrado correctamente.');
+        cerrarModal(); // Cierra el modal de añadir/editar guerra
+        cargarGuerras(); // Recargar la lista de guerras para ver los cambios
+    })
+    .catch(error => {
+        console.error('Error al guardar la guerra:', error);
+        mostrarAlerta('error', `Error al guardar conflicto: ${error.message}`);
+    });
 }
+
 /**
  * Aplica filtros seleccionados para filtrar guerras
  */
@@ -786,7 +789,7 @@ function aplicarFiltros() {
     const imperioId = document.getElementById('filterEmpire').value;
     
     // Construir la URL con los parámetros
-    let url = 'http://localhost:8080/filtrar_guerras?';
+    let url = '/filtrar_guerras?';
     const params = new URLSearchParams();
     
     if (estado) params.append('estado', estado);

@@ -33,10 +33,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     searchable: false,
                     render: function(data, type, row) {
                         const weaponId = row.id;
+                        if (!weaponId) {
+                            console.warn('ID de arma no encontrado en la fila:', row);
+                            return '<div class="equipment-actions"><span style="color: var(--error);">Error ID</span></div>';
+                        }
                         return `<div class="equipment-actions">
-                            <button class="view-btn" title="Ver detalles" onclick="verArma(${weaponId})"><i class="fas fa-eye"></i></button>
-                            <button class="edit-btn" title="Editar" onclick="editarArma(${weaponId})"><i class="fas fa-edit"></i></button>
-                            <button class="delete-btn" title="Eliminar" onclick="eliminarArma(${weaponId})"><i class="fas fa-trash-alt"></i></button>
+                            <button class="view-btn" title="Ver detalles" data-id="${weaponId}" onclick="verArmaSegura(this)"><i class="fas fa-eye"></i></button>
+                            <button class="edit-btn" title="Editar" data-id="${weaponId}" onclick="editarArmaSegura(this)"><i class="fas fa-edit"></i></button>
+                            <button class="delete-btn" title="Eliminar" data-id="${weaponId}" onclick="eliminarArmaSegura(this)"><i class="fas fa-trash-alt"></i></button>
                         </div>`;
                     },
                     className: 'dt-center'
@@ -76,10 +80,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     searchable: false,
                     render: function(data, type, row) {
                         const armorId = row.id;
+                        if (!armorId) {
+                            console.warn('ID de armadura no encontrado en la fila:', row);
+                            return '<div class="equipment-actions"><span style="color: var(--error);">Error ID</span></div>';
+                        }
                         return `<div class="equipment-actions">
-                            <button class="view-btn" title="Ver detalles" onclick="verArmadura(${armorId})"><i class="fas fa-eye"></i></button>
-                            <button class="edit-btn" title="Editar" onclick="editarArmadura(${armorId})"><i class="fas fa-edit"></i></button>
-                            <button class="delete-btn" title="Eliminar" onclick="eliminarArmadura(${armorId})"><i class="fas fa-trash-alt"></i></button>
+                            <button class="view-btn" title="Ver detalles" data-id="${armorId}" onclick="verArmaduraSegura(this)"><i class="fas fa-eye"></i></button>
+                            <button class="edit-btn" title="Editar" data-id="${armorId}" onclick="editarArmaduraSegura(this)"><i class="fas fa-edit"></i></button>
+                            <button class="delete-btn" title="Eliminar" data-id="${armorId}" onclick="eliminarArmaduraSegura(this)"><i class="fas fa-trash-alt"></i></button>
                         </div>`;
                     },
                     className: 'dt-center'
@@ -120,10 +128,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     searchable: false,
                     render: function(data, type, row) {
                         const toolId = row.id;
+                        if (!toolId) {
+                            console.warn('ID de herramienta no encontrado en la fila:', row);
+                            return '<div class="equipment-actions"><span style="color: var(--error);">Error ID</span></div>';
+                        }
                         return `<div class="equipment-actions">
-                            <button class="view-btn" title="Ver detalles" onclick="verHerramienta(${toolId})"><i class="fas fa-eye"></i></button>
-                            <button class="edit-btn" title="Editar" onclick="editarHerramienta(${toolId})"><i class="fas fa-edit"></i></button>
-                            <button class="delete-btn" title="Eliminar" onclick="eliminarHerramienta(${toolId})"><i class="fas fa-trash-alt"></i></button>
+                            <button class="view-btn" title="Ver detalles" data-id="${toolId}" onclick="verHerramientaSegura(this)"><i class="fas fa-eye"></i></button>
+                            <button class="edit-btn" title="Editar" data-id="${toolId}" onclick="editarHerramientaSegura(this)"><i class="fas fa-edit"></i></button>
+                            <button class="delete-btn" title="Eliminar" data-id="${toolId}" onclick="eliminarHerramientaSegura(this)"><i class="fas fa-trash-alt"></i></button>
                         </div>`;
                     },
                     className: 'dt-center'
@@ -159,10 +171,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     searchable: false,
                     render: function(data, type, row) {
                         const arcanaId = row.id;
+                        if (!arcanaId) {
+                            console.warn('ID de arcana no encontrado en la fila:', row);
+                            return '<div class="equipment-actions"><span style="color: var(--error);">Error ID</span></div>';
+                        }
                         return `<div class="equipment-actions">
-                            <button class="view-btn" title="Ver detalles" onclick="verArcana(${arcanaId})"><i class="fas fa-eye"></i></button>
-                            <button class="edit-btn" title="Editar" onclick="editarArcana(${arcanaId})"><i class="fas fa-edit"></i></button>
-                            <button class="delete-btn" title="Eliminar" onclick="eliminarArcana(${arcanaId})"><i class="fas fa-trash-alt"></i></button>
+                            <button class="view-btn" title="Ver detalles" data-id="${arcanaId}" onclick="verArcanaSegura(this)"><i class="fas fa-eye"></i></button>
+                            <button class="edit-btn" title="Editar" data-id="${arcanaId}" onclick="editarArcanaSegura(this)"><i class="fas fa-edit"></i></button>
+                            <button class="delete-btn" title="Eliminar" data-id="${arcanaId}" onclick="eliminarArcanaSegura(this)"><i class="fas fa-trash-alt"></i></button>
                         </div>`;
                     },
                     className: 'dt-center'
@@ -197,7 +213,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     /* Carga de imperiums */
     function cargarImperios() {
-        fetch("http://localhost:8080/listar_imperios")
+        fetch("/listar_imperios")
             .then(res => {
                 if (!res.ok) {
                     throw new Error(`Error HTTP ${res.status}: ${res.statusText}`);
@@ -229,7 +245,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     /* Carga de datos */
     function cargarArmas() {
-        fetch("http://localhost:8080/listar_armas")
+        fetch("/listar_armas")
             .then(res => {
                 if (!res.ok) {
                     return res.text().then(text => {
@@ -264,7 +280,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function cargarArmaduras() {
-        fetch("http://localhost:8080/listar_armaduras")
+        fetch("/listar_armaduras")
             .then(res => {
                 if (!res.ok) {
                     return res.text().then(text => {
@@ -299,7 +315,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function cargarHerramientas() {
-        fetch("http://localhost:8080/listar_herramientas")
+        fetch("/listar_herramientas")
             .then(res => {
                 if (!res.ok) {
                     return res.text().then(text => {
@@ -334,7 +350,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function cargarArcanas() {
-        fetch("http://localhost:8080/listar_arcanas")
+        fetch("/listar_arcanas")
             .then(res => {
                 if (!res.ok) {
                     return res.text().then(text => {
@@ -370,10 +386,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
     /* Funciones de Armas */
     window.verArma = function(id) {
-        fetch(`http://localhost:8080/obtener_arma?id=${id}`)
+        if (id === undefined || id === null) {
+            console.error('ID de arma inválido:', id);
+            mostrarAlerta('error', 'No se puede mostrar el arma: ID inválido.');
+            return;
+        }
+        
+        fetch(`/obtener_arma?id=${id}`)
             .then(res => {
                 if (!res.ok) {
-                    throw new Error(`Error HTTP ${res.status}: ${res.statusText}`);
+                    return res.text().then(text => {
+                        throw new Error(`Error HTTP ${res.status}: ${res.statusText}. Detalle: ${text}`);
+                    });
                 }
                 return res.json();
             })
@@ -424,10 +448,18 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     window.editarArma = function(id) {
-        fetch(`http://localhost:8080/obtener_arma?id=${id}`)
+        if (id === undefined || id === null) {
+            console.error('ID de arma inválido para editar:', id);
+            mostrarAlerta('error', 'No se puede editar el arma: ID inválido.');
+            return;
+        }
+        
+        fetch(`/obtener_arma?id=${id}`)
             .then(res => {
                 if (!res.ok) {
-                    throw new Error(`Error HTTP ${res.status}: ${res.statusText}`);
+                    return res.text().then(text => {
+                        throw new Error(`Error HTTP ${res.status}: ${res.statusText}. Detalle: ${text}`);
+                    });
                 }
                 return res.json();
             })
@@ -473,7 +505,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     window.eliminarArma = function(id) {
         if (confirm('¿Está seguro de que desea eliminar esta arma?')) {
-            fetch(`http://localhost:8080/eliminar_arma?id=${id}`)
+            fetch(`/eliminar_arma?id=${id}`)
                 .then(res => {
                     if (!res.ok) {
                         throw new Error(`Error HTTP ${res.status}: ${res.statusText}`);
@@ -493,10 +525,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
     /* Funciones de Armaduras */
     window.verArmadura = function(id) {
-        fetch(`http://localhost:8080/obtener_armadura?id=${id}`)
+        if (id === undefined || id === null) {
+            console.error('ID de armadura inválido:', id);
+            mostrarAlerta('error', 'No se puede mostrar la armadura: ID inválido.');
+            return;
+        }
+        
+        fetch(`/obtener_armadura?id=${id}`)
             .then(res => {
                 if (!res.ok) {
-                    throw new Error(`Error HTTP ${res.status}: ${res.statusText}`);
+                    return res.text().then(text => {
+                        throw new Error(`Error HTTP ${res.status}: ${res.statusText}. Detalle: ${text}`);
+                    });
                 }
                 return res.json();
             })
@@ -547,10 +587,18 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     window.editarArmadura = function(id) {
-        fetch(`http://localhost:8080/obtener_armadura?id=${id}`)
+        if (id === undefined || id === null) {
+            console.error('ID de armadura inválido para editar:', id);
+            mostrarAlerta('error', 'No se puede editar la armadura: ID inválido.');
+            return;
+        }
+        
+        fetch(`/obtener_armadura?id=${id}`)
             .then(res => {
                 if (!res.ok) {
-                    throw new Error(`Error HTTP ${res.status}: ${res.statusText}`);
+                    return res.text().then(text => {
+                        throw new Error(`Error HTTP ${res.status}: ${res.statusText}. Detalle: ${text}`);
+                    });
                 }
                 return res.json();
             })
@@ -596,7 +644,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     window.eliminarArmadura = function(id) {
         if (confirm('¿Está seguro de que desea eliminar esta armadura?')) {
-            fetch(`http://localhost:8080/eliminar_armadura?id=${id}`)
+            fetch(`/eliminar_armadura?id=${id}`)
                 .then(res => {
                     if (!res.ok) {
                         throw new Error(`Error HTTP ${res.status}: ${res.statusText}`);
@@ -616,10 +664,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
     /* Funciones de Herramientas */
     window.verHerramienta = function(id) {
-        fetch(`http://localhost:8080/obtener_herramienta?id=${id}`)
+        if (id === undefined || id === null) {
+            console.error('ID de herramienta inválido:', id);
+            mostrarAlerta('error', 'No se puede mostrar la herramienta: ID inválido.');
+            return;
+        }
+        
+        fetch(`/obtener_herramienta?id=${id}`)
             .then(res => {
                 if (!res.ok) {
-                    throw new Error(`Error HTTP ${res.status}: ${res.statusText}`);
+                    return res.text().then(text => {
+                        throw new Error(`Error HTTP ${res.status}: ${res.statusText}. Detalle: ${text}`);
+                    });
                 }
                 return res.json();
             })
@@ -674,10 +730,18 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     window.editarHerramienta = function(id) {
-        fetch(`http://localhost:8080/obtener_herramienta?id=${id}`)
+        if (id === undefined || id === null) {
+            console.error('ID de herramienta inválido para editar:', id);
+            mostrarAlerta('error', 'No se puede editar la herramienta: ID inválido.');
+            return;
+        }
+        
+        fetch(`/obtener_herramienta?id=${id}`)
             .then(res => {
                 if (!res.ok) {
-                    throw new Error(`Error HTTP ${res.status}: ${res.statusText}`);
+                    return res.text().then(text => {
+                        throw new Error(`Error HTTP ${res.status}: ${res.statusText}. Detalle: ${text}`);
+                    });
                 }
                 return res.json();
             })
@@ -724,7 +788,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     window.eliminarHerramienta = function(id) {
         if (confirm('¿Está seguro de que desea eliminar esta herramienta?')) {
-            fetch(`http://localhost:8080/eliminar_herramienta?id=${id}`)
+            fetch(`/eliminar_herramienta?id=${id}`)
                 .then(res => {
                     if (!res.ok) {
                         throw new Error(`Error HTTP ${res.status}: ${res.statusText}`);
@@ -744,10 +808,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
     /* Funciones de Arcanas */
     window.verArcana = function(id) {
-        fetch(`http://localhost:8080/obtener_arcana?id=${id}`)
+        if (id === undefined || id === null) {
+            console.error('ID de arcana inválido:', id);
+            mostrarAlerta('error', 'No se puede mostrar la arcana: ID inválido.');
+            return;
+        }
+        
+        fetch(`/obtener_arcana?id=${id}`)
             .then(res => {
                 if (!res.ok) {
-                    throw new Error(`Error HTTP ${res.status}: ${res.statusText}`);
+                    return res.text().then(text => {
+                        throw new Error(`Error HTTP ${res.status}: ${res.statusText}. Detalle: ${text}`);
+                    });
                 }
                 return res.json();
             })
@@ -782,10 +854,18 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     window.editarArcana = function(id) {
-        fetch(`http://localhost:8080/obtener_arcana?id=${id}`)
+        if (id === undefined || id === null) {
+            console.error('ID de arcana inválido para editar:', id);
+            mostrarAlerta('error', 'No se puede editar la arcana: ID inválido.');
+            return;
+        }
+        
+        fetch(`/obtener_arcana?id=${id}`)
             .then(res => {
                 if (!res.ok) {
-                    throw new Error(`Error HTTP ${res.status}: ${res.statusText}`);
+                    return res.text().then(text => {
+                        throw new Error(`Error HTTP ${res.status}: ${res.statusText}. Detalle: ${text}`);
+                    });
                 }
                 return res.json();
             })
@@ -815,7 +895,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     window.eliminarArcana = function(id) {
         if (confirm('¿Está seguro de que desea eliminar esta arcana?')) {
-            fetch(`http://localhost:8080/eliminar_arcana?id=${id}`)
+            fetch(`/eliminar_arcana?id=${id}`)
                 .then(res => {
                     if (!res.ok) {
                         throw new Error(`Error HTTP ${res.status}: ${res.statusText}`);
@@ -1122,7 +1202,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         /* Construir la URL */
-        const baseUrl = id ? 'http://localhost:8080/actualizar_arma' : 'http://localhost:8080/aniadir_arma';
+        const baseUrl = id ? '/actualizar_arma' : '/aniadir_arma';
         const params = new URLSearchParams();
         
         if (id) params.append('id', id);
@@ -1189,7 +1269,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         /* Construir la URL */
-        const baseUrl = id ? 'http://localhost:8080/actualizar_armadura' : 'http://localhost:8080/aniadir_armadura';
+        const baseUrl = id ? '/actualizar_armadura' : '/aniadir_armadura';
         const params = new URLSearchParams();
         
         if (id) params.append('id', id);
@@ -1257,7 +1337,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         /* Construir la URL */
-        const baseUrl = id ? 'http://localhost:8080/actualizar_herramienta' : 'http://localhost:8080/aniadir_herramienta';
+        const baseUrl = id ? '/actualizar_herramienta' : '/aniadir_herramienta';
         const params = new URLSearchParams();
         
         if (id) params.append('id', id);
@@ -1309,7 +1389,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         /* Construir la URL */
-        const baseUrl = id ? 'http://localhost:8080/actualizar_arcana' : 'http://localhost:8080/aniadir_arcana';
+        const baseUrl = id ? '/actualizar_arcana' : '/aniadir_arcana';
         const params = new URLSearchParams();
         
         if (id) params.append('id', id);
@@ -1337,6 +1417,67 @@ document.addEventListener('DOMContentLoaded', function() {
                 mostrarAlerta('error', `Error al guardar arcana: ${error.message}`);
             });
     }
+
+    /* Funciones seguras que obtienen el ID del atributo data-id */
+    window.verArmaSegura = function(button) {
+        const id = button.getAttribute('data-id');
+        verArma(id);
+    };
+
+    window.editarArmaSegura = function(button) {
+        const id = button.getAttribute('data-id');
+        editarArma(id);
+    };
+
+    window.eliminarArmaSegura = function(button) {
+        const id = button.getAttribute('data-id');
+        eliminarArma(id);
+    };
+
+    window.verArmaduraSegura = function(button) {
+        const id = button.getAttribute('data-id');
+        verArmadura(id);
+    };
+
+    window.editarArmaduraSegura = function(button) {
+        const id = button.getAttribute('data-id');
+        editarArmadura(id);
+    };
+
+    window.eliminarArmaduraSegura = function(button) {
+        const id = button.getAttribute('data-id');
+        eliminarArmadura(id);
+    };
+
+    window.verHerramientaSegura = function(button) {
+        const id = button.getAttribute('data-id');
+        verHerramienta(id);
+    };
+
+    window.editarHerramientaSegura = function(button) {
+        const id = button.getAttribute('data-id');
+        editarHerramienta(id);
+    };
+
+    window.eliminarHerramientaSegura = function(button) {
+        const id = button.getAttribute('data-id');
+        eliminarHerramienta(id);
+    };
+
+    window.verArcanaSegura = function(button) {
+        const id = button.getAttribute('data-id');
+        verArcana(id);
+    };
+
+    window.editarArcanaSegura = function(button) {
+        const id = button.getAttribute('data-id');
+        editarArcana(id);
+    };
+
+    window.eliminarArcanaSegura = function(button) {
+        const id = button.getAttribute('data-id');
+        eliminarArcana(id);
+    };
 
     /* Inicialización */
     initializeTables();

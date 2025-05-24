@@ -85,7 +85,7 @@ function fixTableDisplay() {
  * Carga la lista de imperios desde el servidor
  */
 function cargarImperios() {
-    fetch("http://localhost:8080/listar_imperios")
+    fetch("/listar_imperios")
         .then(res => {
             if (!res.ok) {
                 return res.text().then(text => {
@@ -130,7 +130,7 @@ function verImperio(id) {
         mostrarAlerta('error', 'No se puede mostrar el imperio: ID inválido.');
         return;
     }
-    fetch(`http://localhost:8080/obtener_imperio?id=${id}`)
+    fetch(`/obtener_imperio?id=${id}`)
         .then(res => {
             if (!res.ok) {
                 return res.text().then(text => { 
@@ -243,7 +243,7 @@ function editarImperio(id) {
     modalTitle.textContent = 'Editar Imperio';
     empireIdInput.value = id;
 
-    fetch(`http://localhost:8080/obtener_imperio?id=${id}`)
+    fetch(`/obtener_imperio?id=${id}`)
         .then(res => {
             if (!res.ok) {
                 return res.text().then(text => { 
@@ -301,7 +301,7 @@ function eliminarImperio(id) {
     }
     
     if (confirm(`¿Está seguro que desea eliminar el imperio con ID ${id}? Esta acción no se puede deshacer.`)) {
-        fetch(`http://localhost:8080/eliminar_imperio?id=${id}`)
+        fetch(`/eliminar_imperio?id=${id}`)
             .then(res => {
                 if (!res.ok) {
                     return res.text().then(text => {
@@ -385,7 +385,7 @@ function guardarImperio() {
     }
 
     // Construir la URL con los parámetros
-    let url = id ? 'http://localhost:8080/actualizar_imperio?' : 'http://localhost:8080/aniadir_imperio?';
+    let url = id ? '/actualizar_imperio?' : '/aniadir_imperio?';
     
     const params = new URLSearchParams();
     if (id) params.append('id', id);
@@ -432,7 +432,7 @@ function aplicarFiltros() {
     const enGuerra = enGuerraSelect && enGuerraSelect.value ? enGuerraSelect.value === 'true' : null;
     
     // Construir la URL con los parámetros
-    let url = 'http://localhost:8080/filtrar_imperios?';
+    let url = '/filtrar_imperios?';
     const params = new URLSearchParams();
     
     if (poblacionMinima && parseInt(poblacionMinima) > 0) params.append('poblacionMinima', poblacionMinima);

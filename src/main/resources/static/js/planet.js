@@ -72,7 +72,7 @@ function fixTableDisplay() {
  * Carga la lista de planetas desde el servidor
  */
 function cargarPlanetas() {
-    fetch("http://localhost:8080/listar_planetas")
+    fetch("/listar_planetas")
         .then(res => {
             if (!res.ok) {
                 throw new Error(`Error HTTP: ${res.status}`);
@@ -169,7 +169,7 @@ function guardarPlaneta() {
         formData.append('id', planetId);
     }
     
-    const url = planetId ? 'http://localhost:8080/actualizar_planeta' : 'http://localhost:8080/aniadir_planeta';
+    const url = planetId ? '/actualizar_planeta' : '/aniadir_planeta';
     
     const params = new URLSearchParams();
     for (const pair of formData) {
@@ -199,7 +199,7 @@ function guardarPlaneta() {
  */
 function eliminarPlaneta(id) {
     if (confirm('¿Está seguro de que desea eliminar este planeta? Esta acción no se puede deshacer.')) {
-        fetch(`http://localhost:8080/eliminar_planeta?id=${id}`)
+        fetch(`/eliminar_planeta?id=${id}`)
             .then(res => {
                 if (!res.ok) {
                     throw new Error(`Error HTTP: ${res.status}`);

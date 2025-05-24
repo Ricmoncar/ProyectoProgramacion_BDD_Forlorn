@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Inicialización de DataTables para la tabla de personas
+    // Inicialización de la tabla de personas con DataTables
     let personsTable = $('#personsTable').DataTable({
         language: {
             url: 'https://cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json'
@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 render: function(data, type, row) {
                     const personaId = row.id;
                     if (personaId === undefined || personaId === null) {
-                        console.error("ID de persona no encontrado en los datos de la fila:", row);
+                        console.error("ID de persona no encontrado:", row);
                         return 'Error ID';
                     }
                     return `<div class="person-actions">
@@ -49,128 +49,48 @@ document.addEventListener('DOMContentLoaded', function() {
                 target: 'tr'
             }
         },
-        order: [[1, 'asc']], // Ordenar por nombre
-        createdRow: function(row, data, dataIndex) {
-            // Garantiza que todas las filas tengan el fondo correcto
-            $(row).css('background-color', dataIndex % 2 === 0 ? 'rgba(30, 30, 30, 0.8)' : 'var(--dark-secondary)');
-        }
+        order: [[1, 'asc']]
     });
-
-    // Variables globales para el manejo de equipamiento
-    window.armasDisponibles = [];
-    window.armadurasDisponibles = [];
-    window.herramientasDisponibles = [];
-    window.arcanasDisponibles = [];
-    
-    // Arreglos para almacenar el equipamiento seleccionado
-    window.armasEquipadas = [];
-    window.armadurasEquipadas = [];
-    window.herramientasEquipadas = [];
-    window.arcanasAdquiridas = [];
 
     // Cargar datos iniciales
     cargarRazas();
     cargarImperios();
-    cargarEquipamiento('arma');
-    cargarEquipamiento('armadura');
-    cargarEquipamiento('herramienta');
-    cargarEquipamiento('arcana');
     cargarPersonas();
 
-    // Configuración de eventos para modales
+    // Configurar eventos de botones principales
     const addBtn = document.getElementById('addPersonBtn');
     const cancelBtn = document.getElementById('cancelBtn');
     const closeViewBtn = document.getElementById('closeViewBtn');
-    const cancelEquipmentBtn = document.getElementById('cancelEquipmentBtn');
 
-    // Fixed event handler for addPersonBtn
-    if (addBtn) {
-        console.log('Add person button found');
-        addBtn.addEventListener('click', function() {
-            console.log('Add person button clicked');
-            abrirModalAnadir();
-        });
-    } else {
-        console.error("Add person button not found");
-    }
-    
-    // Fixed event handler for cancelBtn
-    if (cancelBtn) {
-        cancelBtn.addEventListener('click', function() {
-            console.log('Cancel button clicked');
-            cerrarModal();
-        });
-    } else {
-        console.error("Cancel button not found");
-    }
-    
-    if (closeViewBtn) {
-        closeViewBtn.addEventListener('click', cerrarModalDetalles);
-    }
-    
-    if (cancelEquipmentBtn) {
-        cancelEquipmentBtn.addEventListener('click', cerrarModalEquipamiento);
-    }
+    if (addBtn) addBtn.addEventListener('click', abrirModalAnadir);
+    if (cancelBtn) cancelBtn.addEventListener('click', cerrarModal);
+    if (closeViewBtn) closeViewBtn.addEventListener('click', cerrarModalDetalles);
 
-    // Configuración de eventos para filtros
+    // Configurar eventos de filtros
     const applyFiltersBtn = document.getElementById('applyFiltersBtn');
     const resetFiltersBtn = document.getElementById('resetFiltersBtn');
-    const nivelSlider = document.getElementById('filterNivelMin');
-    const nivelValue = document.getElementById('nivelMinValue');
 
     if (applyFiltersBtn) applyFiltersBtn.addEventListener('click', aplicarFiltros);
     if (resetFiltersBtn) resetFiltersBtn.addEventListener('click', resetearFiltros);
+
+    // Configurar eventos para cerrar modales
+    document.querySelectorAll('.close-modal').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.getElementById('personModal').style.display = 'none';
+            document.getElementById('viewPersonModal').style.display = 'none';
+            document.getElementById('equipmentSelectionModal').style.display = 'none';
+        });
+    });
     
-    // Configuración del slider de nivel
-    if (nivelSlider && nivelValue) {
-        nivelSlider.addEventListener('input', function() {
-            nivelValue.textContent = this.value;
+    // Configurar botón de cancelar del modal de equipamiento
+    const cancelEquipmentBtn = document.getElementById('cancelEquipmentBtn');
+    if (cancelEquipmentBtn) {
+        cancelEquipmentBtn.addEventListener('click', function() {
+            document.getElementById('equipmentSelectionModal').style.display = 'none';
         });
     }
 
-    // Configuración de eventos para pestañas de equipamiento
-    const tabBtns = document.querySelectorAll('.tab-btn');
-    tabBtns.forEach(button => {
-        button.addEventListener('click', function() {
-            // Remover clase active de todos los botones y contenidos
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            
-            // Añadir clase active al botón clickeado
-            this.classList.add('active');
-            
-            // Mostrar el contenido correspondiente
-            const tabId = this.getAttribute('data-tab') + '-tab';
-            document.getElementById(tabId).classList.add('active');
-        });
-    });
-
-    // Configuración de botones para añadir equipamiento
-    const addEquipmentBtns = document.querySelectorAll('.add-equipment-btn');
-    addEquipmentBtns.forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.preventDefault(); // Prevent form submission
-            const type = this.getAttribute('data-type');
-            console.log('Opening equipment modal for type:', type);
-            abrirModalEquipamiento(type);
-        });
-    });
-
-    // Configuración de eventos para cerrar modales
-    let closeButtons = document.querySelectorAll('.close-modal');
-    closeButtons.forEach(function(btn) {
-        btn.addEventListener('click', function() {
-            console.log('Close button clicked');
-            const personModal = document.getElementById('personModal');
-            const viewPersonModal = document.getElementById('viewPersonModal');
-            const equipmentModal = document.getElementById('equipmentModal');
-            if (personModal) personModal.style.display = 'none';
-            if (viewPersonModal) viewPersonModal.style.display = 'none';
-            if (equipmentModal) equipmentModal.style.display = 'none';
-        });
-    });
-
-    // Configuración de formularios
+    // Configurar formulario
     const personForm = document.getElementById('personForm');
     if (personForm) {
         personForm.addEventListener('submit', function(e) {
@@ -179,58 +99,37 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    const equipmentForm = document.getElementById('equipmentForm');
-    if (equipmentForm) {
-        equipmentForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            agregarEquipamiento();
+    // Configurar pestañas de equipamiento
+    document.querySelectorAll('.tab-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            this.classList.add('active');
+            const tabId = this.getAttribute('data-tab');
+            document.getElementById(tabId).classList.add('active');
         });
-    }
+    });
 
-    // Cerrar modales al hacer clic fuera del contenido
+    // Cerrar modales al hacer clic fuera
     window.addEventListener('click', function(event) {
         const personModal = document.getElementById('personModal');
         const viewPersonModal = document.getElementById('viewPersonModal');
-        const equipmentModal = document.getElementById('equipmentModal');
+        const equipmentModal = document.getElementById('equipmentSelectionModal');
         
-        if (event.target == personModal) {
-            cerrarModal();
-        }
-        if (event.target == viewPersonModal) {
-            cerrarModalDetalles();
-        }
-        if (event.target == equipmentModal) {
-            cerrarModalEquipamiento();
-        }
+        if (event.target == personModal) cerrarModal();
+        if (event.target == viewPersonModal) cerrarModalDetalles();
+        if (event.target == equipmentModal) equipmentModal.style.display = 'none';
     });
     
-    // Corregir visualización de la tabla
-    fixTableDisplay();
-    
-    // Configure form tabs if they exist
-    const tabs = document.querySelectorAll('.tab');
-    tabs.forEach(tab => {
-        tab.addEventListener('click', function() {
-            // Remove active class from all tabs
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            // Add active class to clicked tab
-            this.classList.add('active');
-            
-            // Hide all tab contents
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            // Show content corresponding to clicked tab
-            document.getElementById(this.getAttribute('data-tab') + '-tab').classList.add('active');
-        });
-    });
+    // Arreglar visualización de tablas
+    arreglarVisualizacionTabla();
 });
 
-/**
- * Corrige problemas de visualización en las tablas con tema oscuro
- */
-function fixTableDisplay() {
+// Función para arreglar la visualización de las tablas con tema oscuro
+function arreglarVisualizacionTabla() {
     setTimeout(function() {
         $('table.dataTable tbody td').css('background-color', 'inherit');
-        
         $('table.dataTable tbody tr:odd').css('background-color', 'rgba(30, 30, 30, 0.8)');
         $('table.dataTable tbody tr:even').css('background-color', 'var(--dark-secondary)');
         
@@ -242,11 +141,9 @@ function fixTableDisplay() {
     }, 100);
 }
 
-/**
- * Carga la lista de razas para los selectores
- */
+// Cargar lista de razas para los selectores
 function cargarRazas() {
-    fetch("http://localhost:8080/listar_razas")
+    fetch("/listar_razas")
         .then(res => {
             if (!res.ok) {
                 throw new Error(`Error HTTP ${res.status}: ${res.statusText}`);
@@ -254,19 +151,15 @@ function cargarRazas() {
             return res.json();
         })
         .then(razas => {
-            const selectRaza = document.getElementById('personRaza');
-            const filterRaza = document.getElementById('filterRaza');
+            const selectRaza = document.getElementById('personRace');
+            const filterRaza = document.getElementById('filterRace');
 
             if (!selectRaza || !filterRaza) {
-                console.error("Elementos select de raza no encontrados en el DOM.");
+                console.error("No se encontraron los elementos select de raza en el DOM");
                 return;
             }
 
-            // Guardar valores seleccionados actualmente
-            const currentFilterValue = filterRaza.value;
-            const currentFormValue = selectRaza.value;
-
-            // Limpiar y rellenar las opciones
+            // Limpiar y rellenar opciones
             selectRaza.innerHTML = '<option value="">Seleccione una raza</option>';
             filterRaza.innerHTML = '<option value="">Todas</option>';
 
@@ -277,14 +170,8 @@ function cargarRazas() {
                     option.textContent = raza.nombre;
                     selectRaza.appendChild(option.cloneNode(true));
                     filterRaza.appendChild(option);
-                } else {
-                    console.warn("Raza con datos inválidos recibida:", raza);
                 }
             });
-
-            // Restaurar selección previa si es posible
-            if (currentFormValue) selectRaza.value = currentFormValue;
-            if (currentFilterValue) filterRaza.value = currentFilterValue;
         })
         .catch(error => {
             console.error('Error al cargar razas:', error);
@@ -292,11 +179,9 @@ function cargarRazas() {
         });
 }
 
-/**
- * Carga la lista de imperios para los selectores
- */
+// Cargar lista de imperios para los selectores  
 function cargarImperios() {
-    fetch("http://localhost:8080/listar_imperios")
+    fetch("/listar_imperios")
         .then(res => {
             if (!res.ok) {
                 throw new Error(`Error HTTP ${res.status}: ${res.statusText}`);
@@ -304,19 +189,15 @@ function cargarImperios() {
             return res.json();
         })
         .then(imperios => {
-            const selectImperio = document.getElementById('personImperio');
-            const filterImperio = document.getElementById('filterImperio');
+            const selectImperio = document.getElementById('personEmpire');
+            const filterImperio = document.getElementById('filterEmpire');
 
             if (!selectImperio || !filterImperio) {
-                console.error("Elementos select de imperio no encontrados en el DOM.");
+                console.error("No se encontraron los elementos select de imperio en el DOM");
                 return;
             }
 
-            // Guardar valores seleccionados actualmente
-            const currentFilterValue = filterImperio.value;
-            const currentFormValue = selectImperio.value;
-
-            // Limpiar y rellenar las opciones
+            // Limpiar y rellenar opciones
             selectImperio.innerHTML = '<option value="">Sin imperio</option>';
             filterImperio.innerHTML = '<option value="">Todos</option>';
 
@@ -327,14 +208,8 @@ function cargarImperios() {
                     option.textContent = imperio.nombre;
                     selectImperio.appendChild(option.cloneNode(true));
                     filterImperio.appendChild(option);
-                } else {
-                    console.warn("Imperio con datos inválidos recibido:", imperio);
                 }
             });
-
-            // Restaurar selección previa si es posible
-            if (currentFormValue) selectImperio.value = currentFormValue;
-            if (currentFilterValue) filterImperio.value = currentFilterValue;
         })
         .catch(error => {
             console.error('Error al cargar imperios:', error);
@@ -342,66 +217,9 @@ function cargarImperios() {
         });
 }
 
-/**
- * Carga los diferentes tipos de equipamiento disponibles
- * @param {string} tipo - Tipo de equipamiento ('arma', 'armadura', 'herramienta', 'arcana')
- */
-function cargarEquipamiento(tipo) {
-    let endpoint = '';
-    
-    switch(tipo) {
-        case 'arma':
-            endpoint = 'listar_armas';
-            break;
-        case 'armadura':
-            endpoint = 'listar_armaduras';
-            break;
-        case 'herramienta':
-            endpoint = 'listar_herramientas';
-            break;
-        case 'arcana':
-            endpoint = 'listar_arcanas';
-            break;
-        default:
-            console.error('Tipo de equipamiento no válido:', tipo);
-            return;
-    }
-    
-    fetch(`http://localhost:8080/${endpoint}`)
-        .then(res => {
-            if (!res.ok) {
-                throw new Error(`Error HTTP ${res.status}: ${res.statusText}`);
-            }
-            return res.json();
-        })
-        .then(items => {
-            // Almacenar en la variable global correspondiente
-            switch(tipo) {
-                case 'arma':
-                    window.armasDisponibles = items;
-                    break;
-                case 'armadura':
-                    window.armadurasDisponibles = items;
-                    break;
-                case 'herramienta':
-                    window.herramientasDisponibles = items;
-                    break;
-                case 'arcana':
-                    window.arcanasDisponibles = items;
-                    break;
-            }
-        })
-        .catch(error => {
-            console.error(`Error al cargar ${tipo}s:`, error);
-            mostrarAlerta('error', `No se pudieron cargar los ${tipo}s: ${error.message}`);
-        });
-}
-
-/**
- * Carga la lista de personas desde el servidor
- */
+// Cargar lista de personas desde el servidor
 function cargarPersonas() {
-    fetch("http://localhost:8080/listar_personas")
+    fetch("/listar_personas")
         .then(res => {
             if (!res.ok) {
                 return res.text().then(text => {
@@ -420,24 +238,15 @@ function cargarPersonas() {
             let table = $('#personsTable').DataTable();
             table.clear();
             if (Array.isArray(personas)) {
-                // Agregar el nombre de la raza y el imperio para mostrar en la tabla
+                // Agregar nombres de raza e imperio para mostrar en tabla
                 personas.forEach(persona => {
-                    if (persona.razaId) {
-                        persona.razaNombre = persona.raza ? persona.raza.nombre : 'Desconocida';
-                    } else {
-                        persona.razaNombre = 'N/A';
-                    }
-                    
-                    if (persona.imperioId) {
-                        persona.imperioNombre = persona.imperio ? persona.imperio.nombre : 'Desconocido';
-                    } else {
-                        persona.imperioNombre = 'N/A';
-                    }
+                    persona.razaNombre = persona.raza ? persona.raza.nombre : 'N/A';
+                    persona.imperioNombre = persona.imperio ? persona.imperio.nombre : 'N/A';
                 });
                 
                 table.rows.add(personas).draw();
                 
-                // Corrige el problema de visualización repintando las filas
+                // Arreglar colores de filas
                 $('#personsTable tbody tr').each(function(index) {
                     $(this).css('background-color', index % 2 === 0 ? 'rgba(30, 30, 30, 0.8)' : 'var(--dark-secondary)');
                 });
@@ -452,26 +261,19 @@ function cargarPersonas() {
         });
 }
 
-/**
- * Muestra los detalles de una persona específica
- */
+// Ver detalles de una persona específica
 function verPersona(id) {
     if (id === undefined || id === null) {
         console.error("ID inválido para verPersona");
         mostrarAlerta('error', 'No se puede mostrar la persona: ID inválido.');
         return;
     }
-    fetch(`http://localhost:8080/obtener_persona?id=${id}`)
+    
+    fetch(`/obtener_persona?id=${id}`)
         .then(res => {
             if (!res.ok) {
                 return res.text().then(text => { 
                     throw new Error(`Error HTTP ${res.status}: ${res.statusText}. Detalle: ${text}`)
-                });
-            }
-            const contentType = res.headers.get("content-type");
-            if (!contentType || !contentType.includes("application/json")) {
-                return res.text().then(text => { 
-                    throw new TypeError(`Respuesta inesperada del servidor (no es JSON): ${text}`)
                 });
             }
             return res.json();
@@ -492,14 +294,14 @@ function verPersona(id) {
 
             viewTitle.textContent = `${persona.nombre} ${persona.apellido || ''}`;
 
-            // Formatear fecha
+            // Formatear fecha de nacimiento
             let fechaNacimientoTexto = 'No especificada';
             if (persona.fechaNacimiento) {
                 const fecha = new Date(persona.fechaNacimiento);
                 fechaNacimientoTexto = fecha.toLocaleDateString('es-ES');
             }
 
-            // Información básica
+            // Crear HTML con los detalles
             let detallesHTML = `
                 <div class="person-details">
                     <div class="person-section">
@@ -559,7 +361,6 @@ function verPersona(id) {
                     </div>
             `;
 
-            // Estadísticas
             if (persona.estadisticas) {
                 const stats = persona.estadisticas;
                 detallesHTML += `
@@ -579,85 +380,79 @@ function verPersona(id) {
                 `;
             }
 
-            // Equipamiento
-            detallesHTML += `<div class="person-section"><h4>Equipamiento</h4>`;
-
-            // Armas
-            detallesHTML += `<div class="equipment-section"><h5>Armas</h5>`;
-            if (persona.armas && persona.armas.length > 0) {
-                detallesHTML += `<ul class="equipment-list">`;
-                persona.armas.forEach(arma => {
-                    detallesHTML += `
-                        <li>
-                            <span class="equipment-name">${arma.nombre}</span>
-                            <span class="equipment-status ${arma.equipada ? 'equipped' : ''}">${arma.equipada ? 'Equipada' : 'No equipada'}</span>
-                        </li>
-                    `;
-                });
-                detallesHTML += `</ul>`;
-            } else {
-                detallesHTML += `<p>No tiene armas.</p>`;
-            }
             detallesHTML += `</div>`;
 
-            // Armaduras
-            detallesHTML += `<div class="equipment-section"><h5>Armaduras</h5>`;
-            if (persona.armaduras && persona.armaduras.length > 0) {
-                detallesHTML += `<ul class="equipment-list">`;
-                persona.armaduras.forEach(armadura => {
-                    detallesHTML += `
-                        <li>
-                            <span class="equipment-name">${armadura.nombre}</span>
-                            <span class="equipment-status ${armadura.equipada ? 'equipped' : ''}">${armadura.equipada ? 'Equipada' : 'No equipada'}</span>
-                        </li>
-                    `;
-                });
-                detallesHTML += `</ul>`;
-            } else {
-                detallesHTML += `<p>No tiene armaduras.</p>`;
-            }
-            detallesHTML += `</div>`;
-
-            // Herramientas
-            detallesHTML += `<div class="equipment-section"><h5>Herramientas</h5>`;
-            if (persona.herramientas && persona.herramientas.length > 0) {
-                detallesHTML += `<ul class="equipment-list">`;
-                persona.herramientas.forEach(herramienta => {
-                    detallesHTML += `
-                        <li>
-                            <span class="equipment-name">${herramienta.nombre}</span>
-                            <span class="equipment-status ${herramienta.equipada ? 'equipped' : ''}">${herramienta.equipada ? 'Equipada' : 'No equipada'}</span>
-                        </li>
-                    `;
-                });
-                detallesHTML += `</ul>`;
-            } else {
-                detallesHTML += `<p>No tiene herramientas.</p>`;
-            }
-            detallesHTML += `</div>`;
-
-            // Arcanas
-            detallesHTML += `<div class="equipment-section"><h5>Arcanas</h5>`;
-            if (persona.arcanas && persona.arcanas.length > 0) {
-                detallesHTML += `<ul class="equipment-list">`;
-                persona.arcanas.forEach(arcana => {
-                    detallesHTML += `
-                        <li>
-                            <span class="equipment-name">${arcana.tipo}</span>
-                            <span class="equipment-status">${arcana.maestria || 'Nivel básico'}</span>
-                        </li>
-                    `;
-                });
-                detallesHTML += `</ul>`;
-            } else {
-                detallesHTML += `<p>No domina ninguna arcana.</p>`;
-            }
-            detallesHTML += `</div>`;
-
-            detallesHTML += `</div></div>`;
-
+            // Mostrar el contenido inicial
             detailsContainer.innerHTML = detallesHTML;
-            viewModal.style.display = 'block';
+
+            // Cargar y mostrar equipamiento
+            cargarEquipamientoPersona(persona.id, function(equipamiento) {
+                if (equipamiento && (equipamiento.armas.length > 0 || equipamiento.armaduras.length > 0 || equipamiento.herramientas.length > 0 || equipamiento.arcanas.length > 0)) {
+                    let equipamientoHTML = `
+                        <div class="person-section">
+                            <h4>Equipamiento</h4>
+                    `;
+
+                    if (equipamiento.armas.length > 0) {
+                        equipamientoHTML += `
+                            <div class="equipment-section">
+                                <h5>Armas</h5>
+                                <ul class="equipment-list">`;
+                        equipamiento.armas.forEach(arma => {
+                            equipamientoHTML += `<li><span class="equipment-name">${arma.nombre}</span> <span class="equipment-property">${arma.material || 'Material desconocido'}</span></li>`;
+                        });
+                        equipamientoHTML += `</ul></div>`;
+                    }
+
+                    if (equipamiento.armaduras.length > 0) {
+                        equipamientoHTML += `
+                            <div class="equipment-section">
+                                <h5>Armaduras</h5>
+                                <ul class="equipment-list">`;
+                        equipamiento.armaduras.forEach(armadura => {
+                            equipamientoHTML += `<li><span class="equipment-name">${armadura.nombre}</span> <span class="equipment-property">${armadura.material || 'Material desconocido'}</span></li>`;
+                        });
+                        equipamientoHTML += `</ul></div>`;
+                    }
+
+                    if (equipamiento.herramientas.length > 0) {
+                        equipamientoHTML += `
+                            <div class="equipment-section">
+                                <h5>Herramientas</h5>
+                                <ul class="equipment-list">`;
+                        equipamiento.herramientas.forEach(herramienta => {
+                            equipamientoHTML += `<li><span class="equipment-name">${herramienta.nombre}</span> <span class="equipment-property">${herramienta.uso || 'Uso general'}</span></li>`;
+                        });
+                        equipamientoHTML += `</ul></div>`;
+                    }
+
+                    if (equipamiento.arcanas.length > 0) {
+                        equipamientoHTML += `
+                            <div class="equipment-section">
+                                <h5>Arcanas</h5>
+                                <ul class="equipment-list">`;
+                        equipamiento.arcanas.forEach(arcana => {
+                            equipamientoHTML += `<li><span class="equipment-name">${arcana.tipo}</span> <span class="equipment-property">Maestría: ${arcana.maestria || 'Básica'}</span></li>`;
+                        });
+                        equipamientoHTML += `</ul></div>`;
+                    }
+
+                    equipamientoHTML += `</div>`;
+                    
+                    // Agregar el equipamiento al contenido existente
+                    detailsContainer.innerHTML += equipamientoHTML;
+                } else {
+                    // Agregar mensaje de "sin equipamiento"
+                    detailsContainer.innerHTML += `
+                        <div class="person-section">
+                            <h4>Equipamiento</h4>
+                            <p class="no-items">Esta persona no tiene equipamiento asignado.</p>
+                        </div>
+                    `;
+                }
+
+                viewModal.style.display = 'block';
+            });
         })
         .catch(error => {
             console.error('Error al obtener la persona:', error);
@@ -665,10 +460,7 @@ function verPersona(id) {
         });
 }
 
-/**
- * Abre el modal de edición con los datos de la persona seleccionada
- */
-
+// Abrir modal de edición con los datos de la persona seleccionada
 function editarPersona(id) {
     if (id === undefined || id === null) {
         console.error("ID inválido para editarPersona");
@@ -689,24 +481,12 @@ function editarPersona(id) {
     form.reset();
     modalTitle.textContent = 'Editar Persona';
     personIdInput.value = id;
-    
-    // Resetear listas de equipamiento
-    window.armasEquipadas = [];
-    window.armadurasEquipadas = [];
-    window.herramientasEquipadas = [];
-    window.arcanasAdquiridas = [];
 
-    fetch(`http://localhost:8080/obtener_persona?id=${id}`)
+    fetch(`/obtener_persona?id=${id}`)
         .then(res => {
             if (!res.ok) {
                 return res.text().then(text => { 
                     throw new Error(`Error HTTP ${res.status}: ${res.statusText}. Detalle: ${text}`)
-                });
-            }
-            const contentType = res.headers.get("content-type");
-            if (!contentType || !contentType.includes("application/json")) {
-                return res.text().then(text => { 
-                    throw new TypeError(`Respuesta inesperada del servidor (no es JSON): ${text}`)
                 });
             }
             return res.json();
@@ -716,31 +496,29 @@ function editarPersona(id) {
                 throw new Error("No se recibió información de la persona para editar.");
             }
 
-            // Información básica
+            // Rellenar información básica
             document.getElementById('personName').value = persona.nombre || '';
-            document.getElementById('personLastName').value = persona.apellido || '';
-            document.getElementById('personRaza').value = persona.razaId || '';
-            document.getElementById('personImperio').value = persona.imperioId || '';
-            document.getElementById('personProfesion').value = persona.profesion || '';
-            document.getElementById('personOro').value = persona.oro || 0;
+            document.getElementById('personSurname').value = persona.apellido || '';
+            document.getElementById('personRace').value = persona.razaId || '';
+            document.getElementById('personEmpire').value = persona.imperioId || '';
+            document.getElementById('personProfession').value = persona.profesion || '';
+            document.getElementById('personGold').value = persona.oro || 0;
             
             // Características físicas
-            document.getElementById('personAlto').value = persona.alto || '';
-            document.getElementById('personAncho').value = persona.ancho || '';
-            document.getElementById('personGrasaCorporal').value = persona.porcentajeGrasaCorporal || '';
-            document.getElementById('personDescripcionFisica').value = persona.descripcionFisica || '';
-            document.getElementById('personPersonalidad').value = persona.personalidad || '';
+            document.getElementById('personHeight').value = persona.alto || '';
+            document.getElementById('personWidth').value = persona.ancho || '';
+            document.getElementById('personBodyFat').value = persona.porcentajeGrasaCorporal || '';
+            document.getElementById('personPhysicalDesc').value = persona.descripcionFisica || '';
+            document.getElementById('personPersonality').value = persona.personalidad || '';
             
             // Formatear fecha
             if (persona.fechaNacimiento) {
                 const fecha = new Date(persona.fechaNacimiento);
                 const fechaFormateada = fecha.toISOString().split('T')[0];
-                document.getElementById('personFechaNacimiento').value = fechaFormateada;
-            } else {
-                document.getElementById('personFechaNacimiento').value = '';
+                document.getElementById('personBirthDate').value = fechaFormateada;
             }
             
-            document.getElementById('personDireccion').value = persona.direccion || '';
+            document.getElementById('personAddress').value = persona.direccion || '';
             
             // Estadísticas
             if (persona.estadisticas) {
@@ -754,36 +532,6 @@ function editarPersona(id) {
                 document.getElementById('statXP').value = stats.xp || 0;
                 document.getElementById('statLVL').value = stats.lvl || 1;
             }
-            
-            // Equipamiento
-            if (persona.armas && persona.armas.length > 0) {
-                window.armasEquipadas = persona.armas;
-                actualizarListaEquipamiento('armas');
-            }
-            
-            if (persona.armaduras && persona.armaduras.length > 0) {
-                window.armadurasEquipadas = persona.armaduras;
-                actualizarListaEquipamiento('armaduras');
-            }
-            
-            if (persona.herramientas && persona.herramientas.length > 0) {
-                window.herramientasEquipadas = persona.herramientas;
-                actualizarListaEquipamiento('herramientas');
-            }
-            
-            if (persona.arcanas && persona.arcanas.length > 0) {
-                window.arcanasAdquiridas = persona.arcanas;
-                actualizarListaEquipamiento('arcana');
-            }
-
-            // Ensure first tab is active
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            
-            const basicTab = document.querySelector('.tab[data-tab="basic"]');
-            const basicContent = document.getElementById('basic-tab');
-            if (basicTab) basicTab.classList.add('active');
-            if (basicContent) basicContent.classList.add('active');
 
             modal.style.display = 'block';
         })
@@ -794,9 +542,7 @@ function editarPersona(id) {
         });
 }
 
-/**
- * Elimina una persona tras confirmación del usuario
- */
+// Eliminar una persona tras confirmación del usuario
 function eliminarPersona(id) {
     if (id === undefined || id === null) {
         console.error("ID inválido para eliminarPersona");
@@ -805,7 +551,7 @@ function eliminarPersona(id) {
     }
     
     if (confirm(`¿Está seguro que desea eliminar la persona con ID ${id}? Esta acción no se puede deshacer.`)) {
-        fetch(`http://localhost:8080/eliminar_persona?id=${id}`)
+        fetch(`/eliminar_persona?id=${id}`)
             .then(res => {
                 if (!res.ok) {
                     return res.text().then(text => {
@@ -815,7 +561,7 @@ function eliminarPersona(id) {
                 return res.text();
             })
             .then(resultado => {
-                mostrarAlerta('success', `Persona ${id} eliminada correctamente. ${resultado}`);
+                mostrarAlerta('success', `Persona eliminada correctamente. ${resultado}`);
                 cargarPersonas();
             })
             .catch(error => {
@@ -825,31 +571,15 @@ function eliminarPersona(id) {
     }
 }
 
-/**
- * Abre el modal para añadir una nueva persona
- */
+// Abrir modal para añadir una nueva persona
 function abrirModalAnadir() {
-    console.log('abrirModalAnadir called');
     const form = document.getElementById('personForm');
     const modalTitle = document.getElementById('personModalTitle');
     const personIdInput = document.getElementById('personId');
     const modal = document.getElementById('personModal');
 
-    if (!form) {
-        console.error("Form element not found");
-    }
-    if (!modalTitle) {
-        console.error("Modal title element not found");
-    }
-    if (!personIdInput) {
-        console.error("Person ID input not found");
-    }
-    if (!modal) {
-        console.error("Modal element not found");
-    }
-
     if (!form || !modalTitle || !personIdInput || !modal) {
-        console.error("Required elements for modal not found");
+        console.error("Elementos del modal de añadir no encontrados.");
         return;
     }
 
@@ -857,25 +587,8 @@ function abrirModalAnadir() {
     modalTitle.textContent = 'Añadir Nueva Persona';
     personIdInput.value = '';
     
-    // Resetear listas de equipamiento
-    window.armasEquipadas = [];
-    window.armadurasEquipadas = [];
-    window.herramientasEquipadas = [];
-    window.arcanasAdquiridas = [];
-    
-    // Limpiar listas de equipamiento en la UI
-    const armasLista = document.getElementById('armas-list');
-    const armadurasLista = document.getElementById('armaduras-list');
-    const herramientasLista = document.getElementById('herramientas-list');
-    const arcanaLista = document.getElementById('arcana-list');
-    
-    if (armasLista) armasLista.innerHTML = '<p class="no-items">No hay armas equipadas</p>';
-    if (armadurasLista) armadurasLista.innerHTML = '<p class="no-items">No hay armaduras equipadas</p>';
-    if (herramientasLista) herramientasLista.innerHTML = '<p class="no-items">No hay herramientas equipadas</p>';
-    if (arcanaLista) arcanaLista.innerHTML = '<p class="no-items">No hay arcana dominada</p>';
-    
     // Establecer valores por defecto
-    document.getElementById('personOro').value = 0;
+    document.getElementById('personGold').value = 0;
     document.getElementById('statATK').value = 10;
     document.getElementById('statDEF').value = 10;
     document.getElementById('statHP').value = 10;
@@ -885,486 +598,149 @@ function abrirModalAnadir() {
     document.getElementById('statXP').value = 0;
     document.getElementById('statLVL').value = 1;
     
-    // Ensure first tab is active
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-    
-    const basicTab = document.querySelector('.tab[data-tab="basic"]');
-    const basicContent = document.getElementById('basic-tab');
-    if (basicTab) basicTab.classList.add('active');
-    if (basicContent) basicContent.classList.add('active');
-    
-    console.log('Opening modal - current display style:', modal.style.display);
     modal.style.display = 'block';
-    console.log('Modal should now be visible');
 }
 
-/**
- * Cierra el modal de añadir/editar persona
- */
+// Cerrar el modal de añadir/editar persona
 function cerrarModal() {
-    console.log('cerrarModal called');
     const modal = document.getElementById('personModal');
     if (modal) {
         modal.style.display = 'none';
-        console.log('Modal should now be hidden');
-    } else {
-        console.error('Modal element not found');
     }
 }
 
-/**
- * Cierra el modal de detalles de la persona
- */
+// Cerrar el modal de detalles de la persona
 function cerrarModalDetalles() {
-    console.log('cerrarModalDetalles called');
     const modal = document.getElementById('viewPersonModal');
     if (modal) {
         modal.style.display = 'none';
         const detailsContainer = document.getElementById('personDetails');
         if (detailsContainer) detailsContainer.innerHTML = '';
-    } else {
-        console.error('View modal element not found');
     }
 }
 
-/**
- * Abre el modal de equipamiento
- */
-function abrirModalEquipamiento(tipo) {
-    console.log('abrirModalEquipamiento called for type:', tipo);
-    const modal = document.getElementById('equipmentModal');
-    const titulo = document.getElementById('equipmentModalTitle');
-    const tipoInput = document.getElementById('equipmentType');
-    const equipmentSelect = document.getElementById('equipmentSelect');
-    const equipadaGroup = document.getElementById('equipadaGroup');
-    const maestriaGroup = document.getElementById('maestriaGroup');
-    
-    if (!modal || !titulo || !tipoInput || !equipmentSelect) {
-        console.error("Elementos del modal de equipamiento no encontrados.");
-        return;
-    }
-    
-    tipoInput.value = tipo;
-    
-    // Configurar el título y contenido según el tipo
-    switch(tipo) {
-        case 'arma':
-            titulo.textContent = 'Añadir Arma';
-            equipmentSelect.innerHTML = '<option value="">Seleccione un arma</option>';
-            
-            // Filtrar para mostrar solo los elementos que no están ya equipados
-            const armasIds = window.armasEquipadas.map(a => a.id);
-            window.armasDisponibles.forEach(arma => {
-                if (!armasIds.includes(arma.id)) {
-                    const option = document.createElement('option');
-                    option.value = arma.id;
-                    option.textContent = arma.nombre;
-                    equipmentSelect.appendChild(option);
-                }
-            });
-            
-            equipadaGroup.style.display = 'block';
-            maestriaGroup.style.display = 'none';
-            break;
-            
-        case 'armadura':
-            titulo.textContent = 'Añadir Armadura';
-            equipmentSelect.innerHTML = '<option value="">Seleccione una armadura</option>';
-            
-            const armadurasIds = window.armadurasEquipadas.map(a => a.id);
-            window.armadurasDisponibles.forEach(armadura => {
-                if (!armadurasIds.includes(armadura.id)) {
-                    const option = document.createElement('option');
-                    option.value = armadura.id;
-                    option.textContent = armadura.nombre;
-                    equipmentSelect.appendChild(option);
-                }
-            });
-            
-            equipadaGroup.style.display = 'block';
-            maestriaGroup.style.display = 'none';
-            break;
-            
-        case 'herramienta':
-            titulo.textContent = 'Añadir Herramienta';
-            equipmentSelect.innerHTML = '<option value="">Seleccione una herramienta</option>';
-            
-            const herramientasIds = window.herramientasEquipadas.map(h => h.id);
-            window.herramientasDisponibles.forEach(herramienta => {
-                if (!herramientasIds.includes(herramienta.id)) {
-                    const option = document.createElement('option');
-                    option.value = herramienta.id;
-                    option.textContent = herramienta.nombre;
-                    equipmentSelect.appendChild(option);
-                }
-            });
-            
-            equipadaGroup.style.display = 'block';
-            maestriaGroup.style.display = 'none';
-            break;
-            
-        case 'arcana':
-            titulo.textContent = 'Añadir Arcana';
-            equipmentSelect.innerHTML = '<option value="">Seleccione una arcana</option>';
-            
-            const arcanasIds = window.arcanasAdquiridas.map(a => a.id);
-            window.arcanasDisponibles.forEach(arcana => {
-                if (!arcanasIds.includes(arcana.id)) {
-                    const option = document.createElement('option');
-                    option.value = arcana.id;
-                    option.textContent = arcana.tipo;
-                    equipmentSelect.appendChild(option);
-                }
-            });
-            
-            equipadaGroup.style.display = 'none';
-            maestriaGroup.style.display = 'block';
-            break;
-            
-        default:
-            console.error('Tipo de equipamiento no válido:', tipo);
-            return;
-    }
-    
-    modal.style.display = 'block';
-}
-
-/**
- * Cierra el modal de equipamiento
- */
-function cerrarModalEquipamiento() {
-    console.log('cerrarModalEquipamiento called');
-    const modal = document.getElementById('equipmentModal');
-    if (modal) {
-        modal.style.display = 'none';
-    } else {
-        console.error('Equipment modal element not found');
-    }
-}
-
-/**
- * Agrega equipamiento a la persona actual
- */
-function agregarEquipamiento() {
-    const tipo = document.getElementById('equipmentType').value;
-    const itemId = document.getElementById('equipmentSelect').value;
-    
-    if (!itemId) {
-        mostrarAlerta('error', 'Debe seleccionar un elemento.');
-        return;
-    }
-    
-    // Buscar el elemento en la lista correspondiente
-    let elemento = null;
-    switch(tipo) {
-        case 'arma':
-            elemento = window.armasDisponibles.find(a => a.id == itemId);
-            if (elemento) {
-                const equipado = document.getElementById('equipmentEquipped').value === 'true';
-                window.armasEquipadas.push({
-                    ...elemento,
-                    equipada: equipado
-                });
-                actualizarListaEquipamiento('armas');
-            }
-            break;
-            
-        case 'armadura':
-            elemento = window.armadurasDisponibles.find(a => a.id == itemId);
-            if (elemento) {
-                const equipado = document.getElementById('equipmentEquipped').value === 'true';
-                window.armadurasEquipadas.push({
-                    ...elemento,
-                    equipada: equipado
-                });
-                actualizarListaEquipamiento('armaduras');
-            }
-            break;
-            
-        case 'herramienta':
-            elemento = window.herramientasDisponibles.find(h => h.id == itemId);
-            if (elemento) {
-                const equipado = document.getElementById('equipmentEquipped').value === 'true';
-                window.herramientasEquipadas.push({
-                    ...elemento,
-                    equipada: equipado
-                });
-                actualizarListaEquipamiento('herramientas');
-            }
-            break;
-            
-        case 'arcana':
-            elemento = window.arcanasDisponibles.find(a => a.id == itemId);
-            if (elemento) {
-                const maestria = document.getElementById('arcanaMaestria').value;
-                window.arcanasAdquiridas.push({
-                    ...elemento,
-                    maestria: maestria
-                });
-                actualizarListaEquipamiento('arcana');
-            }
-            break;
-    }
-    
-    cerrarModalEquipamiento();
-    mostrarAlerta('success', `${tipo.charAt(0).toUpperCase() + tipo.slice(1)} añadida correctamente.`);
-}
-
-/**
- * Actualiza la lista visual de equipamiento en el modal
- */
-function actualizarListaEquipamiento(tipo) {
-    let container = null;
-    let items = [];
-    
-    switch(tipo) {
-        case 'armas':
-            container = document.getElementById('armas-list');
-            items = window.armasEquipadas;
-            break;
-            
-        case 'armaduras':
-            container = document.getElementById('armaduras-list');
-            items = window.armadurasEquipadas;
-            break;
-            
-        case 'herramientas':
-            container = document.getElementById('herramientas-list');
-            items = window.herramientasEquipadas;
-            break;
-            
-        case 'arcana':
-            container = document.getElementById('arcana-list');
-            items = window.arcanasAdquiridas;
-            break;
-    }
-    
-    if (!container) return;
-    
-    if (items.length === 0) {
-        container.innerHTML = `<p class="no-items">No hay ${tipo} equipadas</p>`;
-        return;
-    }
-    
-    container.innerHTML = '';
-    const lista = document.createElement('ul');
-    lista.className = 'equipment-item-list';
-    
-    items.forEach((item, index) => {
-        const li = document.createElement('li');
-        
-        if (tipo === 'arcana') {
-            li.innerHTML = `
-                <span class="equipment-name">${item.tipo}</span>
-                <span class="equipment-property">Maestría: ${item.maestria || 'Básico'}</span>
-                <button type="button" class="btn-icon delete-equipment" data-index="${index}" data-type="${tipo}">
-                    <i class="fas fa-trash-alt"></i>
-                </button>
-            `;
-        } else {
-            li.innerHTML = `
-                <span class="equipment-name">${item.nombre}</span>
-                <span class="equipment-property">Equipado: ${item.equipada ? 'Sí' : 'No'}</span>
-                <button type="button" class="btn-icon delete-equipment" data-index="${index}" data-type="${tipo}">
-                    <i class="fas fa-trash-alt"></i>
-                </button>
-            `;
-        }
-        
-        lista.appendChild(li);
-    });
-    
-    container.appendChild(lista);
-    
-    // Añadir eventos para eliminar equipamiento
-    container.querySelectorAll('.delete-equipment').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const index = parseInt(this.getAttribute('data-index'));
-            const tipo = this.getAttribute('data-type');
-            eliminarEquipamiento(tipo, index);
-        });
-    });
-}
-
-/**
- * Elimina un equipamiento de la lista
- */
-function eliminarEquipamiento(tipo, index) {
-    switch(tipo) {
-        case 'armas':
-            if (index >= 0 && index < window.armasEquipadas.length) {
-                window.armasEquipadas.splice(index, 1);
-                actualizarListaEquipamiento('armas');
-                mostrarAlerta('info', 'Arma eliminada.');
-            }
-            break;
-            
-        case 'armaduras':
-            if (index >= 0 && index < window.armadurasEquipadas.length) {
-                window.armadurasEquipadas.splice(index, 1);
-                actualizarListaEquipamiento('armaduras');
-                mostrarAlerta('info', 'Armadura eliminada.');
-            }
-            break;
-            
-        case 'herramientas':
-            if (index >= 0 && index < window.herramientasEquipadas.length) {
-                window.herramientasEquipadas.splice(index, 1);
-                actualizarListaEquipamiento('herramientas');
-                mostrarAlerta('info', 'Herramienta eliminada.');
-            }
-            break;
-            
-        case 'arcana':
-            if (index >= 0 && index < window.arcanasAdquiridas.length) {
-                window.arcanasAdquiridas.splice(index, 1);
-                actualizarListaEquipamiento('arcana');
-                mostrarAlerta('info', 'Arcana eliminada.');
-            }
-            break;
-    }
-}
-
-/**
- * Guarda una nueva persona o actualiza una existente
- */
-
+// Funcion para guardar una persona
 
 function guardarPersona() {
-    const id = document.getElementById('personId').value;
-    const nombre = document.getElementById('personName').value.trim();
-    const apellido = document.getElementById('personLastName').value.trim();
-    const razaId = document.getElementById('personRaza').value;
-    const imperioId = document.getElementById('personImperio').value;
-    const profesion = document.getElementById('personProfesion').value;
-    const oro = document.getElementById('personOro').value;
+    const idValue = document.getElementById('personId').value;
+    const id = idValue ? parseInt(idValue) : null;
     
-    // Datos físicos
-    const alto = document.getElementById('personAlto').value;
-    const ancho = document.getElementById('personAncho').value;
-    const grasaCorporal = document.getElementById('personGrasaCorporal').value;
-    const descripcionFisica = document.getElementById('personDescripcionFisica').value.trim();
-    const personalidad = document.getElementById('personPersonalidad').value.trim();
-    
-    // Otros datos
-    const fechaNacimiento = document.getElementById('personFechaNacimiento').value;
-    const direccion = document.getElementById('personDireccion').value.trim();
-    
-    // Estadísticas
-    const estadisticas = {
-        tipo: 'Personal',
-        atk: document.getElementById('statATK').value,
-        def: document.getElementById('statDEF').value,
-        hp: document.getElementById('statHP').value,
-        spe: document.getElementById('statSPE').value,
-        mat: document.getElementById('statMAT').value,
-        mdf: document.getElementById('statMDF').value,
-        xp: document.getElementById('statXP').value,
-        lvl: document.getElementById('statLVL').value
+    const personaData = {
+        id: id,
+        nombre: document.getElementById('personName').value.trim(),
+        apellido: document.getElementById('personSurname').value.trim() || null,
+        razaId: document.getElementById('personRace').value ? parseInt(document.getElementById('personRace').value) : null,
+        imperioId: document.getElementById('personEmpire').value ? parseInt(document.getElementById('personEmpire').value) : null,
+        profesion: document.getElementById('personProfession').value.trim() || null,
+        oro: parseInt(document.getElementById('personGold').value) || 0,
+        alto: parseFloat(document.getElementById('personHeight').value) || null,
+        ancho: parseFloat(document.getElementById('personWidth').value) || null,
+        porcentajeGrasaCorporal: parseFloat(document.getElementById('personBodyFat').value) || null,
+        descripcionFisica: document.getElementById('personPhysicalDesc').value.trim() || null,
+        personalidad: document.getElementById('personPersonality').value.trim() || null,
+        fechaNacimiento: document.getElementById('personBirthDate').value || null,
+        direccion: document.getElementById('personAddress').value.trim() || null,
+        
+        estadisticas: {
+            tipo: 'Personal',
+            atk: parseInt(document.getElementById('statATK').value) || 10,
+            def: parseInt(document.getElementById('statDEF').value) || 10,
+            hp: parseInt(document.getElementById('statHP').value) || 10,
+            spe: parseInt(document.getElementById('statSPE').value) || 10,
+            mat: parseInt(document.getElementById('statMAT').value) || 10,
+            mdf: parseInt(document.getElementById('statMDF').value) || 10,
+            xp: parseInt(document.getElementById('statXP').value) || 0,
+            lvl: parseInt(document.getElementById('statLVL').value) || 1
+        },
+
+        armas: [],
+        armaduras: [],
+        herramientas: [],
+        arcanas: []
     };
 
-    // Validación básica
-    if (!nombre) {
+    if (!personaData.nombre) {
         mostrarAlerta('error', 'El nombre de la persona es obligatorio.');
         return;
     }
-
-    if (!razaId) {
+    if (!personaData.razaId) {
         mostrarAlerta('error', 'Debe seleccionar una raza.');
         return;
     }
 
-    // Construir el objeto persona
-    const persona = {
-        id: id || null,
-        nombre: nombre,
-        apellido: apellido,
-        ancho: ancho || null,
-        alto: alto || null,
-        descripcionFisica: descripcionFisica,
-        porcentajeGrasaCorporal: grasaCorporal || null,
-        personalidad: personalidad,
-        oro: oro || 0,
-        fechaNacimiento: fechaNacimiento || null,
-        profesion: profesion,
-        direccion: direccion,
-        razaId: razaId,
-        imperioId: imperioId || null,
-        estadisticas: estadisticas,
-        armas: window.armasEquipadas,
-        armaduras: window.armadurasEquipadas,
-        herramientas: window.herramientasEquipadas,
-        arcanas: window.arcanasAdquiridas
-    };
+    document.querySelectorAll('#personWeapons .equipment-item-selected').forEach(item => {
+        const equipmentId = item.getAttribute('data-equipment-id');
+        if (equipmentId) {
+            personaData.armas.push({ id: parseInt(equipmentId) });
+        }
+    });
 
-    const baseUrl = id ? 'http://localhost:8080/actualizar_persona' : 'http://localhost:8080/aniadir_persona';
-    
-    const params = new URLSearchParams();
-    if (id) params.append('id', id);
-    params.append('nombre', nombre);
-    if (apellido) params.append('apellido', apellido);
-    if (ancho) params.append('ancho', ancho);
-    if (alto) params.append('alto', alto);
-    if (descripcionFisica) params.append('descripcionFisica', descripcionFisica);
-    if (grasaCorporal) params.append('porcentajeGrasaCorporal', grasaCorporal);
-    if (personalidad) params.append('personalidad', personalidad);
-    params.append('oro', oro || 0);
-    if (fechaNacimiento) params.append('fechaNacimiento', fechaNacimiento);
-    if (profesion) params.append('profesion', profesion);
-    if (direccion) params.append('direccion', direccion);
-    params.append('razaId', razaId);
-    if (imperioId) params.append('imperioId', imperioId);
+    document.querySelectorAll('#personArmor .equipment-item-selected').forEach(item => {
+        const equipmentId = item.getAttribute('data-equipment-id');
+        if (equipmentId) {
+            personaData.armaduras.push({ id: parseInt(equipmentId) });
+        }
+    });
 
-    params.append('estadisticasTipo', estadisticas.tipo);
-    params.append('atk', estadisticas.atk);
-    params.append('def', estadisticas.def);
-    params.append('hp', estadisticas.hp);
-    params.append('spe', estadisticas.spe);
-    params.append('mat', estadisticas.mat);
-    params.append('mdf', estadisticas.mdf);
-    params.append('xp', estadisticas.xp);
-    params.append('lvl', estadisticas.lvl);
+    document.querySelectorAll('#personTools .equipment-item-selected').forEach(item => {
+        const equipmentId = item.getAttribute('data-equipment-id');
+        if (equipmentId) {
+            personaData.herramientas.push({ id: parseInt(equipmentId) });
+        }
+    });
 
-    const url = `${baseUrl}?${params.toString()}`;
-    console.log('Requesting URL:', url);
-    
+    document.querySelectorAll('#personArcana .equipment-item-selected').forEach(item => {
+        const equipmentId = item.getAttribute('data-equipment-id');
+        if (equipmentId) {
+            personaData.arcanas.push({ id: parseInt(equipmentId) });
+        }
+    });
 
-    fetch(url)
-        .then(res => {
-            if (!res.ok) {
-                return res.text().then(text => {
-                    throw new Error(`Error HTTP ${res.status}: ${res.statusText}. Detalle: ${text}`);
-                });
-            }
-            return res.text();
-        })
-        .then(resultado => {
-            mostrarAlerta('success', id ? 'Persona actualizada correctamente.' : 'Persona añadida correctamente.');
-            cerrarModal();
-            cargarPersonas();
-        })
-        .catch(error => {
-            console.error('Error al guardar persona:', error);
-            mostrarAlerta('error', `Error al guardar persona: ${error.message}`);
-            
-            // Debug info
-            console.log('Object being sent:', persona);
-            console.log('URL being used:', url);
-        });
+    const url = id ? '/actualizar_persona' : '/aniadir_persona';
+
+    console.log("Enviando JSON para guardar persona a URL:", url);
+    console.log("Datos Persona:", JSON.stringify(personaData, null, 2));
+
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(personaData)
+    })
+    .then(res => {
+        if (!res.ok) {
+            return res.text().then(text => {
+                let errorDetail = text;
+                try {
+                    const jsonError = JSON.parse(text);
+                    errorDetail = jsonError.message || jsonError.error || text;
+                } catch (e) { /* No era JSON */ }
+                throw new Error(`Error HTTP ${res.status}: ${res.statusText}. Detalle: ${errorDetail}`);
+            });
+        }
+        return res.text();
+    })
+    .then(resultado => {
+        mostrarAlerta('success', id ? 'Persona actualizada correctamente.' : 'Persona añadida correctamente.');
+        cerrarModal();
+        cargarPersonas();
+    })
+    .catch(error => {
+        console.error('Error al guardar persona:', error);
+        mostrarAlerta('error', `Error al guardar persona: ${error.message}`);
+    });
 }
 
-/**
- * Aplica filtros seleccionados para filtrar personas
- */
+// Aplicar filtros seleccionados para filtrar personas
 function aplicarFiltros() {
-    const razaId = document.getElementById('filterRaza').value;
-    const imperioId = document.getElementById('filterImperio').value;
-    const profesion = document.getElementById('filterProfesion').value;
-    const nivelMin = document.getElementById('filterNivelMin').value;
+    const razaId = document.getElementById('filterRace').value;
+    const imperioId = document.getElementById('filterEmpire').value;
+    const profesion = document.getElementById('filterProfession').value;
+    const nivelMin = document.getElementById('filterMinLevel').value;
     
-    // Construir la URL con los parámetros
-    let url = 'http://localhost:8080/filtrar_personas?';
+    // Construir URL con parámetros
+    let url = '/filtrar_personas?';
     const params = new URLSearchParams();
     
     if (razaId) params.append('razaId', razaId);
@@ -1385,12 +761,6 @@ function aplicarFiltros() {
                     throw new Error(`Error HTTP ${res.status}: ${res.statusText}. Detalle: ${text}`);
                 });
             }
-            const contentType = res.headers.get("content-type");
-            if (!contentType || !contentType.includes("application/json")) {
-                return res.text().then(text => {
-                    throw new TypeError(`Respuesta inesperada del servidor (no es JSON): ${text}`);
-                });
-            }
             return res.json();
         })
         .then(personas => {
@@ -1398,24 +768,15 @@ function aplicarFiltros() {
             table.clear();
             
             if (Array.isArray(personas)) {
-                // Agregar el nombre de la raza y el imperio para mostrar en la tabla
+                // Agregar nombres de raza e imperio para mostrar en tabla
                 personas.forEach(persona => {
-                    if (persona.razaId) {
-                        persona.razaNombre = persona.raza ? persona.raza.nombre : 'Desconocida';
-                    } else {
-                        persona.razaNombre = 'N/A';
-                    }
-                    
-                    if (persona.imperioId) {
-                        persona.imperioNombre = persona.imperio ? persona.imperio.nombre : 'Desconocido';
-                    } else {
-                        persona.imperioNombre = 'N/A';
-                    }
+                    persona.razaNombre = persona.raza ? persona.raza.nombre : 'N/A';
+                    persona.imperioNombre = persona.imperio ? persona.imperio.nombre : 'N/A';
                 });
                 
                 table.rows.add(personas).draw();
                 
-                // Corrige el problema de visualización repintando las filas
+                // Arreglar colores de filas
                 $('#personsTable tbody tr').each(function(index) {
                     $(this).css('background-color', index % 2 === 0 ? 'rgba(30, 30, 30, 0.8)' : 'var(--dark-secondary)');
                 });
@@ -1436,24 +797,17 @@ function aplicarFiltros() {
         });
 }
 
-/**
- * Resetea todos los filtros y carga todas las personas
- */
+// Resetear todos los filtros y cargar todas las personas
 function resetearFiltros() {
-    const filterRaza = document.getElementById('filterRaza');
-    const filterImperio = document.getElementById('filterImperio');
-    const filterProfesion = document.getElementById('filterProfesion');
-    const filterNivelMin = document.getElementById('filterNivelMin');
-    const nivelMinValue = document.getElementById('nivelMinValue');
+    const filterRace = document.getElementById('filterRace');
+    const filterEmpire = document.getElementById('filterEmpire');
+    const filterProfession = document.getElementById('filterProfession');
+    const filterMinLevel = document.getElementById('filterMinLevel');
     
-    if (filterRaza) filterRaza.value = '';
-    if (filterImperio) filterImperio.value = '';
-    if (filterProfesion) filterProfesion.value = '';
-    
-    if (filterNivelMin) {
-        filterNivelMin.value = 1;
-        if (nivelMinValue) nivelMinValue.textContent = '1';
-    }
+    if (filterRace) filterRace.value = '';
+    if (filterEmpire) filterEmpire.value = '';
+    if (filterProfession) filterProfession.value = '';
+    if (filterMinLevel) filterMinLevel.value = 1;
     
     const filterResults = document.getElementById('filterResults');
     if (filterResults) filterResults.textContent = '';
@@ -1461,9 +815,274 @@ function resetearFiltros() {
     cargarPersonas();
 }
 
-/**
- * Muestra alertas en la parte superior derecha de la pantalla
- */
+// Función para cargar el equipamiento de una persona
+function cargarEquipamientoPersona(personaId, callback) {
+    const equipamiento = {
+        armas: [],
+        armaduras: [],
+        herramientas: [],
+        arcanas: []
+    };
+
+    let completedRequests = 0;
+    const totalRequests = 4;
+
+    function checkCompletion() {
+        completedRequests++;
+        if (completedRequests === totalRequests) {
+            callback(equipamiento);
+        }
+    }
+
+    // Cargar armas de la persona
+    fetch(`/listar_armas_persona?personaId=${personaId}`)
+        .then(res => {
+            if (!res.ok) {
+                throw new Error(`Error HTTP ${res.status}`);
+            }
+            return res.json();
+        })
+        .then(armas => {
+            if (Array.isArray(armas)) {
+                equipamiento.armas = armas;
+            }
+        })
+        .catch(error => {
+            console.warn('Error al cargar armas de la persona:', error);
+            // No mostrar error al usuario, solo log
+        })
+        .finally(() => {
+            checkCompletion();
+        });
+
+    // Cargar armaduras de la persona
+    fetch(`/listar_armaduras_persona?personaId=${personaId}`)
+        .then(res => {
+            if (!res.ok) {
+                throw new Error(`Error HTTP ${res.status}`);
+            }
+            return res.json();
+        })
+        .then(armaduras => {
+            if (Array.isArray(armaduras)) {
+                equipamiento.armaduras = armaduras;
+            }
+        })
+        .catch(error => {
+            console.warn('Error al cargar armaduras de la persona:', error);
+        })
+        .finally(() => {
+            checkCompletion();
+        });
+
+    // Cargar herramientas de la persona
+    fetch(`/listar_herramientas_persona?personaId=${personaId}`)
+        .then(res => {
+            if (!res.ok) {
+                throw new Error(`Error HTTP ${res.status}`);
+            }
+            return res.json();
+        })
+        .then(herramientas => {
+            if (Array.isArray(herramientas)) {
+                equipamiento.herramientas = herramientas;
+            }
+        })
+        .catch(error => {
+            console.warn('Error al cargar herramientas de la persona:', error);
+        })
+        .finally(() => {
+            checkCompletion();
+        });
+
+    // Cargar arcanas de la persona
+    fetch(`/listar_arcanas_persona?personaId=${personaId}`)
+        .then(res => {
+            if (!res.ok) {
+                throw new Error(`Error HTTP ${res.status}`);
+            }
+            return res.json();
+        })
+        .then(arcanas => {
+            if (Array.isArray(arcanas)) {
+                equipamiento.arcanas = arcanas;
+            }
+        })
+        .catch(error => {
+            console.warn('Error al cargar arcanas de la persona:', error);
+        })
+        .finally(() => {
+            checkCompletion();
+        });
+}
+
+// Función para abrir el modal de selección de equipamiento
+function openEquipmentModal(equipmentType) {
+    const modal = document.getElementById('equipmentSelectionModal');
+    const modalTitle = document.getElementById('equipmentModalTitle');
+    const availableEquipment = document.getElementById('availableEquipment');
+    
+    if (!modal || !modalTitle || !availableEquipment) {
+        console.error('Elementos del modal de equipamiento no encontrados');
+        return;
+    }
+    
+    // Configurar título según el tipo
+    const titles = {
+        'weapon': 'Seleccionar Arma',
+        'armor': 'Seleccionar Armadura', 
+        'tool': 'Seleccionar Herramienta',
+        'arcana': 'Seleccionar Arcana'
+    };
+    
+    modalTitle.textContent = titles[equipmentType] || 'Seleccionar Equipamiento';
+    
+    // Mostrar indicador de carga
+    availableEquipment.innerHTML = '<p>Cargando equipamiento...</p>';
+    modal.style.display = 'block';
+    
+    // Cargar equipamiento según el tipo
+    loadEquipmentByType(equipmentType, availableEquipment);
+}
+
+// Función para cargar equipamiento por tipo
+function loadEquipmentByType(type, container) {
+    const endpoints = {
+        'weapon': '/listar_armas',
+        'armor': '/listar_armaduras',
+        'tool': '/listar_herramientas', 
+        'arcana': '/listar_arcanas'
+    };
+    
+    const endpoint = endpoints[type];
+    if (!endpoint) {
+        container.innerHTML = '<p>Tipo de equipamiento no válido</p>';
+        return;
+    }
+    
+    fetch(endpoint)
+        .then(res => {
+            if (!res.ok) {
+                throw new Error(`Error HTTP ${res.status}: ${res.statusText}`);
+            }
+            return res.json();
+        })
+        .then(items => {
+            if (!Array.isArray(items) || items.length === 0) {
+                container.innerHTML = '<p>No hay equipamiento disponible</p>';
+                return;
+            }
+            
+            let html = '<div class="equipment-grid">';
+            items.forEach(item => {
+                const name = item.nombre || item.tipo || 'Sin nombre';
+                const price = item.pvp ? `${item.pvp} oro` : 'Gratis';
+                const description = item.descripcion || item.material || 'Sin descripción';
+                
+                html += `
+                    <div class="equipment-item" data-id="${item.id}" data-type="${type}">
+                        <h4>${name}</h4>
+                        <p class="equipment-price">${price}</p>
+                        <p class="equipment-desc">${description}</p>
+                        <button class="btn btn-small select-equipment-btn" onclick="selectEquipment(${item.id}, '${type}', '${name}')">
+                            Seleccionar
+                        </button>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            
+            container.innerHTML = html;
+        })
+        .catch(error => {
+            console.error(`Error al cargar ${type}:`, error);
+            container.innerHTML = `<p>Error al cargar equipamiento: ${error.message}</p>`;
+        });
+}
+
+// Función para seleccionar equipamiento
+function selectEquipment(equipmentId, equipmentType, equipmentName) {
+    const personId = document.getElementById('personId').value;
+    
+    if (!personId) {
+        mostrarAlerta('warning', 'Debe guardar la persona primero antes de añadir equipamiento');
+        return;
+    }
+    
+    // Cerrar modal de selección
+    document.getElementById('equipmentSelectionModal').style.display = 'none';
+    
+    // Añadir equipamiento a la lista visual
+    addEquipmentToPersonList(equipmentType, equipmentId, equipmentName);
+    
+    mostrarAlerta('success', `${equipmentName} añadido correctamente`);
+}
+
+// Función para añadir equipamiento a la lista visual
+function addEquipmentToPersonList(type, equipmentId, equipmentName) {
+    const containers = {
+        'weapon': 'personWeapons',
+        'armor': 'personArmor',
+        'tool': 'personTools',
+        'arcana': 'personArcana'
+    };
+    
+    const containerId = containers[type];
+    const container = document.getElementById(containerId);
+    
+    if (!container) {
+        console.error(`Contenedor ${containerId} no encontrado`);
+        return;
+    }
+    
+    // Remover mensaje de "no hay items" si existe
+    const noItemsMsg = container.querySelector('.no-items');
+    if (noItemsMsg) {
+        noItemsMsg.remove();
+    }
+    
+    // Crear elemento de equipamiento
+    const equipmentItem = document.createElement('div');
+    equipmentItem.className = 'equipment-item-selected';
+
+    equipmentItem.setAttribute('data-equipment-id', equipmentId); 
+
+    
+    equipmentItem.innerHTML = `
+        <span class="equipment-name">${equipmentName}</span>
+        <button class="remove-equipment-btn" onclick="removeEquipmentFromList(this)" title="Quitar">
+            <i class="fas fa-times"></i>
+        </button>
+    `;
+    
+    container.appendChild(equipmentItem);
+}
+
+// Función para quitar equipamiento de la lista visual
+function removeEquipmentFromList(button) {
+    const equipmentItem = button.parentElement;
+    const container = equipmentItem.parentElement;
+    
+    equipmentItem.remove();
+    
+    // Si no quedan items, mostrar mensaje
+    if (container.children.length === 0) {
+        const noItemsMsg = document.createElement('p');
+        noItemsMsg.className = 'no-items';
+        
+        const messages = {
+            'personWeapons': 'No hay armas equipadas',
+            'personArmor': 'No hay armaduras equipadas',
+            'personTools': 'No hay herramientas equipadas',
+            'personArcana': 'No hay arcanas dominadas'
+        };
+        
+        noItemsMsg.textContent = messages[container.id] || 'No hay equipamiento';
+        container.appendChild(noItemsMsg);
+    }
+}
+
+// Mostrar alertas en la parte superior derecha de la pantalla
 function mostrarAlerta(tipo, mensaje) {
     const alertContainer = document.getElementById('alertContainer');
     if (!alertContainer) {
@@ -1512,39 +1131,4 @@ function mostrarAlerta(tipo, mensaje) {
             alertDiv.remove();
         }
     }, 5000);
-}
-
-/**
- * Función de depuración para comprobar el estado de los modales
- */
-function debugModals() {
-    const personModal = document.getElementById('personModal');
-    const viewPersonModal = document.getElementById('viewPersonModal');
-    const equipmentModal = document.getElementById('equipmentModal');
-    
-    console.log('Modal Elements Status:');
-    console.log('personModal:', personModal ? personModal.style.display : 'Not found');
-    console.log('viewPersonModal:', viewPersonModal ? viewPersonModal.style.display : 'Not found');
-    console.log('equipmentModal:', equipmentModal ? equipmentModal.style.display : 'Not found');
-    
-    // Check button event listeners
-    const addBtn = document.getElementById('addPersonBtn');
-    if (addBtn) {
-        console.log('Add Person Button found');
-        // Create a temporary click handler to test if events are working
-        const oldClick = addBtn.onclick;
-        addBtn.onclick = function() {
-            console.log('Add Person Button clicked in debug function');
-            if (oldClick) oldClick();
-        };
-    } else {
-        console.log('Add Person Button NOT FOUND');
-    }
-    
-    return {
-        personModal: personModal ? personModal.style.display : 'Not found',
-        viewPersonModal: viewPersonModal ? viewPersonModal.style.display : 'Not found',
-        equipmentModal: equipmentModal ? equipmentModal.style.display : 'Not found',
-        addButtonExists: Boolean(addBtn)
-    };
 }

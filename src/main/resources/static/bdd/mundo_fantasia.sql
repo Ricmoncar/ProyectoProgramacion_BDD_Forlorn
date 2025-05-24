@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 16-05-2025 a las 10:16:49
+-- Tiempo de generación: 24-05-2025 a las 16:30:41
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.0.30
 
@@ -35,6 +35,14 @@ CREATE TABLE `arcana` (
   `Fecha` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Volcado de datos para la tabla `arcana`
+--
+
+INSERT INTO `arcana` (`ID`, `Tipo`, `Maestria`, `Dificultad`, `Fecha`) VALUES
+(1, '5443', 'Maestro', 'Difícil', '0005-05-23'),
+(2, 'faweg', 'Competente', 'Intermedio', '0004-03-22');
+
 -- --------------------------------------------------------
 
 --
@@ -54,6 +62,14 @@ CREATE TABLE `arma` (
   `OrigenImperioID` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Volcado de datos para la tabla `arma`
+--
+
+INSERT INTO `arma` (`ID`, `Nombre`, `BufoEstadisticas`, `Material`, `Descripcion`, `Peso`, `PVP`, `Origen`, `FechaCreacion`, `OrigenImperioID`) VALUES
+(1, 'sword', '+5 ATK, +5 DEF, +5 HP, +5 SPE, +5 MAT, +5 MDF', 'iron', '643', 2352, 235, NULL, '0002-02-22', 1),
+(2, 'gaweg', '+88 ATK', 'weaf', 'erg', 324, 234, NULL, '0003-02-14', 1);
+
 -- --------------------------------------------------------
 
 --
@@ -72,6 +88,13 @@ CREATE TABLE `armadura` (
   `FechaCreacion` date DEFAULT NULL,
   `OrigenImperioID` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `armadura`
+--
+
+INSERT INTO `armadura` (`ID`, `Nombre`, `BufoEstadisticas`, `Material`, `Descripcion`, `Peso`, `PVP`, `Origen`, `FechaCreacion`, `OrigenImperioID`) VALUES
+(1, 'atwe', '+6 ATK', 'wate', NULL, 6, 6, NULL, '0023-03-25', 1);
 
 -- --------------------------------------------------------
 
@@ -177,7 +200,11 @@ INSERT INTO `estadisticas` (`ID`, `Tipo`, `ATK`, `DEF`, `HP`, `SPE`, `MAT`, `MDF
 (2, 'Base', 10, 10, 10, 10, 10, 10, 0, 1),
 (3, 'Personal', 55, 10, 10, 10, 10, 10, 0, 1),
 (4, 'Personal', 10, 10, 10, 10, 10, 10, 0, 1),
-(5, 'Personal', 10, 10, 10, 10, 10, 10, 0, 1);
+(5, 'Personal', 12, 10, 10, 10, 10, 10, 0, 1),
+(6, 'BuffArma', 5, 5, 5, 5, 5, 5, 0, 1),
+(7, 'BuffArmadura', 6, 0, 0, 0, 0, 0, 0, 1),
+(8, 'BuffHerramienta', 6, 0, 0, 0, 0, 0, 0, 1),
+(9, 'BuffArma', 88, 0, 0, 0, 0, 0, 0, 1);
 
 -- --------------------------------------------------------
 
@@ -212,6 +239,13 @@ CREATE TABLE `herramienta` (
   `FechaCreacion` date DEFAULT NULL,
   `OrigenImperioID` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `herramienta`
+--
+
+INSERT INTO `herramienta` (`ID`, `Nombre`, `BufoEstadisticas`, `Material`, `Descripcion`, `Peso`, `PVP`, `Uso`, `Origen`, `FechaCreacion`, `OrigenImperioID`) VALUES
+(1, 'heh', '+6 ATK', 'areh', NULL, 75, 45, 'pickaxe', NULL, '0323-02-23', 1);
 
 -- --------------------------------------------------------
 
@@ -536,19 +570,19 @@ ALTER TABLE `raza`
 -- AUTO_INCREMENT de la tabla `arcana`
 --
 ALTER TABLE `arcana`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de la tabla `arma`
 --
 ALTER TABLE `arma`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de la tabla `armadura`
 --
 ALTER TABLE `armadura`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT de la tabla `bioma`
@@ -572,7 +606,7 @@ ALTER TABLE `continente`
 -- AUTO_INCREMENT de la tabla `estadisticas`
 --
 ALTER TABLE `estadisticas`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT de la tabla `guerra`
@@ -584,7 +618,7 @@ ALTER TABLE `guerra`
 -- AUTO_INCREMENT de la tabla `herramienta`
 --
 ALTER TABLE `herramienta`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT de la tabla `imperio`

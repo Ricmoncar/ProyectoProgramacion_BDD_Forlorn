@@ -139,7 +139,7 @@ function fixTableDisplay() {
  * Carga la lista de continentes desde el servidor para los select
  */
 function cargarContinentes() {
-    fetch("http://localhost:8080/listar_continentes")
+    fetch("/listar_continentes")
         .then(res => {
             if (!res.ok) {
                 throw new Error(`Error HTTP ${res.status}: ${res.statusText}`);
@@ -189,7 +189,7 @@ function cargarContinentes() {
  * Carga la lista de biomas desde el servidor
  */
 function cargarBiomas() {
-    fetch("http://localhost:8080/listar_biomas")
+    fetch("/listar_biomas")
         .then(res => {
             if (!res.ok) {
                 return res.text().then(text => {
@@ -234,7 +234,7 @@ function verBioma(id) {
         mostrarAlerta('error', 'No se puede mostrar el bioma: ID inválido.');
         return;
     }
-    fetch(`http://localhost:8080/obtener_bioma?id=${id}`)
+    fetch(`/obtener_bioma?id=${id}`)
         .then(res => {
             if (!res.ok) {
                 return res.text().then(text => { 
@@ -326,7 +326,7 @@ function editarBioma(id) {
     modalTitle.textContent = 'Editar Bioma';
     biomeIdInput.value = id;
 
-    fetch(`http://localhost:8080/obtener_bioma?id=${id}`)
+    fetch(`/obtener_bioma?id=${id}`)
         .then(res => {
             if (!res.ok) {
                 return res.text().then(text => { 
@@ -385,7 +385,7 @@ function eliminarBioma(id) {
     }
     
     if (confirm(`¿Está seguro que desea eliminar el bioma con ID ${id}? Esta acción no se puede deshacer.`)) {
-        fetch(`http://localhost:8080/eliminar_bioma?id=${id}`)
+        fetch(`/eliminar_bioma?id=${id}`)
             .then(res => {
                 if (!res.ok) {
                     return res.text().then(text => {
@@ -473,7 +473,7 @@ function guardarBioma() {
     }
 
     // Construir la URL con los parámetros
-    let url = id ? 'http://localhost:8080/actualizar_bioma?' : 'http://localhost:8080/aniadir_bioma?';
+    let url = id ? '/actualizar_bioma?' : '/aniadir_bioma?';
     
     const params = new URLSearchParams();
     if (id) params.append('id', id);
@@ -517,7 +517,7 @@ function aplicarFiltros() {
     const temperaturaSelect = document.getElementById('filterTemperatura').value;
     
     // Construir la URL con los parámetros
-    let url = 'http://localhost:8080/filtrar_biomas?';
+    let url = '/filtrar_biomas?';
     const params = new URLSearchParams();
     
     if (continenteId) params.append('continenteId', continenteId);

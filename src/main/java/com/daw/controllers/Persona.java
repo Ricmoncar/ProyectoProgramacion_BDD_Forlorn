@@ -1,10 +1,8 @@
-/**
- * Clase modelo para Persona
- */
-package com.daw.controllers;
+package com.daw.controllers; // Asegúrate de que el paquete sea el correcto para tu proyecto
 
 import java.sql.Date;
 import java.util.List;
+import java.util.ArrayList; // Importa ArrayList para inicializar las listas
 
 public class Persona {
     private Integer id;
@@ -20,20 +18,26 @@ public class Persona {
     private String profesion;
     private String direccion;
     private Integer razaId;
-    private Raza raza;
+    private Raza raza; 
     private Integer imperioId;
     private Imperio imperio;
     private Integer estadisticasId;
     private Estadisticas estadisticas;
+    
+    // Campos para equipamiento
     private List<Arma> armas;
     private List<Armadura> armaduras;
     private List<Herramienta> herramientas;
     private List<Arcana> arcanas;
     
     public Persona() {
+        // Inicializar las listas para evitar NullPointerExceptions
+        this.armas = new ArrayList<>();
+        this.armaduras = new ArrayList<>();
+        this.herramientas = new ArrayList<>();
+        this.arcanas = new ArrayList<>();
     }
     
-    // Getters y Setters
     public Integer getId() {
         return id;
     }

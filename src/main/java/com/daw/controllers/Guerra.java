@@ -2,7 +2,7 @@ package com.daw.controllers;
 
 import java.sql.Date;
 import java.util.List;
-
+import java.util.ArrayList;
 public class Guerra {
     private Integer id;
     private String nombre;
@@ -11,9 +11,12 @@ public class Guerra {
     private String descripcion;
     private List<ParticipanteGuerra> imperiosParticipantes;
     
-    public Guerra() {
+
+     public Guerra() {
+        // Inicializar la lista para evitar NullPointerExceptions si se accede antes de ser seteada
+        this.imperiosParticipantes = new ArrayList<>(); 
     }
-    
+ 
     public Integer getId() {
         return id;
     }

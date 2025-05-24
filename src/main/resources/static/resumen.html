@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tabla Maestra</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.dataTables.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+
+    <style>
+      .dashboard-widget {
+        background-color: #2c2c2c;
+        padding: 20px;
+        margin-bottom: 30px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      }
+      .dashboard-widget h3 {
+        color: var(--primary-color);
+        margin-top: 0;
+        border-bottom: 1px solid var(--primary-color-dark);
+        padding-bottom: 10px;
+        margin-bottom: 15px;
+      }
+      .dashboard-widget ul {
+        list-style: none;
+        padding-left: 0;
+      }
+      .dashboard-widget li {
+        padding: 8px 0;
+        border-bottom: 1px solid #444;
+        color: #ccc;
+      }
+      .dashboard-widget li:last-child {
+        border-bottom: none;
+      }
+      .dashboard-widget li strong {
+        color: #fff;
+      }
+      .dashboard-widget li a {
+        color: var(--secondary-color);
+        text-decoration: none;
+      }
+      .dashboard-widget li a:hover {
+        text-decoration: underline;
+      }
+
+      #widgetActividadReciente {
+        display: flex; /* Para poner las columnas una al lado de la otra */
+        flex-wrap: wrap; /* Para que se ajusten */
+        gap: 20px;
+      }
+      .actividad-columna {
+        flex: 1; /* Que cada columna intente ocupar el mismo espacio */
+        min-width: 250px;
+        background-color: #333;
+        padding: 15px;
+        border-radius: 6px;
+      }
+      .actividad-columna h4 {
+        color: var(--secondary-color);
+        margin-top: 0;
+      }
+
+      /* Estilo general para todos los widgets del dashboard */
+      .dashboard-widget {
+        background-color: rgba(20, 20, 20, 0.7);
+        padding: 25px;
+        margin-bottom: 30px;
+        border-radius: 12px; /* Bordes más redondeados */
+        border: 1px solid rgba(212, 175, 55, 0.2);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(5px);
+      }
+
+      .dashboard-widget h3 {
+        font-family: "Cinzel", serif;
+        color: var(--primary-color, #d4af37);
+        margin-top: 0;
+        border-bottom: 2px solid var(--primary-color-dark, #b8860b);
+        padding-bottom: 12px;
+        margin-bottom: 20px;
+        font-size: 1.8rem;
+        text-align: center;
+        letter-spacing: 1px;
+      }
+
+      /* Contenedor para las columnas de actividad reciente */
+      #widgetActividadReciente {
+        display: grid; /* Usar grid para mejor control de columnas */
+        grid-template-columns: repeat(
+          auto-fit,
+          minmax(280px, 1fr)
+        ); /* Columnas responsivas */
+        gap: 25px;
+      }
+
+      /* Estilo para cada columna dentro del widget de actividad reciente */
+      .actividad-columna {
+        background-color: rgba(
+          30,
+          30,
+          30,
+          0.8
+        ); /* Un poco más claro que el widget principal */
+        padding: 20px;
+        border-radius: 8px;
+        border: 1px solid rgba(212, 175, 55, 0.15);
+        transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out; /* Transición para hover */
+      }
+
+      .actividad-columna:hover {
+        transform: translateY(
+          -5px
+        ); /* Ligero levantamiento al pasar el mouse */
+        box-shadow: 0 6px 12px rgba(212, 175, 55, 0.2);
+      }
+
+      .actividad-columna h4 {
+        font-family: "Trajan Pro", serif;
+        color: var(--secondary-color, #e0e0e0);
+        margin-top: 0;
+        margin-bottom: 15px;
+        font-size: 1.3rem;
+        border-bottom: 1px solid #555;
+        padding-bottom: 8px;
+      }
+
+      .actividad-columna ul {
+        list-style: none;
+        padding-left: 0;
+        margin-bottom: 0;
+      }
+
+      .actividad-columna li {
+        padding: 10px 0;
+        border-bottom: 1px dashed #4a4a4a; /* Separador más sutil y temático */
+        color: var(--text-faded, #a0a0a0);
+        font-size: 0.9rem;
+        line-height: 1.5;
+        transition: background-color 0.2s ease-in-out;
+      }
+
+      .actividad-columna li:last-child {
+        border-bottom: none;
+      }
+
+      .actividad-columna li:hover {
+        background-color: rgba(212, 175, 55, 0.05);
+      }
+
+      .actividad-columna li strong,
+      .dashboard-widget li strong {
+        /* Aplicar también a estadísticas globales */
+        color: var(--gold, #ffd700);
+        font-weight: 600;
+      }
+
+      .actividad-columna li a,
+      .dashboard-widget li a {
+        color: var(--secondary-color, #c0c0c0);
+        text-decoration: none;
+        transition: color 0.2s ease;
+      }
+
+      .actividad-columna li a:hover,
+      .dashboard-widget li a:hover {
+        color: var(--primary-color, #d4af37);
+        text-decoration: underline;
+      }
+
+      /* Estilos específicos para la lista de estadísticas globales (Widget 1) */
+      #listaEstadisticasGlobales li {
+        font-size: 1rem;
+        padding: 12px 0;
+      }
+
+      /* Mensaje de "Cargando..." o "No hay X recientes" */
+      .actividad-columna ul li:only-child {
+        /* Si solo hay un <li> (el de "Cargando" o "No hay") */
+        font-style: italic;
+        text-align: center;
+        color: #777;
+        border-bottom: none; /* Quitar borde si es el único mensaje */
+      }
+
+      /*  Estilos para la Tabla Maestra */
+
+      /* Colores base para filas alternas */
+      #tablaMaestra tbody tr.dt-row-odd {
+        background-color: rgba(30, 30, 30, 0.9);
+      }
+      #tablaMaestra tbody tr.dt-row-even {
+        background-color: rgba(40, 40, 40, 0.9);
+      }
+
+      /* Estilos específicos por tipo de entidad */
+
+      #tablaMaestra tbody tr.tipo-planeta {
+        border-left: 4px solid #2980b9; /* Azul para planetas */
+      }
+      #tablaMaestra tbody tr.tipo-planeta:hover {
+        background-color: rgba(41, 128, 185, 0.1); /* Un hover azulado */
+      }
+
+      #tablaMaestra tbody tr.tipo-imperio {
+        border-left: 4px solid #8e44ad; /* Púrpura para imperios */
+      }
+      #tablaMaestra tbody tr.tipo-imperio:hover {
+        background-color: rgba(142, 68, 173, 0.1);
+      }
+
+      #tablaMaestra tbody tr.tipo-guerra {
+        border-left: 4px solid var(--crimson, #dc143c); /* Carmesí para guerras */
+      }
+      #tablaMaestra tbody tr.tipo-guerra:hover {
+        background-color: rgba(220, 20, 60, 0.1);
+      }
+
+      #tablaMaestra tbody tr.tipo-persona {
+        border-left: 4px solid #27ae60; /* Verde para personas */
+      }
+      #tablaMaestra tbody tr.tipo-persona:hover {
+        background-color: rgba(39, 174, 96, 0.1);
+      }
+
+      #tablaMaestra tbody tr.tipo-raza {
+        border-left: 4px solid #f39c12; /* Naranja para razas */
+      }
+      #tablaMaestra tbody tr.tipo-raza:hover {
+        background-color: rgba(243, 156, 18, 0.1);
+      }
+
+      #tablaMaestra tbody tr.tipo-continente {
+        border-left: 4px solid #16a085; /* Turquesa para continentes */
+      }
+      #tablaMaestra tbody tr.tipo-continente:hover {
+        background-color: rgba(22, 160, 133, 0.1);
+      }
+
+      #tablaMaestra tbody tr.tipo-bioma {
+        border-left: 4px solid #d35400; /* Naranja oscuro/marrón para biomas */
+      }
+      #tablaMaestra tbody tr.tipo-bioma:hover {
+        background-color: rgba(211, 84, 0, 0.1);
+      }
+
+      /* Para el equipamiento, puedes usar un color general o uno por tipo */
+      #tablaMaestra tbody tr.tipo-arma,
+      #tablaMaestra tbody tr.tipo-armadura,
+      #tablaMaestra tbody tr.tipo-herramienta,
+      #tablaMaestra tbody tr.tipo-arcana {
+        border-left: 4px solid #7f8c8d; /* Gris para equipamiento */
+      }
+      #tablaMaestra tbody tr.tipo-arma:hover,
+      #tablaMaestra tbody tr.tipo-armadura:hover,
+      #tablaMaestra tbody tr.tipo-herramienta:hover,
+      #tablaMaestra tbody tr.tipo-arcana:hover {
+        background-color: rgba(127, 140, 141, 0.1);
+      }
+
+      /* Mejorar legibilidad del texto en las filas */
+      #tablaMaestra tbody td {
+        color: #e0e0e0; /* Color de texto principal claro */
+        padding: 10px 12px; /* Ajustar padding si es necesario */
+        vertical-align: middle;
+      }
+
+      /* Estilo para la columna de acciones para que el icono se vea bien */
+      #tablaMaestra .actions-column a.view-btn {
+        color: var(--primary-color, #d4af37);
+        font-size: 1.1em;
+        transition: color 0.2s ease;
+      }
+      #tablaMaestra .actions-column a.view-btn:hover {
+        color: var(--gold, #ffd700);
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Cabecera -->
+    <header>
+      <div class="container nav-container">
+        <a href="index.html" class="logo">Crónicas del <span>Destino</span></a>
+        <nav class="nav-links">
+          <a href="index.html">Inicio</a>
+          <a href="resumen.html" class="active">Resumen</a>
+          <a href="planet.html">Planetas</a>
+          <a href="continent.html">Continentes</a>
+          <a href="biome.html">Biomas</a>
+          <a href="race.html">Razas</a>
+          <a href="empire.html">Imperios</a>
+          <a href="war.html">Guerras</a>
+          <a href="person.html">Personas</a>
+          <a href="equipment.html">Equipamiento</a>
+        </nav>
+      </div>
+    </header>
+
+    <!-- Widget 1 -->
+    <section class="section">
+      <div class="container">
+        <h2 class="section-title">Visión General del Universo</h2>
+
+        <div id="widgetEstadisticasGlobales" class="dashboard-widget">
+          <h3>Estado Actual del Universo</h3>
+          <ul id="listaEstadisticasGlobales">
+            <li>Cargando estadísticas...</li>
+          </ul>
+        </div>
+
+        <!-- Widget 2 -->
+        <div id="widgetActividadReciente" class="dashboard-widget">
+          <h3>Última Actividad Registrada</h3>
+
+          <div class="actividad-columna">
+            <h4>Planetas Recientes</h4>
+            <ul id="listaPlanetasRecientes">
+              <li>Cargando...</li>
+            </ul>
+          </div>
+
+          <div class="actividad-columna">
+            <h4>Imperios Recientes</h4>
+            <ul id="listaImperiosRecientes">
+              <li>Cargando...</li>
+            </ul>
+          </div>
+
+          <div class="actividad-columna">
+            <h4>Personas Recientes</h4>
+            <ul id="listaPersonasRecientes">
+              <li>Cargando...</li>
+            </ul>
+          </div>
+
+          <div class="actividad-columna">
+            <h4>Guerras Recientes</h4>
+            <ul id="listaGuerrasRecientes">
+              <li>Cargando...</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table
+            id="tablaMaestra"
+            class="display responsive nowrap"
+            style="width: 100%"
+          >
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Tipo</th>
+                <th>Nombre / Identificador</th>
+                <th>Fecha Relevante</th>
+                <th>Info Clave 1</th>
+                <th>Info Clave 2</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- DataTables -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+    <!-- Pie de página -->
+    <footer>
+      <div class="container">
+        <div class="footer-container">
+          <div class="footer-section">
+            <h3>Crónicas del Destino</h3>
+            <p>Un mundo de fantasía meticulosamente creado.</p>
+            <div class="social-links">
+              <a href="#" aria-label="Facebook" class="social-link">F</a>
+              <a href="#" aria-label="Twitter" class="social-link">T</a>
+              <a href="#" aria-label="Instagram" class="social-link">I</a>
+              <a href="#" aria-label="Discord" class="social-link">D</a>
+            </div>
+          </div>
+
+          <div class="footer-section">
+            <h3>Explorar</h3>
+            <ul class="footer-links">
+              <li><a href="planet.html">Planetas</a></li>
+              <li><a href="continent.html">Continentes</a></li>
+              <li><a href="biome.html">Biomas</a></li>
+              <li><a href="race.html">Razas</a></li>
+              <li><a href="empire.html">Imperios</a></li>
+              <li><a href="war.html">Guerras</a></li>
+              <li><a href="person.html">Personas</a></li>
+              <li><a href="equipment.html">Equipamiento</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-section">
+            <h3>Operaciones</h3>
+            <ul class="footer-links">
+              <li><a href="#">Crear Nueva Entidad</a></li>
+              <li><a href="#">Editar Existentes</a></li>
+              <li><a href="#">Explorar Base de Datos</a></li>
+              <li><a href="#">Generar Informes</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-section">
+            <h3>Contacto</h3>
+            <ul class="footer-links">
+              <li><a href="#">Sobre el Creador</a></li>
+              <li><a href="#">Contribuir</a></li>
+              <li><a href="#">Reportar Errores</a></li>
+              <li><a href="#">Sugerir Mejoras</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="copyright">
+          <p>© 2025 Crónicas del Destino. Todos los derechos reservados.</p>
+        </div>
+      </div>
+    </footer>
+    <footer></footer>
+    <script src="js/resumen.js"></script>
+    <script src="js/resumen_tabla_maestra.js"></script>
+  </body>
+</html>

@@ -131,7 +131,7 @@ function fixTableDisplay() {
  * Carga la lista de planetas para los selectores
  */
 function cargarPlanetas() {
-    fetch("http://localhost:8080/listar_planetas")
+    fetch("/listar_planetas")
         .then(res => {
             if (!res.ok) {
                 throw new Error(`Error HTTP ${res.status}: ${res.statusText}`);
@@ -181,7 +181,7 @@ function cargarPlanetas() {
  * Carga la lista de continentes desde el servidor
  */
 function cargarContinentes() {
-    fetch("http://localhost:8080/listar_continentes")
+    fetch("/listar_continentes")
         .then(res => {
             if (!res.ok) {
                 return res.text().then(text => {
@@ -226,7 +226,7 @@ function verContinente(id) {
         mostrarAlerta('error', 'No se puede mostrar el continente: ID inválido.');
         return;
     }
-    fetch(`http://localhost:8080/obtener_continente?id=${id}`)
+    fetch(`/obtener_continente?id=${id}`)
         .then(res => {
             if (!res.ok) {
                 return res.text().then(text => { 
@@ -323,7 +323,7 @@ function editarContinente(id) {
     modalTitle.textContent = 'Editar Continente';
     continentIdInput.value = id;
 
-    fetch(`http://localhost:8080/obtener_continente?id=${id}`)
+    fetch(`/obtener_continente?id=${id}`)
         .then(res => {
             if (!res.ok) {
                 return res.text().then(text => { 
@@ -378,7 +378,7 @@ function eliminarContinente(id) {
     }
     
     if (confirm(`¿Está seguro que desea eliminar el continente con ID ${id}? Esta acción no se puede deshacer.`)) {
-        fetch(`http://localhost:8080/eliminar_continente?id=${id}`)
+        fetch(`/eliminar_continente?id=${id}`)
             .then(res => {
                 if (!res.ok) {
                     return res.text().then(text => {
@@ -468,7 +468,7 @@ function guardarContinente() {
     const habitable = habitableSelect ? habitableSelect.value === '1' : false;
 
     // Construir la URL con los parámetros
-    let url = id ? 'http://localhost:8080/actualizar_continente?' : 'http://localhost:8080/aniadir_continente?';
+    let url = id ? '/actualizar_continente?' : '/aniadir_continente?';
     
     const params = new URLSearchParams();
     if (id) params.append('id', id);
@@ -514,7 +514,7 @@ function aplicarFiltros() {
     const habitable = habitableSelect && habitableSelect.value ? habitableSelect.value === 'true' : null;
     
     // Construir la URL con los parámetros
-    let url = 'http://localhost:8080/filtrar_continentes?';
+    let url = '/filtrar_continentes?';
     const params = new URLSearchParams();
     
     if (planetaId) params.append('planetaId', planetaId);
