@@ -48,7 +48,8 @@ public class AplicacionSQLController {
             @RequestParam Float densidad,
             @RequestParam String descripcion) {
         try {
-            return ResponseEntity.ok().body(servicio.aniadirPlaneta(nombre, ubicacion, habitable, nivelAgua, fechaCreacion, tamanio, densidad, descripcion));
+            return ResponseEntity.ok().body(servicio.aniadirPlaneta(nombre, ubicacion, habitable, nivelAgua,
+                    fechaCreacion, tamanio, densidad, descripcion));
         } catch (SQLException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
@@ -81,7 +82,8 @@ public class AplicacionSQLController {
             @RequestParam Float densidad,
             @RequestParam String descripcion) {
         try {
-            return ResponseEntity.ok().body(servicio.actualizarPlaneta(id, nombre, ubicacion, habitable, nivelAgua, fechaCreacion, tamanio, densidad, descripcion));
+            return ResponseEntity.ok().body(servicio.actualizarPlaneta(id, nombre, ubicacion, habitable, nivelAgua,
+                    fechaCreacion, tamanio, densidad, descripcion));
         } catch (SQLException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
@@ -125,7 +127,8 @@ public class AplicacionSQLController {
             @RequestParam Boolean habitable,
             @RequestParam String descripcion) {
         try {
-            return ResponseEntity.ok().body(servicio.aniadirContinente(nombre, planetaId, hemisferio, clima, tamanio, habitable, descripcion));
+            return ResponseEntity.ok().body(
+                    servicio.aniadirContinente(nombre, planetaId, hemisferio, clima, tamanio, habitable, descripcion));
         } catch (SQLException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
@@ -157,7 +160,8 @@ public class AplicacionSQLController {
             @RequestParam Boolean habitable,
             @RequestParam String descripcion) {
         try {
-            return ResponseEntity.ok().body(servicio.actualizarContinente(id, nombre, planetaId, hemisferio, clima, tamanio, habitable, descripcion));
+            return ResponseEntity.ok().body(servicio.actualizarContinente(id, nombre, planetaId, hemisferio, clima,
+                    tamanio, habitable, descripcion));
         } catch (SQLException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
@@ -221,7 +225,8 @@ public class AplicacionSQLController {
             @RequestParam(required = false) String precipitaciones,
             @RequestParam(required = false) Float temperaturaMedia) {
         try {
-            return ResponseEntity.ok().body(servicio.aniadirBioma(nombre, continenteId, clima, porcentajeHumedad, precipitaciones, temperaturaMedia));
+            return ResponseEntity.ok().body(servicio.aniadirBioma(nombre, continenteId, clima, porcentajeHumedad,
+                    precipitaciones, temperaturaMedia));
         } catch (SQLException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
@@ -299,7 +304,8 @@ public class AplicacionSQLController {
             @RequestParam(required = false) Float tempMin,
             @RequestParam(required = false) Float tempMax) {
         try {
-            return ResponseEntity.ok().body(servicio.filtrarBiomas(continenteId, clima, humedadMinima, tempMin, tempMax));
+            return ResponseEntity.ok()
+                    .body(servicio.filtrarBiomas(continenteId, clima, humedadMinima, tempMin, tempMax));
         } catch (SQLException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
@@ -334,7 +340,8 @@ public class AplicacionSQLController {
             @RequestParam(defaultValue = "10") Integer mat,
             @RequestParam(defaultValue = "10") Integer mdf) {
         try {
-            return ResponseEntity.ok().body(servicio.aniadirRaza(nombre, descripcionFisica, fechaConcepcion, alturaPromedia, anchoPromedio, atk, def, hp, spe, mat, mdf));
+            return ResponseEntity.ok().body(servicio.aniadirRaza(nombre, descripcionFisica, fechaConcepcion,
+                    alturaPromedia, anchoPromedio, atk, def, hp, spe, mat, mdf));
         } catch (SQLException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
@@ -370,7 +377,8 @@ public class AplicacionSQLController {
             @RequestParam(defaultValue = "10") Integer mat,
             @RequestParam(defaultValue = "10") Integer mdf) {
         try {
-            return ResponseEntity.ok().body(servicio.actualizarRaza(id, nombre, descripcionFisica, fechaConcepcion, alturaPromedia, anchoPromedio, atk, def, hp, spe, mat, mdf));
+            return ResponseEntity.ok().body(servicio.actualizarRaza(id, nombre, descripcionFisica, fechaConcepcion,
+                    alturaPromedia, anchoPromedio, atk, def, hp, spe, mat, mdf));
         } catch (SQLException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
@@ -446,7 +454,8 @@ public class AplicacionSQLController {
             @RequestParam(required = false) Float tamanio,
             @RequestParam(required = false, defaultValue = "false") Boolean enGuerra) {
         try {
-            return ResponseEntity.ok().body(servicio.aniadirImperio(nombre, poblacion, descripcion, fechaCreacion, lider, ideologia, gdp, tamanio, enGuerra));
+            return ResponseEntity.ok().body(servicio.aniadirImperio(nombre, poblacion, descripcion, fechaCreacion,
+                    lider, ideologia, gdp, tamanio, enGuerra));
         } catch (SQLException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
@@ -480,7 +489,8 @@ public class AplicacionSQLController {
             @RequestParam(required = false) Float tamanio,
             @RequestParam(required = false, defaultValue = "false") Boolean enGuerra) {
         try {
-            return ResponseEntity.ok().body(servicio.actualizarImperio(id, nombre, poblacion, descripcion, fechaCreacion, lider, ideologia, gdp, tamanio, enGuerra));
+            return ResponseEntity.ok().body(servicio.actualizarImperio(id, nombre, poblacion, descripcion,
+                    fechaCreacion, lider, ideologia, gdp, tamanio, enGuerra));
         } catch (SQLException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
@@ -552,13 +562,15 @@ public class AplicacionSQLController {
         try {
             return ResponseEntity.ok().body(servicio.aniadirGuerra(guerra));
         } catch (SQLException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error de base de datos al añadir guerra: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error de base de datos al añadir guerra: " + e.getMessage());
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Argumento inválido: " + e.getMessage());
         } catch (Exception e) {
             System.err.println("Error en aniadirGuerra controller: " + e.getMessage());
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error en los datos de la guerra: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Error en los datos de la guerra: " + e.getMessage());
         }
     }
 
@@ -574,24 +586,28 @@ public class AplicacionSQLController {
         }
     }
 
-    //Actualiza los datos de una guerra existente.
-    //Recibe el objeto Guerra completo, incluyendo los imperios participantes, en el cuerpo de la solicitud.
+    // Actualiza los datos de una guerra existente.
+    // Recibe el objeto Guerra completo, incluyendo los imperios participantes, en
+    // el cuerpo de la solicitud.
     //
     @PostMapping("/actualizar_guerra")
     public ResponseEntity<?> actualizarGuerra(@RequestBody Guerra guerra) {
         try {
             if (guerra.getId() == null) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El ID de la guerra es requerido para la actualización.");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("El ID de la guerra es requerido para la actualización.");
             }
             return ResponseEntity.ok().body(servicio.actualizarGuerra(guerra));
         } catch (SQLException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error de base de datos al actualizar guerra: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error de base de datos al actualizar guerra: " + e.getMessage());
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Argumento inválido: " + e.getMessage());
         } catch (Exception e) {
             System.err.println("Error en actualizarGuerra controller: " + e.getMessage());
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error en los datos de la guerra: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Error en los datos de la guerra: " + e.getMessage());
         }
     }
 
@@ -654,7 +670,8 @@ public class AplicacionSQLController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         } catch (Exception e) {
             // si el JSON no se puede convertir a objeto Persona.
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error en los datos de la persona: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Error en los datos de la persona: " + e.getMessage());
         }
     }
 
@@ -666,9 +683,11 @@ public class AplicacionSQLController {
     @PostMapping("/actualizar_persona")
     public ResponseEntity<?> actualizarPersona(@RequestBody Persona persona) {
         try {
-            // El ID de la persona debe venir dentro del objeto 'persona' enviado en el JSON.
+            // El ID de la persona debe venir dentro del objeto 'persona' enviado en el
+            // JSON.
             if (persona.getId() == null) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El ID de la persona es requerido para la actualización.");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("El ID de la persona es requerido para la actualización.");
             }
 
             // Spring mapea el JSON al objeto 'persona'.
@@ -679,7 +698,8 @@ public class AplicacionSQLController {
         } catch (Exception e) {
             System.err.println("Error en actualizarPersona controller: " + e.getMessage());
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error en los datos de la persona: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Error en los datos de la persona: " + e.getMessage());
         }
     }
 
@@ -788,7 +808,7 @@ public class AplicacionSQLController {
         }
     }
 
-// Agregar estos métodos al final de AplicacionSQLController.java
+    // Agregar estos métodos al final de AplicacionSQLController.java
 
     /* ----- Endpoints para gestión de Armas ----- */
     /**
@@ -1063,9 +1083,10 @@ public class AplicacionSQLController {
             @RequestParam(required = false, defaultValue = "0") Integer bufMat,
             @RequestParam(required = false, defaultValue = "0") Integer bufMdf) {
         try {
-            return ResponseEntity.ok().body(servicio.actualizarHerramienta(id, nombre, material, descripcion, uso, peso, pvp,
-                    imperioOrigen, fechaCreacion, bufAtk, bufDef,
-                    bufHp, bufSpe, bufMat, bufMdf));
+            return ResponseEntity.ok()
+                    .body(servicio.actualizarHerramienta(id, nombre, material, descripcion, uso, peso, pvp,
+                            imperioOrigen, fechaCreacion, bufAtk, bufDef,
+                            bufHp, bufSpe, bufMat, bufMdf));
         } catch (SQLException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
@@ -1215,7 +1236,8 @@ public class AplicacionSQLController {
         try {
             return ResponseEntity.ok().body(servicio.obtenerEstadisticasGlobales());
         } catch (SQLException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al obtener estadísticas globales: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al obtener estadísticas globales: " + e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error inesperado: " + e.getMessage());
         }
@@ -1228,7 +1250,8 @@ public class AplicacionSQLController {
         } catch (Exception e) {
             System.err.println("Error en getPlanetasRecientes controller: " + e.getMessage());
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al obtener planetas recientes: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al obtener planetas recientes: " + e.getMessage());
         }
     }
 
@@ -1239,11 +1262,13 @@ public class AplicacionSQLController {
         } catch (SQLException e) {
             System.err.println("Error SQL en getImperiosRecientes controller: " + e.getMessage());
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error de base de datos al obtener imperios recientes: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error de base de datos al obtener imperios recientes: " + e.getMessage());
         } catch (Exception e) {
             System.err.println("Error en getImperiosRecientes controller: " + e.getMessage());
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error inesperado al obtener imperios recientes: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error inesperado al obtener imperios recientes: " + e.getMessage());
         }
     }
 
@@ -1254,11 +1279,13 @@ public class AplicacionSQLController {
         } catch (SQLException e) {
             System.err.println("Error SQL en getPersonasRecientes controller: " + e.getMessage());
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error de base de datos al obtener personas recientes: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error de base de datos al obtener personas recientes: " + e.getMessage());
         } catch (Exception e) {
             System.err.println("Error en getPersonasRecientes controller: " + e.getMessage());
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error inesperado al obtener personas recientes: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error inesperado al obtener personas recientes: " + e.getMessage());
         }
     }
 
@@ -1269,37 +1296,43 @@ public class AplicacionSQLController {
         } catch (SQLException e) {
             System.err.println("Error SQL en getGuerrasRecientes controller: " + e.getMessage());
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error de base de datos al obtener guerras recientes: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error de base de datos al obtener guerras recientes: " + e.getMessage());
         } catch (Exception e) {
             System.err.println("Error en getGuerrasRecientes controller: " + e.getMessage());
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error inesperado al obtener guerras recientes: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error inesperado al obtener guerras recientes: " + e.getMessage());
         }
     }
 
-     /**
-     * Obtiene datos consolidados de varias entidades para la tabla maestra del universo.
+    /**
+     * Obtiene datos consolidados de varias entidades para la tabla maestra del
+     * universo.
      *
-     * @param limitePorEntidad El número máximo de ítems a cargar por cada tipo de entidad (opcional, por defecto 5 o 10).
-     * @return Una lista de objetos FilaTablaMaestra representando los datos para la tabla.
+     * @param limitePorEntidad El número máximo de ítems a cargar por cada tipo de
+     *                         entidad (opcional, por defecto 5 o 10).
+     * @return Una lista de objetos FilaTablaMaestra representando los datos para la
+     *         tabla.
      */
     @GetMapping("/universo/tabla_maestra")
     public ResponseEntity<?> getTablaMaestra(@RequestParam(defaultValue = "5") int limitePorEntidad) {
         try {
             // Llama al método del servicio
-            // para incluir planetas, imperios, guerras, personas, continentes, biomas y equipamiento.
+            // para incluir planetas, imperios, guerras, personas, continentes, biomas y
+            // equipamiento.
             return ResponseEntity.ok().body(servicio.getDatosTablaMaestra(limitePorEntidad));
         } catch (SQLException e) {
             System.err.println("Error SQL al obtener datos para tabla maestra: " + e.getMessage());
-            e.printStackTrace(); 
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                 .body("Error de base de datos al obtener datos para la tabla maestra: " + e.getMessage());
+                    .body("Error de base de datos al obtener datos para la tabla maestra: " + e.getMessage());
         } catch (Exception e) {
 
             System.err.println("Error inesperado al obtener datos para tabla maestra: " + e.getMessage());
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                 .body("Error inesperado al procesar la solicitud: " + e.getMessage());
+                    .body("Error inesperado al procesar la solicitud: " + e.getMessage());
         }
     }
 }

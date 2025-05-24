@@ -1,363 +1,416 @@
-document.addEventListener('DOMContentLoaded', function() {
-    // Configuración inicial de DataTables para la tabla de guerras
-    let warsTable = $('#warsTable').DataTable({
-        language: {
-            url: 'https://cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json'
+document.addEventListener("DOMContentLoaded", function () {
+  // Configuración inicial de DataTables para la tabla de guerras
+  let warsTable = $("#warsTable").DataTable({
+    language: {
+      url: "https://cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json",
+    },
+    responsive: true,
+    columns: [
+      { data: "id" },
+      { data: "nombre" },
+      {
+        data: "fechaInicio",
+        render: function (data) {
+          if (!data) return "N/A";
+          const fecha = new Date(data);
+          return fecha.toLocaleDateString("es-ES");
         },
-        responsive: true,
-        columns: [
-            { data: 'id' },
-            { data: 'nombre' },
-            { 
-                data: 'fechaInicio',
-                render: function(data) {
-                    if (!data) return 'N/A';
-                    const fecha = new Date(data);
-                    return fecha.toLocaleDateString('es-ES');
-                }
-            },
-            { 
-                data: 'fechaFin',
-                render: function(data) {
-                    if (!data) return 'Activo';
-                    const fecha = new Date(data);
-                    return fecha.toLocaleDateString('es-ES');
-                }
-            },
-            {
-                data: null,
-                render: function(data, type, row) {
-                    if (!row.fechaFin) {
-                        return '<span class="status-active">Activo</span>';
-                    } else {
-                        return '<span class="status-ended">Finalizado</span>';
-                    }
-                }
-            },
-            {
-                data: 'imperiosParticipantes',
-                render: function(data) {
-                    if (!data || !Array.isArray(data) || data.length === 0) return 'N/A';
-                    // Mostrar solo los nombres de los imperios, máximo 3
-                    const nombres = data.map(p => p.imperioNombre).slice(0, 3);
-                    const totalImperios = data.length;
-                    return nombres.join(', ') + (totalImperios > 3 ? ` y ${totalImperios - 3} más` : '');
-                }
-            },
-            {
-                data: null,
-                orderable: false,
-                searchable: false,
-                render: function(data, type, row) {
-                    const guerraId = row.id;
-                    if (guerraId === undefined || guerraId === null) {
-                        console.error("ID de guerra no encontrado en los datos de la fila:", row);
-                        return 'Error ID';
-                    }
-                    return `<div class="war-actions">
+      },
+      {
+        data: "fechaFin",
+        render: function (data) {
+          if (!data) return "Activo";
+          const fecha = new Date(data);
+          return fecha.toLocaleDateString("es-ES");
+        },
+      },
+      {
+        data: null,
+        render: function (data, type, row) {
+          if (!row.fechaFin) {
+            return '<span class="status-active">Activo</span>';
+          } else {
+            return '<span class="status-ended">Finalizado</span>';
+          }
+        },
+      },
+      {
+        data: "imperiosParticipantes",
+        render: function (data) {
+          if (!data || !Array.isArray(data) || data.length === 0) return "N/A";
+          // Mostrar solo los nombres de los imperios, máximo 3
+          const nombres = data.map((p) => p.imperioNombre).slice(0, 3);
+          const totalImperios = data.length;
+          return (
+            nombres.join(", ") +
+            (totalImperios > 3 ? ` y ${totalImperios - 3} más` : "")
+          );
+        },
+      },
+      {
+        data: null,
+        orderable: false,
+        searchable: false,
+        render: function (data, type, row) {
+          const guerraId = row.id;
+          if (guerraId === undefined || guerraId === null) {
+            console.error(
+              "ID de guerra no encontrado en los datos de la fila:",
+              row
+            );
+            return "Error ID";
+          }
+          return `<div class="war-actions">
                         <button class="view-btn" title="Ver detalles" onclick="verGuerra(${guerraId})"><i class="fas fa-eye"></i></button>
                         <button class="edit-btn" title="Editar" onclick="editarGuerra(${guerraId})"><i class="fas fa-edit"></i></button>
                         <button class="delete-btn" title="Eliminar" onclick="eliminarGuerra(${guerraId})"><i class="fas fa-trash-alt"></i></button>
                     </div>`;
-                },
-                className: 'dt-center'
-            }
-        ],
-        responsive: {
-            details: {
-                type: 'column',
-                target: 'tr'
-            }
         },
-        order: [[1, 'asc']], // Ordenar por nombre del conflicto
-        createdRow: function(row, data, dataIndex) {
-            // Aplicar colores alternos para las filas
-            $(row).css('background-color', dataIndex % 2 === 0 ? 'rgba(30, 30, 30, 0.8)' : 'var(--dark-secondary)');
-        }
+        className: "dt-center",
+      },
+    ],
+    responsive: {
+      details: {
+        type: "column",
+        target: "tr",
+      },
+    },
+    order: [[1, "asc"]], // Ordenar por nombre del conflicto
+    createdRow: function (row, data, dataIndex) {
+      // Aplicar colores alternos para las filas
+      $(row).css(
+        "background-color",
+        dataIndex % 2 === 0 ? "rgba(30, 30, 30, 0.8)" : "var(--dark-secondary)"
+      );
+    },
+  });
+
+  // Variables para manejar los participantes en una guerra
+  let imperiosDisponibles = [];
+  let participantesGuerra = [];
+
+  // Cargar datos iniciales al abrir la página
+  cargarImperios();
+  cargarGuerras();
+
+  // Configurar eventos de los botones principales
+  const addBtn = document.getElementById("addWarBtn");
+  const cancelBtn = document.getElementById("cancelBtn");
+  const closeViewBtn = document.getElementById("closeViewBtn");
+  const addParticipantBtn = document.getElementById("addParticipantBtn");
+  const cancelParticipantBtn = document.getElementById("cancelParticipantBtn");
+
+  if (addBtn) addBtn.addEventListener("click", abrirModalAnadir);
+  if (cancelBtn) cancelBtn.addEventListener("click", cerrarModal);
+  if (closeViewBtn) closeViewBtn.addEventListener("click", cerrarModalDetalles);
+  if (addParticipantBtn)
+    addParticipantBtn.addEventListener("click", abrirModalParticipante);
+  if (cancelParticipantBtn)
+    cancelParticipantBtn.addEventListener("click", cerrarModalParticipante);
+
+  // Configurar eventos de los filtros
+  const applyFiltersBtn = document.getElementById("applyFiltersBtn");
+  const resetFiltersBtn = document.getElementById("resetFiltersBtn");
+
+  if (applyFiltersBtn)
+    applyFiltersBtn.addEventListener("click", aplicarFiltros);
+  if (resetFiltersBtn)
+    resetFiltersBtn.addEventListener("click", resetearFiltros);
+
+  // Configurar eventos para cerrar modales con la X
+  let closeButtons = document.querySelectorAll(".close-modal");
+  closeButtons.forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      const warModal = document.getElementById("warModal");
+      const viewWarModal = document.getElementById("viewWarModal");
+      const participantModal = document.getElementById("participantModal");
+      if (warModal) warModal.style.display = "none";
+      if (viewWarModal) viewWarModal.style.display = "none";
+      if (participantModal) participantModal.style.display = "none";
     });
+  });
 
-    // Variables para manejar los participantes en una guerra
-    let imperiosDisponibles = [];
-    let participantesGuerra = [];
-
-    // Cargar datos iniciales al abrir la página
-    cargarImperios();
-    cargarGuerras();
-
-    // Configurar eventos de los botones principales
-    const addBtn = document.getElementById('addWarBtn');
-    const cancelBtn = document.getElementById('cancelBtn');
-    const closeViewBtn = document.getElementById('closeViewBtn');
-    const addParticipantBtn = document.getElementById('addParticipantBtn');
-    const cancelParticipantBtn = document.getElementById('cancelParticipantBtn');
-
-    if (addBtn) addBtn.addEventListener('click', abrirModalAnadir);
-    if (cancelBtn) cancelBtn.addEventListener('click', cerrarModal);
-    if (closeViewBtn) closeViewBtn.addEventListener('click', cerrarModalDetalles);
-    if (addParticipantBtn) addParticipantBtn.addEventListener('click', abrirModalParticipante);
-    if (cancelParticipantBtn) cancelParticipantBtn.addEventListener('click', cerrarModalParticipante);
-
-    // Configurar eventos de los filtros
-    const applyFiltersBtn = document.getElementById('applyFiltersBtn');
-    const resetFiltersBtn = document.getElementById('resetFiltersBtn');
-
-    if (applyFiltersBtn) applyFiltersBtn.addEventListener('click', aplicarFiltros);
-    if (resetFiltersBtn) resetFiltersBtn.addEventListener('click', resetearFiltros);
-
-    // Configurar eventos para cerrar modales con la X
-    let closeButtons = document.querySelectorAll('.close-modal');
-    closeButtons.forEach(function(btn) {
-        btn.addEventListener('click', function() {
-            const warModal = document.getElementById('warModal');
-            const viewWarModal = document.getElementById('viewWarModal');
-            const participantModal = document.getElementById('participantModal');
-            if (warModal) warModal.style.display = 'none';
-            if (viewWarModal) viewWarModal.style.display = 'none';
-            if (participantModal) participantModal.style.display = 'none';
-        });
+  // Configurar envío de formularios
+  const warForm = document.getElementById("warForm");
+  if (warForm) {
+    warForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      guardarGuerra();
     });
+  }
 
-    // Configurar envío de formularios
-    const warForm = document.getElementById('warForm');
-    if (warForm) {
-        warForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            guardarGuerra();
-        });
+  const participantForm = document.getElementById("participantForm");
+  if (participantForm) {
+    participantForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      agregarParticipante();
+    });
+  }
+
+  // Cerrar modales al hacer clic fuera del contenido
+  window.addEventListener("click", function (event) {
+    const warModal = document.getElementById("warModal");
+    const viewWarModal = document.getElementById("viewWarModal");
+    const participantModal = document.getElementById("participantModal");
+    if (event.target == warModal) {
+      cerrarModal();
     }
-
-    const participantForm = document.getElementById('participantForm');
-    if (participantForm) {
-        participantForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            agregarParticipante();
-        });
+    if (event.target == viewWarModal) {
+      cerrarModalDetalles();
     }
+    if (event.target == participantModal) {
+      cerrarModalParticipante();
+    }
+  });
 
-    // Cerrar modales al hacer clic fuera del contenido
-    window.addEventListener('click', function(event) {
-        const warModal = document.getElementById('warModal');
-        const viewWarModal = document.getElementById('viewWarModal');
-        const participantModal = document.getElementById('participantModal');
-        if (event.target == warModal) {
-            cerrarModal();
-        }
-        if (event.target == viewWarModal) {
-            cerrarModalDetalles();
-        }
-        if (event.target == participantModal) {
-            cerrarModalParticipante();
-        }
-    });
-    
-    // Arreglar visualización de la tabla
-    arreglarVisualizacionTabla();
+  // Arreglar visualización de la tabla
+  arreglarVisualizacionTabla();
 });
 
 // Arregla problemas de visualización en las tablas con tema oscuro
 function arreglarVisualizacionTabla() {
-    setTimeout(function() {
-        $('table.dataTable tbody td').css('background-color', 'inherit');
-        
-        $('table.dataTable tbody tr:odd').css('background-color', 'rgba(30, 30, 30, 0.8)');
-        $('table.dataTable tbody tr:even').css('background-color', 'var(--dark-secondary)');
-        
-        $('.dataTable').on('draw.dt', function() {
-            $(this).find('tbody tr:odd').css('background-color', 'rgba(30, 30, 30, 0.8)');
-            $(this).find('tbody tr:even').css('background-color', 'var(--dark-secondary)');
-            $(this).find('tbody td').css('background-color', 'inherit');
-        });
-    }, 100);
+  setTimeout(function () {
+    $("table.dataTable tbody td").css("background-color", "inherit");
+
+    $("table.dataTable tbody tr:odd").css(
+      "background-color",
+      "rgba(30, 30, 30, 0.8)"
+    );
+    $("table.dataTable tbody tr:even").css(
+      "background-color",
+      "var(--dark-secondary)"
+    );
+
+    $(".dataTable").on("draw.dt", function () {
+      $(this)
+        .find("tbody tr:odd")
+        .css("background-color", "rgba(30, 30, 30, 0.8)");
+      $(this)
+        .find("tbody tr:even")
+        .css("background-color", "var(--dark-secondary)");
+      $(this).find("tbody td").css("background-color", "inherit");
+    });
+  }, 100);
 }
 
 /**
  * Carga la lista de imperios desde el servidor
  */
 function cargarImperios() {
-    fetch("/listar_imperios")
-        .then(res => {
-            if (!res.ok) {
-                return res.text().then(text => {
-                    throw new Error(`Error HTTP ${res.status}: ${res.statusText}. Detalle: ${text}`);
-                });
-            }
-            const contentType = res.headers.get("content-type");
-            if (!contentType || !contentType.includes("application/json")) {
-                 return res.text().then(text => {
-                    throw new TypeError(`Respuesta inesperada del servidor (no es JSON): ${text}`);
-                 });
-            }
-            return res.json();
-        })
-        .then(imperios => {
-            imperiosDisponibles = imperios;
-            
-            // Añadir imperios a los selectores
-            const filterEmpire = document.getElementById('filterEmpire');
-            const participantEmpire = document.getElementById('participantEmpire');
-            
-            if (filterEmpire) {
-                filterEmpire.innerHTML = '<option value="">Todos</option>';
-                imperios.forEach(imperio => {
-                    const option = document.createElement('option');
-                    option.value = imperio.id;
-                    option.textContent = imperio.nombre;
-                    filterEmpire.appendChild(option);
-                });
-            }
-            
-            if (participantEmpire) {
-                participantEmpire.innerHTML = '<option value="">Seleccione un imperio</option>';
-                imperios.forEach(imperio => {
-                    const option = document.createElement('option');
-                    option.value = imperio.id;
-                    option.textContent = imperio.nombre;
-                    participantEmpire.appendChild(option);
-                });
-            }
-        })
-        .catch(error => {
-            console.error('Error al cargar imperios:', error);
-            mostrarAlerta('error', `No se pudieron cargar los imperios: ${error.message}`);
+  fetch("/listar_imperios")
+    .then((res) => {
+      if (!res.ok) {
+        return res.text().then((text) => {
+          throw new Error(
+            `Error HTTP ${res.status}: ${res.statusText}. Detalle: ${text}`
+          );
         });
+      }
+      const contentType = res.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        return res.text().then((text) => {
+          throw new TypeError(
+            `Respuesta inesperada del servidor (no es JSON): ${text}`
+          );
+        });
+      }
+      return res.json();
+    })
+    .then((imperios) => {
+      imperiosDisponibles = imperios;
+
+      // Añadir imperios a los selectores
+      const filterEmpire = document.getElementById("filterEmpire");
+      const participantEmpire = document.getElementById("participantEmpire");
+
+      if (filterEmpire) {
+        filterEmpire.innerHTML = '<option value="">Todos</option>';
+        imperios.forEach((imperio) => {
+          const option = document.createElement("option");
+          option.value = imperio.id;
+          option.textContent = imperio.nombre;
+          filterEmpire.appendChild(option);
+        });
+      }
+
+      if (participantEmpire) {
+        participantEmpire.innerHTML =
+          '<option value="">Seleccione un imperio</option>';
+        imperios.forEach((imperio) => {
+          const option = document.createElement("option");
+          option.value = imperio.id;
+          option.textContent = imperio.nombre;
+          participantEmpire.appendChild(option);
+        });
+      }
+    })
+    .catch((error) => {
+      console.error("Error al cargar imperios:", error);
+      mostrarAlerta(
+        "error",
+        `No se pudieron cargar los imperios: ${error.message}`
+      );
+    });
 }
 
 /**
  * Carga la lista de guerras desde el servidor
  */
 function cargarGuerras() {
-    fetch("/listar_guerras")
-        .then(res => {
-            if (!res.ok) {
-                return res.text().then(text => {
-                    throw new Error(`Error HTTP ${res.status}: ${res.statusText}. Detalle: ${text}`);
-                });
-            }
-            const contentType = res.headers.get("content-type");
-            if (!contentType || !contentType.includes("application/json")) {
-                 return res.text().then(text => {
-                    throw new TypeError(`Respuesta inesperada del servidor (no es JSON): ${text}`);
-                 });
-            }
-            return res.json();
-        })
-        .then(guerras => {
-            let table = $('#warsTable').DataTable();
-            table.clear();
-            if (Array.isArray(guerras)) {
-                table.rows.add(guerras).draw();
-                
-                // Corrige el problema de visualización repintando las filas
-                $('#warsTable tbody tr').each(function(index) {
-                    $(this).css('background-color', index % 2 === 0 ? 'rgba(30, 30, 30, 0.8)' : 'var(--dark-secondary)');
-                });
-            } else {
-                console.error("La respuesta de listar_guerras no es un array:", guerras);
-                mostrarAlerta('error', 'Error: Formato de datos de guerras inesperado.');
-            }
-        })
-        .catch(error => {
-            console.error('Error al cargar guerras:', error);
-            mostrarAlerta('error', `No se pudieron cargar las guerras: ${error.message}`);
+  fetch("/listar_guerras")
+    .then((res) => {
+      if (!res.ok) {
+        return res.text().then((text) => {
+          throw new Error(
+            `Error HTTP ${res.status}: ${res.statusText}. Detalle: ${text}`
+          );
         });
+      }
+      const contentType = res.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        return res.text().then((text) => {
+          throw new TypeError(
+            `Respuesta inesperada del servidor (no es JSON): ${text}`
+          );
+        });
+      }
+      return res.json();
+    })
+    .then((guerras) => {
+      let table = $("#warsTable").DataTable();
+      table.clear();
+      if (Array.isArray(guerras)) {
+        table.rows.add(guerras).draw();
+
+        // Corrige el problema de visualización repintando las filas
+        $("#warsTable tbody tr").each(function (index) {
+          $(this).css(
+            "background-color",
+            index % 2 === 0 ? "rgba(30, 30, 30, 0.8)" : "var(--dark-secondary)"
+          );
+        });
+      } else {
+        console.error(
+          "La respuesta de listar_guerras no es un array:",
+          guerras
+        );
+        mostrarAlerta(
+          "error",
+          "Error: Formato de datos de guerras inesperado."
+        );
+      }
+    })
+    .catch((error) => {
+      console.error("Error al cargar guerras:", error);
+      mostrarAlerta(
+        "error",
+        `No se pudieron cargar las guerras: ${error.message}`
+      );
+    });
 }
 
 /**
  * Abre el modal para añadir un nuevo participante a la guerra
  */
 function abrirModalParticipante() {
-    const form = document.getElementById('participantForm');
-    const modal = document.getElementById('participantModal');
+  const form = document.getElementById("participantForm");
+  const modal = document.getElementById("participantModal");
 
-    if (!form || !modal) {
-        console.error("Elementos del modal de participante no encontrados.");
-        return;
-    }
+  if (!form || !modal) {
+    console.error("Elementos del modal de participante no encontrados.");
+    return;
+  }
 
-    form.reset();
-    
-    // Filtrar los imperios ya añadidos
-    const participantEmpire = document.getElementById('participantEmpire');
-    if (participantEmpire) {
-        const imperiosYaAnadidos = participantesGuerra.map(p => parseInt(p.imperioId));
-        
-        participantEmpire.innerHTML = '<option value="">Seleccione un imperio</option>';
-        imperiosDisponibles.forEach(imperio => {
-            // Solo mostrar imperios que no estén ya añadidos
-            if (!imperiosYaAnadidos.includes(imperio.id)) {
-                const option = document.createElement('option');
-                option.value = imperio.id;
-                option.textContent = imperio.nombre;
-                participantEmpire.appendChild(option);
-            }
-        });
-    }
-    
-    modal.style.display = 'block';
+  form.reset();
+
+  // Filtrar los imperios ya añadidos
+  const participantEmpire = document.getElementById("participantEmpire");
+  if (participantEmpire) {
+    const imperiosYaAnadidos = participantesGuerra.map((p) =>
+      parseInt(p.imperioId)
+    );
+
+    participantEmpire.innerHTML =
+      '<option value="">Seleccione un imperio</option>';
+    imperiosDisponibles.forEach((imperio) => {
+      // Solo mostrar imperios que no estén ya añadidos
+      if (!imperiosYaAnadidos.includes(imperio.id)) {
+        const option = document.createElement("option");
+        option.value = imperio.id;
+        option.textContent = imperio.nombre;
+        participantEmpire.appendChild(option);
+      }
+    });
+  }
+
+  modal.style.display = "block";
 }
 
 /**
  * Agrega un participante a la guerra actual
  */
 function agregarParticipante() {
-    const imperioId = document.getElementById('participantEmpire').value;
-    const rol = document.getElementById('participantRole').value;
-    const ganador = document.getElementById('participantWinner').value;
-    
-    if (!imperioId) {
-        mostrarAlerta('error', 'Debe seleccionar un imperio.');
-        return;
-    }
-    
-    // Encontrar el nombre del imperio
-    const imperio = imperiosDisponibles.find(imp => imp.id == imperioId);
-    if (!imperio) {
-        mostrarAlerta('error', 'Imperio no encontrado.');
-        return;
-    }
-    
-    // Crear el objeto participante
-    const participante = {
-        imperioId: imperioId,
-        imperioNombre: imperio.nombre,
-        rol: rol,
-        ganador: ganador === 'true' ? true : ganador === 'false' ? false : null
-    };
-    
-    // Añadir a la lista de participantes
-    participantesGuerra.push(participante);
-    
-    // Actualizar la interfaz
-    actualizarListaParticipantes();
-    
-    // Cerrar el modal
-    cerrarModalParticipante();
-    
-    mostrarAlerta('success', `Imperio "${imperio.nombre}" añadido como "${rol}".`);
+  const imperioId = document.getElementById("participantEmpire").value;
+  const rol = document.getElementById("participantRole").value;
+  const ganador = document.getElementById("participantWinner").value;
+
+  if (!imperioId) {
+    mostrarAlerta("error", "Debe seleccionar un imperio.");
+    return;
+  }
+
+  // Encontrar el nombre del imperio
+  const imperio = imperiosDisponibles.find((imp) => imp.id == imperioId);
+  if (!imperio) {
+    mostrarAlerta("error", "Imperio no encontrado.");
+    return;
+  }
+
+  // Crear el objeto participante
+  const participante = {
+    imperioId: imperioId,
+    imperioNombre: imperio.nombre,
+    rol: rol,
+    ganador: ganador === "true" ? true : ganador === "false" ? false : null,
+  };
+
+  // Añadir a la lista de participantes
+  participantesGuerra.push(participante);
+
+  // Actualizar la interfaz
+  actualizarListaParticipantes();
+
+  // Cerrar el modal
+  cerrarModalParticipante();
+
+  mostrarAlerta(
+    "success",
+    `Imperio "${imperio.nombre}" añadido como "${rol}".`
+  );
 }
 
 /**
  * Actualiza la lista visual de participantes en el modal de guerra
  */
 function actualizarListaParticipantes() {
-    const container = document.getElementById('imperiosParticipantes');
-    if (!container) return;
-    
-    // Limpiar el contenedor
-    container.innerHTML = '';
-    
-    if (participantesGuerra.length === 0) {
-        container.innerHTML = '<p>No hay imperios participantes añadidos.</p>';
-        return;
-    }
-    
-    // Crear la tabla de participantes
-    const table = document.createElement('table');
-    table.className = 'participant-table';
-    
-    // Cabecera de la tabla
-    const thead = document.createElement('thead');
-    thead.innerHTML = `
+  const container = document.getElementById("imperiosParticipantes");
+  if (!container) return;
+
+  // Limpiar el contenedor
+  container.innerHTML = "";
+
+  if (participantesGuerra.length === 0) {
+    container.innerHTML = "<p>No hay imperios participantes añadidos.</p>";
+    return;
+  }
+
+  // Crear la tabla de participantes
+  const table = document.createElement("table");
+  table.className = "participant-table";
+
+  // Cabecera de la tabla
+  const thead = document.createElement("thead");
+  thead.innerHTML = `
         <tr>
             <th>Imperio</th>
             <th>Rol</th>
@@ -365,118 +418,135 @@ function actualizarListaParticipantes() {
             <th>Acciones</th>
         </tr>
     `;
-    table.appendChild(thead);
-    
-    // Cuerpo de la tabla
-    const tbody = document.createElement('tbody');
-    participantesGuerra.forEach((p, index) => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
+  table.appendChild(thead);
+
+  // Cuerpo de la tabla
+  const tbody = document.createElement("tbody");
+  participantesGuerra.forEach((p, index) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
             <td>${p.imperioNombre}</td>
             <td>${p.rol}</td>
-            <td>${p.ganador === true ? 'Sí' : p.ganador === false ? 'No' : 'Sin determinar'}</td>
+            <td>${
+              p.ganador === true
+                ? "Sí"
+                : p.ganador === false
+                ? "No"
+                : "Sin determinar"
+            }</td>
             <td>
                 <button type="button" class="btn-icon delete-participant" data-index="${index}">
                     <i class="fas fa-trash-alt"></i>
                 </button>
             </td>
         `;
-        tbody.appendChild(tr);
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody);
+
+  container.appendChild(table);
+
+  // Añadir eventos a los botones de eliminar
+  document.querySelectorAll(".delete-participant").forEach((btn) => {
+    btn.addEventListener("click", function () {
+      const index = parseInt(this.getAttribute("data-index"));
+      eliminarParticipante(index);
     });
-    table.appendChild(tbody);
-    
-    container.appendChild(table);
-    
-    // Añadir eventos a los botones de eliminar
-    document.querySelectorAll('.delete-participant').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const index = parseInt(this.getAttribute('data-index'));
-            eliminarParticipante(index);
-        });
-    });
+  });
 }
 
 /**
  * Elimina un participante de la lista actual
  */
 function eliminarParticipante(index) {
-    if (index >= 0 && index < participantesGuerra.length) {
-        const nombreImperio = participantesGuerra[index].imperioNombre;
-        participantesGuerra.splice(index, 1);
-        actualizarListaParticipantes();
-        mostrarAlerta('info', `Imperio "${nombreImperio}" eliminado de los participantes.`);
-    }
+  if (index >= 0 && index < participantesGuerra.length) {
+    const nombreImperio = participantesGuerra[index].imperioNombre;
+    participantesGuerra.splice(index, 1);
+    actualizarListaParticipantes();
+    mostrarAlerta(
+      "info",
+      `Imperio "${nombreImperio}" eliminado de los participantes.`
+    );
+  }
 }
 
 /**
  * Cierra el modal de añadir participante
  */
 function cerrarModalParticipante() {
-    const modal = document.getElementById('participantModal');
-    if (modal) {
-        modal.style.display = 'none';
-    }
+  const modal = document.getElementById("participantModal");
+  if (modal) {
+    modal.style.display = "none";
+  }
 }
 
 /**
  * Muestra los detalles de una guerra específica
  */
 function verGuerra(id) {
-    if (id === undefined || id === null) {
-        console.error("ID inválido para verGuerra");
-        mostrarAlerta('error', 'No se puede mostrar la guerra: ID inválido.');
+  if (id === undefined || id === null) {
+    console.error("ID inválido para verGuerra");
+    mostrarAlerta("error", "No se puede mostrar la guerra: ID inválido.");
+    return;
+  }
+  fetch(`/obtener_guerra?id=${id}`)
+    .then((res) => {
+      if (!res.ok) {
+        return res.text().then((text) => {
+          throw new Error(
+            `Error HTTP ${res.status}: ${res.statusText}. Detalle: ${text}`
+          );
+        });
+      }
+      const contentType = res.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        return res.text().then((text) => {
+          throw new TypeError(
+            `Respuesta inesperada del servidor (no es JSON): ${text}`
+          );
+        });
+      }
+      return res.json();
+    })
+    .then((guerra) => {
+      if (!guerra) {
+        throw new Error("No se recibió información de la guerra.");
+      }
+
+      const viewTitle = document.getElementById("viewWarTitle");
+      const detailsContainer = document.getElementById("warDetails");
+      const viewModal = document.getElementById("viewWarModal");
+
+      if (!viewTitle || !detailsContainer || !viewModal) {
+        console.error("Elementos del modal de vista no encontrados.");
         return;
-    }
-    fetch(`/obtener_guerra?id=${id}`)
-        .then(res => {
-            if (!res.ok) {
-                return res.text().then(text => { 
-                    throw new Error(`Error HTTP ${res.status}: ${res.statusText}. Detalle: ${text}`)
-                });
-            }
-            const contentType = res.headers.get("content-type");
-            if (!contentType || !contentType.includes("application/json")) {
-                return res.text().then(text => { 
-                    throw new TypeError(`Respuesta inesperada del servidor (no es JSON): ${text}`)
-                });
-            }
-            return res.json();
-        })
-        .then(guerra => {
-            if (!guerra) {
-                throw new Error("No se recibió información de la guerra.");
-            }
-            
-            const viewTitle = document.getElementById('viewWarTitle');
-            const detailsContainer = document.getElementById('warDetails');
-            const viewModal = document.getElementById('viewWarModal');
+      }
 
-            if (!viewTitle || !detailsContainer || !viewModal) {
-                console.error("Elementos del modal de vista no encontrados.");
-                return;
-            }
+      viewTitle.textContent = guerra.nombre || "Detalles del Conflicto";
 
-            viewTitle.textContent = guerra.nombre || 'Detalles del Conflicto';
+      // Formatear fechas
+      let fechaInicioTexto = "No especificada";
+      if (guerra.fechaInicio) {
+        const fechaInicio = new Date(guerra.fechaInicio);
+        fechaInicioTexto = fechaInicio.toLocaleDateString("es-ES");
+      }
 
-            // Formatear fechas
-            let fechaInicioTexto = 'No especificada';
-            if (guerra.fechaInicio) {
-                const fechaInicio = new Date(guerra.fechaInicio);
-                fechaInicioTexto = fechaInicio.toLocaleDateString('es-ES');
-            }
-            
-            let fechaFinTexto = 'Conflicto activo';
-            let estadoGuerra = '<span class="status-active">Activo</span>';
-            if (guerra.fechaFin) {
-                const fechaFin = new Date(guerra.fechaFin);
-                fechaFinTexto = fechaFin.toLocaleDateString('es-ES');
-                estadoGuerra = '<span class="status-ended">Finalizado</span>';
-            }
+      let fechaFinTexto = "Conflicto activo";
+      let estadoGuerra = '<span class="status-active">Activo</span>';
+      if (guerra.fechaFin) {
+        const fechaFin = new Date(guerra.fechaFin);
+        fechaFinTexto = fechaFin.toLocaleDateString("es-ES");
+        estadoGuerra = '<span class="status-ended">Finalizado</span>';
+      }
 
-            // Renderizar participantes
-            let participantesHTML = '<p>No hay información sobre los participantes.</p>';
-            if (guerra.imperiosParticipantes && guerra.imperiosParticipantes.length > 0) {
-                participantesHTML = `
+      // Renderizar participantes
+      let participantesHTML =
+        "<p>No hay información sobre los participantes.</p>";
+      if (
+        guerra.imperiosParticipantes &&
+        guerra.imperiosParticipantes.length > 0
+      ) {
+        participantesHTML = `
                     <table class="participant-table view-table">
                         <thead>
                             <tr>
@@ -487,28 +557,28 @@ function verGuerra(id) {
                         </thead>
                         <tbody>
                 `;
-                
-                guerra.imperiosParticipantes.forEach(p => {
-                    let resultadoTexto = 'Sin determinar';
-                    if (p.ganador === true) resultadoTexto = 'Ganador';
-                    else if (p.ganador === false) resultadoTexto = 'Derrotado';
-                    
-                    participantesHTML += `
+
+        guerra.imperiosParticipantes.forEach((p) => {
+          let resultadoTexto = "Sin determinar";
+          if (p.ganador === true) resultadoTexto = "Ganador";
+          else if (p.ganador === false) resultadoTexto = "Derrotado";
+
+          participantesHTML += `
                         <tr>
                             <td>${p.imperioNombre}</td>
                             <td>${p.rol}</td>
                             <td>${resultadoTexto}</td>
                         </tr>
                     `;
-                });
-                
-                participantesHTML += `
+        });
+
+        participantesHTML += `
                         </tbody>
                     </table>
                 `;
-            }
+      }
 
-            const detallesHTML = `
+      const detallesHTML = `
                 <div class="war-details">
                     <div class="detail-row">
                         <span class="detail-label">Fecha de Inicio:</span>
@@ -524,7 +594,9 @@ function verGuerra(id) {
                     </div>
                     <div class="detail-row full-width">
                         <span class="detail-label">Descripción:</span>
-                        <div class="detail-description">${guerra.descripcion || 'No hay descripción disponible.'}</div>
+                        <div class="detail-description">${
+                          guerra.descripcion || "No hay descripción disponible."
+                        }</div>
                     </div>
                     <div class="detail-row full-width">
                         <span class="detail-label">Imperios Participantes:</span>
@@ -535,249 +607,284 @@ function verGuerra(id) {
                 </div>
             `;
 
-            detailsContainer.innerHTML = detallesHTML;
-            viewModal.style.display = 'block';
-        })
-        .catch(error => {
-            console.error('Error al obtener la guerra:', error);
-            mostrarAlerta('error', `Error al obtener el conflicto: ${error.message}`);
-        });
+      detailsContainer.innerHTML = detallesHTML;
+      viewModal.style.display = "block";
+    })
+    .catch((error) => {
+      console.error("Error al obtener la guerra:", error);
+      mostrarAlerta("error", `Error al obtener el conflicto: ${error.message}`);
+    });
 }
 
 /**
  * Abre el modal de edición con los datos de la guerra seleccionada
  */
 function editarGuerra(id) {
-    if (id === undefined || id === null) {
-        console.error("ID inválido para editarGuerra");
-        mostrarAlerta('error', 'No se puede editar la guerra: ID inválido.');
-        return;
-    }
-    
-    const form = document.getElementById('warForm');
-    const modalTitle = document.getElementById('warModalTitle');
-    const warIdInput = document.getElementById('warId');
-    const modal = document.getElementById('warModal');
+  if (id === undefined || id === null) {
+    console.error("ID inválido para editarGuerra");
+    mostrarAlerta("error", "No se puede editar la guerra: ID inválido.");
+    return;
+  }
 
-    if (!form || !modalTitle || !warIdInput || !modal) {
-        console.error("Elementos del modal de edición no encontrados.");
-        return;
-    }
+  const form = document.getElementById("warForm");
+  const modalTitle = document.getElementById("warModalTitle");
+  const warIdInput = document.getElementById("warId");
+  const modal = document.getElementById("warModal");
 
-    form.reset();
-    modalTitle.textContent = 'Editar Conflicto';
-    warIdInput.value = id;
-    
-    // Resetear la lista de participantes
-    participantesGuerra = [];
+  if (!form || !modalTitle || !warIdInput || !modal) {
+    console.error("Elementos del modal de edición no encontrados.");
+    return;
+  }
 
-    fetch(`/obtener_guerra?id=${id}`)
-        .then(res => {
-            if (!res.ok) {
-                return res.text().then(text => { 
-                    throw new Error(`Error HTTP ${res.status}: ${res.statusText}. Detalle: ${text}`)
-                });
-            }
-            const contentType = res.headers.get("content-type");
-            if (!contentType || !contentType.includes("application/json")) {
-                return res.text().then(text => { 
-                    throw new TypeError(`Respuesta inesperada del servidor (no es JSON): ${text}`)
-                });
-            }
-            return res.json();
-        })
-        .then(guerra => {
-            if (!guerra) {
-                throw new Error("No se recibió información de la guerra para editar.");
-            }
+  form.reset();
+  modalTitle.textContent = "Editar Conflicto";
+  warIdInput.value = id;
 
-            document.getElementById('warName').value = guerra.nombre || '';
-            document.getElementById('warDescription').value = guerra.descripcion || '';
-            
-            // Formatear fechas
-            if (guerra.fechaInicio) {
-                const fechaInicio = new Date(guerra.fechaInicio);
-                const fechaInicioFormateada = fechaInicio.toISOString().split('T')[0];
-                document.getElementById('warStartDate').value = fechaInicioFormateada;
-            } else {
-                document.getElementById('warStartDate').value = '';
-            }
-            
-            if (guerra.fechaFin) {
-                const fechaFin = new Date(guerra.fechaFin);
-                const fechaFinFormateada = fechaFin.toISOString().split('T')[0];
-                document.getElementById('warEndDate').value = fechaFinFormateada;
-            } else {
-                document.getElementById('warEndDate').value = '';
-            }
-            
-            // Cargar participantes
-            if (guerra.imperiosParticipantes && guerra.imperiosParticipantes.length > 0) {
-                participantesGuerra = [...guerra.imperiosParticipantes];
-                actualizarListaParticipantes();
-            }
+  // Resetear la lista de participantes
+  participantesGuerra = [];
 
-            modal.style.display = 'block';
-        })
-        .catch(error => {
-            console.error('Error al cargar datos de la guerra para editar:', error);
-            mostrarAlerta('error', `Error al cargar datos del conflicto: ${error.message}`);
-            cerrarModal();
+  fetch(`/obtener_guerra?id=${id}`)
+    .then((res) => {
+      if (!res.ok) {
+        return res.text().then((text) => {
+          throw new Error(
+            `Error HTTP ${res.status}: ${res.statusText}. Detalle: ${text}`
+          );
         });
+      }
+      const contentType = res.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        return res.text().then((text) => {
+          throw new TypeError(
+            `Respuesta inesperada del servidor (no es JSON): ${text}`
+          );
+        });
+      }
+      return res.json();
+    })
+    .then((guerra) => {
+      if (!guerra) {
+        throw new Error("No se recibió información de la guerra para editar.");
+      }
+
+      document.getElementById("warName").value = guerra.nombre || "";
+      document.getElementById("warDescription").value =
+        guerra.descripcion || "";
+
+      // Formatear fechas
+      if (guerra.fechaInicio) {
+        const fechaInicio = new Date(guerra.fechaInicio);
+        const fechaInicioFormateada = fechaInicio.toISOString().split("T")[0];
+        document.getElementById("warStartDate").value = fechaInicioFormateada;
+      } else {
+        document.getElementById("warStartDate").value = "";
+      }
+
+      if (guerra.fechaFin) {
+        const fechaFin = new Date(guerra.fechaFin);
+        const fechaFinFormateada = fechaFin.toISOString().split("T")[0];
+        document.getElementById("warEndDate").value = fechaFinFormateada;
+      } else {
+        document.getElementById("warEndDate").value = "";
+      }
+
+      // Cargar participantes
+      if (
+        guerra.imperiosParticipantes &&
+        guerra.imperiosParticipantes.length > 0
+      ) {
+        participantesGuerra = [...guerra.imperiosParticipantes];
+        actualizarListaParticipantes();
+      }
+
+      modal.style.display = "block";
+    })
+    .catch((error) => {
+      console.error("Error al cargar datos de la guerra para editar:", error);
+      mostrarAlerta(
+        "error",
+        `Error al cargar datos del conflicto: ${error.message}`
+      );
+      cerrarModal();
+    });
 }
 
 /**
  * Elimina una guerra tras confirmación del usuario
  */
 function eliminarGuerra(id) {
-    if (id === undefined || id === null) {
-        console.error("ID inválido para eliminarGuerra");
-        mostrarAlerta('error', 'No se puede eliminar la guerra: ID inválido.');
-        return;
-    }
-    
-    if (confirm(`¿Está seguro que desea eliminar la guerra con ID ${id}? Esta acción no se puede deshacer.`)) {
-        fetch(`/eliminar_guerra?id=${id}`)
-            .then(res => {
-                if (!res.ok) {
-                    return res.text().then(text => {
-                        throw new Error(`Error HTTP ${res.status}: ${res.statusText}. Detalle: ${text}`);
-                    });
-                }
-                return res.text();
-            })
-            .then(resultado => {
-                mostrarAlerta('success', `Conflicto ${id} eliminado correctamente. ${resultado}`);
-                cargarGuerras();
-            })
-            .catch(error => {
-                console.error('Error al eliminar la guerra:', error);
-                mostrarAlerta('error', `Error al eliminar conflicto: ${error.message}`);
-            });
-    }
+  if (id === undefined || id === null) {
+    console.error("ID inválido para eliminarGuerra");
+    mostrarAlerta("error", "No se puede eliminar la guerra: ID inválido.");
+    return;
+  }
+
+  if (
+    confirm(
+      `¿Está seguro que desea eliminar la guerra con ID ${id}? Esta acción no se puede deshacer.`
+    )
+  ) {
+    fetch(`/eliminar_guerra?id=${id}`)
+      .then((res) => {
+        if (!res.ok) {
+          return res.text().then((text) => {
+            throw new Error(
+              `Error HTTP ${res.status}: ${res.statusText}. Detalle: ${text}`
+            );
+          });
+        }
+        return res.text();
+      })
+      .then((resultado) => {
+        mostrarAlerta(
+          "success",
+          `Conflicto ${id} eliminado correctamente. ${resultado}`
+        );
+        cargarGuerras();
+      })
+      .catch((error) => {
+        console.error("Error al eliminar la guerra:", error);
+        mostrarAlerta("error", `Error al eliminar conflicto: ${error.message}`);
+      });
+  }
 }
 
 /**
  * Abre el modal para añadir una nueva guerra
  */
 function abrirModalAnadir() {
-    const form = document.getElementById('warForm');
-    const modalTitle = document.getElementById('warModalTitle');
-    const warIdInput = document.getElementById('warId');
-    const modal = document.getElementById('warModal');
+  const form = document.getElementById("warForm");
+  const modalTitle = document.getElementById("warModalTitle");
+  const warIdInput = document.getElementById("warId");
+  const modal = document.getElementById("warModal");
 
-    if (!form || !modalTitle || !warIdInput || !modal) {
-        console.error("Elementos del modal de añadir no encontrados.");
-        return;
-    }
+  if (!form || !modalTitle || !warIdInput || !modal) {
+    console.error("Elementos del modal de añadir no encontrados.");
+    return;
+  }
 
-    form.reset();
-    modalTitle.textContent = 'Registrar Nueva Guerra';
-    warIdInput.value = '';
-    
-    // Limpiar la lista de participantes
-    participantesGuerra = [];
-    actualizarListaParticipantes();
-    
-    modal.style.display = 'block';
+  form.reset();
+  modalTitle.textContent = "Registrar Nueva Guerra";
+  warIdInput.value = "";
+
+  // Limpiar la lista de participantes
+  participantesGuerra = [];
+  actualizarListaParticipantes();
+
+  modal.style.display = "block";
 }
 
 /**
  * Cierra el modal de añadir/editar guerra
  */
 function cerrarModal() {
-    const modal = document.getElementById('warModal');
-    if (modal) {
-        modal.style.display = 'none';
-    }
+  const modal = document.getElementById("warModal");
+  if (modal) {
+    modal.style.display = "none";
+  }
 }
 
 /**
  * Cierra el modal de detalles de la guerra
  */
 function cerrarModalDetalles() {
-    const modal = document.getElementById('viewWarModal');
-    if (modal) {
-        modal.style.display = 'none';
-        const detailsContainer = document.getElementById('warDetails');
-        if (detailsContainer) detailsContainer.innerHTML = '';
-    }
+  const modal = document.getElementById("viewWarModal");
+  if (modal) {
+    modal.style.display = "none";
+    const detailsContainer = document.getElementById("warDetails");
+    if (detailsContainer) detailsContainer.innerHTML = "";
+  }
 }
 
 // Función para guardar una nueva guerra o actualizar una existente
 function guardarGuerra() {
-    const idValue = document.getElementById('warId').value;
-    const id = idValue ? parseInt(idValue) : null; // El ID será null si es una nueva guerra
+  const idValue = document.getElementById("warId").value;
+  const id = idValue ? parseInt(idValue) : null; // El ID será null si es una nueva guerra
 
-    // 1. Construir el objeto JavaScript 'guerraData'
-    const guerraData = {
-        id: id,
-        nombre: document.getElementById('warName').value.trim(),
-        fechaInicio: document.getElementById('warStartDate').value, // Enviar como string YYYY-MM-DD
-        fechaFin: document.getElementById('warEndDate').value || null, // Enviar como string YYYY-MM-DD o null
-        descripcion: document.getElementById('warDescription').value.trim() || null,
-        
-        // Aquí usamos la variable global 'participantesGuerra'
-        //que contiene objetos { imperioId: "1", imperioNombre: "NombreImperio", rol: "Atacante", ganador: true/false/null }
-        // Solo necesitamos enviar imperioId, rol y ganador al backend.
-        // El backend espera List<ParticipanteGuerra>, donde cada ParticipanteGuerra tiene imperioId, rol, ganador.
-        imperiosParticipantes: participantesGuerra.map(p => {
-            return {
-                imperioId: parseInt(p.imperioId), // Debe ser un num
-                rol: p.rol,
-                ganador: p.ganador // Esto ya debería ser true, false, o null desde agregarParticipante
-            };
-        })
-    };
+  // 1. Construir el objeto JavaScript 'guerraData'
+  const guerraData = {
+    id: id,
+    nombre: document.getElementById("warName").value.trim(),
+    fechaInicio: document.getElementById("warStartDate").value, // Enviar como string YYYY-MM-DD
+    fechaFin: document.getElementById("warEndDate").value || null, // Enviar como string YYYY-MM-DD o null
+    descripcion: document.getElementById("warDescription").value.trim() || null,
 
-    // Validación básica
-    if (!guerraData.nombre) {
-        mostrarAlerta('error', 'El nombre del conflicto es obligatorio.');
-        return;
-    }
-    if (!guerraData.fechaInicio) {
-        mostrarAlerta('error', 'La fecha de inicio es obligatoria.');
-        return;
-    }
-    if (guerraData.fechaFin && new Date(guerraData.fechaFin) < new Date(guerraData.fechaInicio)) {
-        mostrarAlerta('error', 'La fecha de finalización no puede ser anterior a la fecha de inicio.');
-        return;
-    }
+    // Aquí usamos la variable global 'participantesGuerra'
+    //que contiene objetos { imperioId: "1", imperioNombre: "NombreImperio", rol: "Atacante", ganador: true/false/null }
+    // Solo necesitamos enviar imperioId, rol y ganador al backend.
+    // El backend espera List<ParticipanteGuerra>, donde cada ParticipanteGuerra tiene imperioId, rol, ganador.
+    imperiosParticipantes: participantesGuerra.map((p) => {
+      return {
+        imperioId: parseInt(p.imperioId), // Debe ser un num
+        rol: p.rol,
+        ganador: p.ganador, // Esto ya debería ser true, false, o null desde agregarParticipante
+      };
+    }),
+  };
 
-    const url = id ? '/actualizar_guerra' : '/aniadir_guerra';
+  // Validación básica
+  if (!guerraData.nombre) {
+    mostrarAlerta("error", "El nombre del conflicto es obligatorio.");
+    return;
+  }
+  if (!guerraData.fechaInicio) {
+    mostrarAlerta("error", "La fecha de inicio es obligatoria.");
+    return;
+  }
+  if (
+    guerraData.fechaFin &&
+    new Date(guerraData.fechaFin) < new Date(guerraData.fechaInicio)
+  ) {
+    mostrarAlerta(
+      "error",
+      "La fecha de finalización no puede ser anterior a la fecha de inicio."
+    );
+    return;
+  }
 
-    console.log("Enviando JSON para guardar guerra a URL:", url);
-    console.log("Datos Guerra:", JSON.stringify(guerraData, null, 2));
+  const url = id ? "/actualizar_guerra" : "/aniadir_guerra";
 
-    // Enviar la petición fetch con método POST y cuerpo JSON
-    fetch(url, {
-        method: 'POST', // Usar POST
-        headers: {
-            'Content-Type': 'application/json' // Indicar que el cuerpo es JSON
-        },
-        body: JSON.stringify(guerraData) // Convertir el objeto JavaScript a un string JSON
+  console.log("Enviando JSON para guardar guerra a URL:", url);
+  console.log("Datos Guerra:", JSON.stringify(guerraData, null, 2));
+
+  // Enviar la petición fetch con método POST y cuerpo JSON
+  fetch(url, {
+    method: "POST", // Usar POST
+    headers: {
+      "Content-Type": "application/json", // Indicar que el cuerpo es JSON
+    },
+    body: JSON.stringify(guerraData), // Convertir el objeto JavaScript a un string JSON
+  })
+    .then((res) => {
+      if (!res.ok) {
+        return res.text().then((text) => {
+          let errorDetail = text;
+          try {
+            const jsonError = JSON.parse(text);
+            errorDetail = jsonError.message || jsonError.error || text;
+          } catch (e) {
+            /* No era JSON */
+          }
+          throw new Error(
+            `Error HTTP ${res.status}: ${res.statusText}. Detalle: ${errorDetail}`
+          );
+        });
+      }
+      return res.text();
     })
-    .then(res => {
-        if (!res.ok) {
-            return res.text().then(text => {
-                let errorDetail = text;
-                try {
-                    const jsonError = JSON.parse(text);
-                    errorDetail = jsonError.message || jsonError.error || text;
-                } catch (e) { /* No era JSON */ }
-                throw new Error(`Error HTTP ${res.status}: ${res.statusText}. Detalle: ${errorDetail}`);
-            });
-        }
-        return res.text(); 
+    .then((resultado) => {
+      mostrarAlerta(
+        "success",
+        id
+          ? "Conflicto actualizado correctamente."
+          : "Conflicto registrado correctamente."
+      );
+      cerrarModal(); // Cierra el modal de añadir/editar guerra
+      cargarGuerras(); // Recargar la lista de guerras para ver los cambios
     })
-    .then(resultado => {
-        mostrarAlerta('success', id ? 'Conflicto actualizado correctamente.' : 'Conflicto registrado correctamente.');
-        cerrarModal(); // Cierra el modal de añadir/editar guerra
-        cargarGuerras(); // Recargar la lista de guerras para ver los cambios
-    })
-    .catch(error => {
-        console.error('Error al guardar la guerra:', error);
-        mostrarAlerta('error', `Error al guardar conflicto: ${error.message}`);
+    .catch((error) => {
+      console.error("Error al guardar la guerra:", error);
+      mostrarAlerta("error", `Error al guardar conflicto: ${error.message}`);
     });
 }
 
@@ -785,130 +892,143 @@ function guardarGuerra() {
  * Aplica filtros seleccionados para filtrar guerras
  */
 function aplicarFiltros() {
-    const estado = document.getElementById('filterStatus').value;
-    const imperioId = document.getElementById('filterEmpire').value;
-    
-    // Construir la URL con los parámetros
-    let url = '/filtrar_guerras?';
-    const params = new URLSearchParams();
-    
-    if (estado) params.append('estado', estado);
-    if (imperioId) params.append('imperioId', imperioId);
-    
-    url += params.toString();
-    
-    // Mostrar indicador de carga
-    const filterResults = document.getElementById('filterResults');
-    if (filterResults) filterResults.textContent = 'Aplicando filtros...';
-    
-    fetch(url)
-        .then(res => {
-            if (!res.ok) {
-                return res.text().then(text => {
-                    throw new Error(`Error HTTP ${res.status}: ${res.statusText}. Detalle: ${text}`);
-                });
-            }
-            const contentType = res.headers.get("content-type");
-            if (!contentType || !contentType.includes("application/json")) {
-                return res.text().then(text => {
-                    throw new TypeError(`Respuesta inesperada del servidor (no es JSON): ${text}`);
-                });
-            }
-            return res.json();
-        })
-        .then(guerras => {
-            let table = $('#warsTable').DataTable();
-            table.clear();
-            
-            if (Array.isArray(guerras)) {
-                table.rows.add(guerras).draw();
-                
-                // Corrige el problema de visualización repintando las filas
-                $('#warsTable tbody tr').each(function(index) {
-                    $(this).css('background-color', index % 2 === 0 ? 'rgba(30, 30, 30, 0.8)' : 'var(--dark-secondary)');
-                });
-                
-                if (filterResults) {
-                    filterResults.textContent = `Se encontraron ${guerras.length} conflictos con los filtros seleccionados.`;
-                }
-            } else {
-                console.error("La respuesta de filtrar_guerras no es un array:", guerras);
-                mostrarAlerta('error', 'Error: Formato de datos de guerras inesperado.');
-                if (filterResults) filterResults.textContent = '';
-            }
-        })
-        .catch(error => {
-            console.error('Error al filtrar guerras:', error);
-            mostrarAlerta('error', `Error al filtrar conflictos: ${error.message}`);
-            if (filterResults) filterResults.textContent = '';
+  const estado = document.getElementById("filterStatus").value;
+  const imperioId = document.getElementById("filterEmpire").value;
+
+  // Construir la URL con los parámetros
+  let url = "/filtrar_guerras?";
+  const params = new URLSearchParams();
+
+  if (estado) params.append("estado", estado);
+  if (imperioId) params.append("imperioId", imperioId);
+
+  url += params.toString();
+
+  // Mostrar indicador de carga
+  const filterResults = document.getElementById("filterResults");
+  if (filterResults) filterResults.textContent = "Aplicando filtros...";
+
+  fetch(url)
+    .then((res) => {
+      if (!res.ok) {
+        return res.text().then((text) => {
+          throw new Error(
+            `Error HTTP ${res.status}: ${res.statusText}. Detalle: ${text}`
+          );
         });
+      }
+      const contentType = res.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        return res.text().then((text) => {
+          throw new TypeError(
+            `Respuesta inesperada del servidor (no es JSON): ${text}`
+          );
+        });
+      }
+      return res.json();
+    })
+    .then((guerras) => {
+      let table = $("#warsTable").DataTable();
+      table.clear();
+
+      if (Array.isArray(guerras)) {
+        table.rows.add(guerras).draw();
+
+        // Corrige el problema de visualización repintando las filas
+        $("#warsTable tbody tr").each(function (index) {
+          $(this).css(
+            "background-color",
+            index % 2 === 0 ? "rgba(30, 30, 30, 0.8)" : "var(--dark-secondary)"
+          );
+        });
+
+        if (filterResults) {
+          filterResults.textContent = `Se encontraron ${guerras.length} conflictos con los filtros seleccionados.`;
+        }
+      } else {
+        console.error(
+          "La respuesta de filtrar_guerras no es un array:",
+          guerras
+        );
+        mostrarAlerta(
+          "error",
+          "Error: Formato de datos de guerras inesperado."
+        );
+        if (filterResults) filterResults.textContent = "";
+      }
+    })
+    .catch((error) => {
+      console.error("Error al filtrar guerras:", error);
+      mostrarAlerta("error", `Error al filtrar conflictos: ${error.message}`);
+      if (filterResults) filterResults.textContent = "";
+    });
 }
 
 /**
  * Resetea todos los filtros y carga todas las guerras
  */
 function resetearFiltros() {
-    const filterStatus = document.getElementById('filterStatus');
-    const filterEmpire = document.getElementById('filterEmpire');
-    
-    if (filterStatus) filterStatus.value = '';
-    if (filterEmpire) filterEmpire.value = '';
-    
-    const filterResults = document.getElementById('filterResults');
-    if (filterResults) filterResults.textContent = '';
-    
-    cargarGuerras();
+  const filterStatus = document.getElementById("filterStatus");
+  const filterEmpire = document.getElementById("filterEmpire");
+
+  if (filterStatus) filterStatus.value = "";
+  if (filterEmpire) filterEmpire.value = "";
+
+  const filterResults = document.getElementById("filterResults");
+  if (filterResults) filterResults.textContent = "";
+
+  cargarGuerras();
 }
 
 /**
  * Muestra alertas en la parte superior derecha de la pantalla
  */
 function mostrarAlerta(tipo, mensaje) {
-    const alertContainer = document.getElementById('alertContainer');
-    if (!alertContainer) {
-        console.error("Contenedor de alertas no encontrado");
-        alert(mensaje);
-        return;
-    }
+  const alertContainer = document.getElementById("alertContainer");
+  if (!alertContainer) {
+    console.error("Contenedor de alertas no encontrado");
+    alert(mensaje);
+    return;
+  }
 
-    const alertDiv = document.createElement('div');
-    alertDiv.className = `alert alert-${tipo}`;
-    
-    // Color según el tipo de alerta
-    switch (tipo) {
-        case 'success':
-            alertDiv.style.backgroundColor = 'var(--success)';
-            break;
-        case 'error':
-            alertDiv.style.backgroundColor = 'var(--error)';
-            break;
-        case 'info':
-            alertDiv.style.backgroundColor = 'var(--info)';
-            break;
-        case 'warning':
-            alertDiv.style.backgroundColor = 'var(--warning)';
-            break;
-    }
-    
-    alertDiv.innerHTML = `
+  const alertDiv = document.createElement("div");
+  alertDiv.className = `alert alert-${tipo}`;
+
+  // Color según el tipo de alerta
+  switch (tipo) {
+    case "success":
+      alertDiv.style.backgroundColor = "var(--success)";
+      break;
+    case "error":
+      alertDiv.style.backgroundColor = "var(--error)";
+      break;
+    case "info":
+      alertDiv.style.backgroundColor = "var(--info)";
+      break;
+    case "warning":
+      alertDiv.style.backgroundColor = "var(--warning)";
+      break;
+  }
+
+  alertDiv.innerHTML = `
         <span>${mensaje}</span>
         <button class="close-alert">&times;</button>
     `;
-    
-    alertContainer.appendChild(alertDiv);
-    
-    // Añadir evento para cerrar la alerta
-    const closeBtn = alertDiv.querySelector('.close-alert');
-    if (closeBtn) {
-        closeBtn.addEventListener('click', function() {
-            alertDiv.remove();
-        });
+
+  alertContainer.appendChild(alertDiv);
+
+  // Añadir evento para cerrar la alerta
+  const closeBtn = alertDiv.querySelector(".close-alert");
+  if (closeBtn) {
+    closeBtn.addEventListener("click", function () {
+      alertDiv.remove();
+    });
+  }
+
+  // Auto-cerrar después de 5 segundos
+  setTimeout(() => {
+    if (alertDiv.parentNode) {
+      alertDiv.remove();
     }
-    
-    // Auto-cerrar después de 5 segundos
-    setTimeout(() => {
-        if (alertDiv.parentNode) {
-            alertDiv.remove();
-        }
-    }, 5000);
+  }, 5000);
 }

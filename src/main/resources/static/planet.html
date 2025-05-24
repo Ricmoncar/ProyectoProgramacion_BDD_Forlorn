@@ -1,199 +1,277 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Planetas - Crónicas del Destino</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.dataTables.min.css">
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.dataTables.min.css"
+    />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
     <script src="js/planet.js"></script>
-</head>
-<body>
+  </head>
+  <body>
+    <div id="alertContainer"></div>
     <!-- Cabecera -->
     <header>
-        <div class="container nav-container">
-            <a href="index.html" class="logo">Crónicas del <span>Destino</span></a>
-            <nav class="nav-links">
-                <a href="index.html" class="active">Inicio</a>
-                <a href="planet.html">Planetas</a>
-                <a href="continent.html">Continentes</a>
-                <a href="biome.html">Biomas</a>
-                <a href="race.html">Razas</a>
-                <a href="empire.html">Imperios</a>
-                <a href="war.html">Guerras</a>
-                <a href="person.html">Personas</a>
-                <a href="equipment.html">Equipamiento</a>
-            </nav>
-        </div>
+      <div class="container nav-container">
+        <a href="index.html" class="logo">Crónicas del <span>Destino</span></a>
+        <nav class="nav-links">
+          <a href="index.html" class="active">Inicio</a>
+          <a href="planet.html">Planetas</a>
+          <a href="continent.html">Continentes</a>
+          <a href="biome.html">Biomas</a>
+          <a href="race.html">Razas</a>
+          <a href="empire.html">Imperios</a>
+          <a href="war.html">Guerras</a>
+          <a href="person.html">Personas</a>
+          <a href="equipment.html">Equipamiento</a>
+        </nav>
+      </div>
     </header>
 
     <!-- Sección de héroe -->
     <section class="hero planet-hero">
-        <div class="hero-content">
-            <h1>Planetas de Forlorn</h1>
-            <p>Explora los misteriosos mundos que conforman el universo de Forlorn. Cada planeta cuenta con características únicas, desde su geografía hasta sus condiciones para albergar vida.</p>
-        </div>
+      <div class="hero-content">
+        <h1>Planetas de Forlorn</h1>
+        <p>
+          Explora los misteriosos mundos que conforman el universo de Forlorn.
+          Cada planeta cuenta con características únicas, desde su geografía
+          hasta sus condiciones para albergar vida.
+        </p>
+      </div>
     </section>
 
     <!-- Sección principal -->
     <section class="section">
-        <div class="container">
-            <h2 class="section-title">Catálogo de Planetas</h2>
-            
-            <!-- Barra de acción para el botón Añadir -->
-            <div class="action-bar" style="margin-bottom: 20px; text-align: right;">
-                <button id="addPlanetBtn" class="btn">
-                    <i class="fas fa-plus"></i> Añadir Planeta
-                </button>
-            </div>
-            
-            <!-- Contenedor de DataTables -->
-            <div class="table-container">
-                <table id="planetsTable" class="display responsive nowrap" style="width:100%">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Nombre</th>
-                            <th>Ubicación</th>
-                            <th>Habitable</th>
-                            <th>Nivel Agua</th>
-                            <th>Tamaño</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Los datos se poblarán mediante DataTables -->
-                    </tbody>
-                </table>
-            </div>
-            
-            <!-- Modal de Añadir/Editar Planeta -->
-            <div id="planetModal" class="modal">
-                <div class="modal-content">
-                    <span class="close-modal">&times;</span>
-                    <h3 id="modalTitle">Añadir Nuevo Planeta</h3>
-                    <form id="planetForm">
-                        <input type="hidden" id="planetId">
-                        
-                        <div class="form-group">
-                            <label for="planetName">Nombre:</label>
-                            <input type="text" id="planetName" class="form-control" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="planetLocation">Ubicación:</label>
-                            <input type="text" id="planetLocation" class="form-control">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="planetHabitable">Habitable:</label>
-                            <select id="planetHabitable" class="form-control">
-                                <option value="1">Sí</option>
-                                <option value="0">No</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="planetWaterLevel">Nivel de Agua (0-100):</label>
-                            <input type="number" id="planetWaterLevel" class="form-control" min="0" max="100" step="0.1">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="planetCreationDate">Fecha de Creación:</label>
-                            <input type="date" id="planetCreationDate" class="form-control">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="planetSize">Tamaño (km):</label>
-                            <input type="number" id="planetSize" class="form-control" min="0" step="0.1">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="planetDensity">Densidad (g/cm³):</label>
-                            <input type="number" id="planetDensity" class="form-control" min="0" step="0.01">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="planetDescription">Descripción:</label>
-                            <textarea id="planetDescription" class="form-control"></textarea>
-                        </div>
-                        
-                        <div class="form-actions">
-                            <button type="button" class="btn" id="cancelBtn" style="background-color: #333;">Cancelar</button>
-                            <button type="submit" class="btn">Guardar</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-            
-            <!-- Modal de Ver Detalles de Planeta -->
-            <div id="viewPlanetModal" class="modal">
-                <div class="modal-content">
-                    <span class="close-modal">&times;</span>
-                    <h3 id="viewPlanetName">Detalles del Planeta</h3>
-                    <div id="planetDetails">
-                        <!-- Los detalles se poblarán mediante JS -->
-                    </div>
-                    <div class="form-actions">
-                        <button type="button" class="btn" id="closeViewBtn">Cerrar</button>
-                    </div>
-                </div>
-            </div>
+      <div class="container">
+        <h2 class="section-title">Catálogo de Planetas</h2>
+
+        <!-- Barra de acción para el botón Añadir -->
+        <div class="action-bar" style="margin-bottom: 20px; text-align: right">
+          <button id="addPlanetBtn" class="btn">
+            <i class="fas fa-plus"></i> Añadir Planeta
+          </button>
         </div>
+
+        <!-- Contenedor de DataTables -->
+        <div class="table-container">
+          <table
+            id="planetsTable"
+            class="display responsive nowrap"
+            style="width: 100%"
+          >
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Ubicación</th>
+                <th>Habitable</th>
+                <th>Nivel Agua</th>
+                <th>Tamaño</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Los datos se poblarán mediante DataTables -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Modal de Añadir/Editar Planeta -->
+        <div id="planetModal" class="modal">
+          <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h3 id="modalTitle">Añadir Nuevo Planeta</h3>
+            <form id="planetForm">
+              <input type="hidden" id="planetId" />
+
+              <div class="form-group">
+                <label for="planetName">Nombre:</label>
+                <input
+                  type="text"
+                  id="planetName"
+                  class="form-control"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="planetLocation">Ubicación:</label>
+                <input type="text" id="planetLocation" class="form-control" />
+              </div>
+
+              <div class="form-group">
+                <label for="planetHabitable">Habitable:</label>
+                <select id="planetHabitable" class="form-control">
+                  <option value="1">Sí</option>
+                  <option value="0">No</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="planetWaterLevel">Nivel de Agua (0-100):</label>
+                <input
+                  type="number"
+                  id="planetWaterLevel"
+                  class="form-control"
+                  min="0"
+                  max="100"
+                  step="0.1"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="planetCreationDate">Fecha de Creación:</label>
+                <input
+                  type="date"
+                  id="planetCreationDate"
+                  class="form-control"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="planetSize">Tamaño (km):</label>
+                <input
+                  type="number"
+                  id="planetSize"
+                  class="form-control"
+                  min="0"
+                  step="0.1"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="planetDensity">Densidad (g/cm³):</label>
+                <input
+                  type="number"
+                  id="planetDensity"
+                  class="form-control"
+                  min="0"
+                  step="0.01"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="planetDescription">Descripción:</label>
+                <textarea
+                  id="planetDescription"
+                  class="form-control"
+                ></textarea>
+              </div>
+
+              <div class="form-actions">
+                <button
+                  type="button"
+                  class="btn"
+                  id="cancelBtn"
+                  style="background-color: #333"
+                >
+                  Cancelar
+                </button>
+                <button type="submit" class="btn">Guardar</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Modal de Ver Detalles de Planeta -->
+        <div id="viewPlanetModal" class="modal">
+          <div class="modal-content">
+            <span class="close-modal">×</span>
+            <h3 id="viewPlanetTitle">Detalles del Planeta</h3>
+            <div id="planetDetails"></div>
+            <div class="form-actions">
+              <button type="button" class="btn" id="closeViewBtn">
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
-    
 
     <!-- Pie de página -->
     <footer>
-        <div class="container">
-            <div class="footer-container">
-                <div class="footer-section">
-                    <h3>Crónicas del Destino</h3>
-                    <p>Un mundo de fantasía meticulosamente creado.</p>
-                    <div class="social-links">
-                        <a href="https://www.facebook.com/people/breadiaofficial/100064053702393/?locale=pt_BR" class="social-link">F</a>
-                        <a href="https://web.telegram.org/k/" class="social-link">T</a>
-                        <a href="https://www.instagram.com/" class="social-link">I</a>
-                        <a href="https://discord.gg/yg5EMCp5dD" class="social-link">D</a>
-                    </div>
-                </div>
-                
-                <div class="footer-section">
-                    <h3>Explorar</h3>
-                    <ul class="footer-links">
-                        <li><a href="planet.html">Planetas</a></li>
-                        <li><a href="continent.html">Continentes</a></li>
-                        <li><a href="biome.html">Biomas</a></li>
-                        <li><a href="race.html">Razas</a></li>
-                        <li><a href="empire.html">Imperios</a></li>
-                        <li><a href="resumen.html">Resumen</a></li>
-                        <li><a href="war.html">Guerras</a></li>
-                        <li><a href="person.html">Personas</a></li>
-                        <li><a href="equipment.html">Equipamiento</a></li>
-                    </ul>
-                </div>
-                 
-                <div class="footer-section">
-                    <h3>Contacto</h3>
-                    <ul class="footer-links">
-                        <li><a href="https://github.com/Ricmoncar">Sobre el Creador</a></li>
-                        <li><a href="https://github.com/Ricmoncar/ProyectoProgramacion_BDD_Forlorn">Contribuir</a></li>
-                        <li><a href="https://github.com/Ricmoncar/ProyectoProgramacion_BDD_Forlorn">Reportar Errores</a></li>
-                        <li><a href="https://github.com/Ricmoncar/ProyectoProgramacion_BDD_Forlorn">Sugerir Mejoras</a></li>
-                    </ul>
-                </div>
+      <div class="container">
+        <div class="footer-container">
+          <div class="footer-section">
+            <h3>Crónicas del Destino</h3>
+            <p>Un mundo de fantasía meticulosamente creado.</p>
+            <div class="social-links">
+              <a
+                href="https://www.facebook.com/people/breadiaofficial/100064053702393/?locale=pt_BR"
+                class="social-link"
+                >F</a
+              >
+              <a href="https://web.telegram.org/k/" class="social-link">T</a>
+              <a href="https://www.instagram.com/" class="social-link">I</a>
+              <a href="https://discord.gg/yg5EMCp5dD" class="social-link">D</a>
             </div>
-            
-            <div class="copyright">
-                <p>&copy; 2025 Crónicas del Destino. Todos los derechos reservados.</p>
-            </div>
+          </div>
+
+          <div class="footer-section">
+            <h3>Explorar</h3>
+            <ul class="footer-links">
+              <li><a href="planet.html">Planetas</a></li>
+              <li><a href="continent.html">Continentes</a></li>
+              <li><a href="biome.html">Biomas</a></li>
+              <li><a href="race.html">Razas</a></li>
+              <li><a href="empire.html">Imperios</a></li>
+              <li><a href="resumen.html">Resumen</a></li>
+              <li><a href="war.html">Guerras</a></li>
+              <li><a href="person.html">Personas</a></li>
+              <li><a href="equipment.html">Equipamiento</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-section">
+            <h3>Contacto</h3>
+            <ul class="footer-links">
+              <li>
+                <a href="https://github.com/Ricmoncar">Sobre el Creador</a>
+              </li>
+              <li>
+                <a
+                  href="https://github.com/Ricmoncar/ProyectoProgramacion_BDD_Forlorn"
+                  >Contribuir</a
+                >
+              </li>
+              <li>
+                <a
+                  href="https://github.com/Ricmoncar/ProyectoProgramacion_BDD_Forlorn"
+                  >Reportar Errores</a
+                >
+              </li>
+              <li>
+                <a
+                  href="https://github.com/Ricmoncar/ProyectoProgramacion_BDD_Forlorn"
+                  >Sugerir Mejoras</a
+                >
+              </li>
+            </ul>
+          </div>
         </div>
+
+        <div class="copyright">
+          <p>
+            &copy; 2025 Crónicas del Destino. Todos los derechos reservados.
+          </p>
+        </div>
+      </div>
     </footer>
-</body>
+  </body>
 </html>

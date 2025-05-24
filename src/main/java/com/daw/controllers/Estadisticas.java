@@ -1,6 +1,9 @@
 
 package com.daw.controllers;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class Estadisticas {
     private Integer id;
     private String tipo;
@@ -94,5 +97,70 @@ public class Estadisticas {
     
     public void setLvl(Integer lvl) {
         this.lvl = lvl;
+    }
+    
+    /**
+     * Crea una copia de estas estadísticas
+     */
+    public Estadisticas copiar() {
+        Estadisticas copia = new Estadisticas();
+        copia.setId(this.id);
+        copia.setTipo(this.tipo);
+        copia.setAtk(this.atk);
+        copia.setDef(this.def);
+        copia.setHp(this.hp);
+        copia.setSpe(this.spe);
+        copia.setMat(this.mat);
+        copia.setMdf(this.mdf);
+        copia.setXp(this.xp);
+        copia.setLvl(this.lvl);
+        return copia;
+    }
+    
+    /**
+     * Aplica un buff parseado desde un string como "+5 ATK, +3 DEF, -2 HP"
+     */
+    public void aplicarBuff(String bufoEstadisticas) {
+        if (bufoEstadisticas == null || bufoEstadisticas.trim().isEmpty()) {
+            return;
+        }
+        
+        // Patrón para encontrar modificadores como "+5 ATK", "-3 DEF", etc.
+        Pattern pattern = Pattern.compile("([+-]?\\d+)\\s+(ATK|DEF|HP|SPE|MAT|MDF)", Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(bufoEstadisticas);
+        
+        while (matcher.find()) {
+            int valor = Integer.parseInt(matcher.group(1));
+            String stat = matcher.group(2).toUpperCase();
+            
+            switch (stat) {
+                case "ATK":
+                    this.atk = (this.atk != null ? this.atk : 0) + valor;
+                    break;
+                case "DEF":
+                    this.def = (this.def != null ? this.def : 0) + valor;
+                    break;
+                case "HP":
+                    this.hp = (this.hp != null ? this.hp : 0) + valor;
+                    break;
+                case "SPE":
+                    this.spe = (this.spe != null ? this.spe : 0) + valor;
+                    break;
+                case "MAT":
+                    this.mat = (this.mat != null ? this.mat : 0) + valor;
+                    break;
+                case "MDF":
+                    this.mdf = (this.mdf != null ? this.mdf : 0) + valor;
+                    break;
+            }
+        }
+        
+        // Asegurar que ninguna estadística sea negativa
+        if (this.atk != null && this.atk < 0) this.atk = 0;
+        if (this.def != null && this.def < 0) this.def = 0;
+        if (this.hp != null && this.hp < 0) this.hp = 1; // HP mínimo de 1
+        if (this.spe != null && this.spe < 0) this.spe = 0;
+        if (this.mat != null && this.mat < 0) this.mat = 0;
+        if (this.mdf != null && this.mdf < 0) this.mdf = 0;
     }
 }

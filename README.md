@@ -15,18 +15,21 @@ Se espera que en la entrega, el proyecto tenga las siguientes cualidades:
 
 | Caracteristica  | Progress |
 | ------------- |:-------------:|
-| Página de Inicio | 75% :negative_squared_cross_mark: |
+| Página de Inicio | Done :white_check_mark: |
 | Conexión a BDD | Done :white_check_mark: |
 | Plantilla CRUD básica | Done :white_check_mark: |
 | Implementación Datatables | Done :white_check_mark: |
-| Planetas | 60% :negative_squared_cross_mark: |
+| Planetas | Done :white_check_mark: |
 | Biomas | Done :white_check_mark: |
 | Continentes | Done :white_check_mark: |
 | Imperios | Done :white_check_mark: |
 | Razas | Done :white_check_mark: |
-| Arma/Armadura | 90% :negative_squared_cross_mark: |
-| Arcana (magia) | 90% :negative_squared_cross_mark: |
-| Personas | 50% :negative_squared_cross_mark: |
+| Arma/Armadura | Done :white_check_mark: |
+| Arcana (magia) | Done :white_check_mark: |
+| Personas | Done :white_check_mark: |
+| Guerra | Done :white_check_mark: |
+| Master Table | Done :white_check_mark: |
+| Styling | Done :white_check_mark: |
 
 
 
